@@ -65,6 +65,8 @@
 .config-alm { background: #fef2e6; color: #d97a27; }
 .config-uni { background: #f1e6fa; color: #ae43f6; }
 .config-client { background: #e6f6ff; color: #1e6aa8; }
+.config-backup { background: #e6ecff; color: #2f54c6; }
+.config-doc { background: #fff4e6; color: #c9741c; }
 .config-btn {
     width: 100%;
     background: #f6f8fb;
@@ -88,10 +90,12 @@
 .config-bottom-row {
     margin-top: 28px;
     display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
     justify-content: center;
 }
 .config-bottom-row .config-card {
-    max-width: 520px;
+    max-width: 420px;
     width: 100%;
 }
 @media (max-width: 900px) {

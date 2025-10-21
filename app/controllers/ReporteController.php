@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../helpers/Session.php';
 require_once __DIR__ . '/../helpers/Database.php';
+require_once __DIR__ . '/../helpers/ActivityLogger.php';
 require_once __DIR__ . '/../models/Producto.php';
 require_once __DIR__ . '/../models/Prestamo.php';
 require_once __DIR__ . '/../models/MovimientoInventario.php';
@@ -335,9 +336,14 @@ class ReporteController
                 $line[] = (string) $value($row);
             }
             fputcsv($output, $line);
-    }
+        }
 
         fclose($output);
+        ActivityLogger::log('reporte_export', 'Exportación CSV de ' . $section, [
+            'section' => $section,
+            'desde' => $desde,
+            'hasta' => $hasta,
+        ]);
     }
 
     private function exportPdf(string $section, array $datasets, bool $mostrarCostos, string $desde, string $hasta): void
@@ -401,6 +407,150 @@ class ReporteController
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename=' . $filename);
         echo $pdf;
+        ActivityLogger::log('reporte_export', 'Exportación PDF de ' . $section, [
+            'section' => $section,
+            'desde' => $desde,
+            'hasta' => $hasta,
+        ]);
+    }
+
+    public function rotacion(): void
+    {
+        Session::requireLogin(['Administrador', 'Almacen']);
+
+        $db = Database::getInstance()->getConnection();
+        $desde = $this->parseDate($_GET['from'] ?? date('Y-m-01'));
+        $hasta = $this->parseDate($_GET['to'] ?? date('Y-m-d'));
+        if ($desde > $hasta) {
+            [$desde, $hasta] = [$hasta, $desde];
+        }
+        $tipoFiltro = $_GET['tipo'] ?? '';
+        $almacenId = $_GET['almacen_id'] ?? '';
+
+        $sql = "SELECT p.id,
+                       p.codigo,
+                       p.nombre,
+                       p.tipo,
+                       p.stock_actual,
+                       p.stock_minimo,
+                       a.nombre AS almacen,
+                       SUM(CASE WHEN m.tipo = 'Salida' THEN m.cantidad ELSE 0 END) AS total_salidas,
+                       SUM(CASE WHEN m.tipo = 'Entrada' THEN m.cantidad ELSE 0 END) AS total_entradas,
+                       MAX(m.fecha) AS ultimo_movimiento
+                FROM productos p
+                LEFT JOIN almacenes a ON p.almacen_id = a.id
+                LEFT JOIN movimientos_inventario m
+                       ON m.producto_id = p.id
+                      AND DATE(m.fecha) BETWEEN ? AND ?";
+        $params = [$desde, $hasta];
+
+        $where = [];
+        if ($tipoFiltro !== '' && in_array($tipoFiltro, Producto::tiposDisponibles(), true)) {
+            $where[] = 'p.tipo = ?';
+            $params[] = $tipoFiltro;
+        }
+        if ($almacenId !== '') {
+            $where[] = 'p.almacen_id = ?';
+            $params[] = (int) $almacenId;
+        }
+        if ($where) {
+            $sql .= ' WHERE ' . implode(' AND ', $where);
+        }
+        $sql .= ' GROUP BY p.id ORDER BY total_salidas DESC, p.nombre ASC';
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $filas = $stmt->fetchAll() ?: [];
+
+        $rotacion = [];
+        foreach ($filas as $fila) {
+            $salidas = (float) ($fila['total_salidas'] ?? 0);
+            $entradas = (float) ($fila['total_entradas'] ?? 0);
+            $stockActual = (float) ($fila['stock_actual'] ?? 0);
+            $stockPromedio = max(1.0, ($stockActual + max($entradas, 0)) / 2);
+            $indice = $salidas > 0 ? $salidas / $stockPromedio : 0.0;
+            $clasificacion = match (true) {
+                $salidas <= 0 => 'Sin movimiento',
+                $indice >= 2 => 'Alta',
+                $indice >= 1 => 'Media',
+                default => 'Baja',
+            };
+            $diasSinMovimiento = null;
+            if (!empty($fila['ultimo_movimiento'])) {
+                $ultimo = new DateTime($fila['ultimo_movimiento']);
+                $fin = new DateTime($hasta);
+                $diasSinMovimiento = $ultimo->diff($fin)->days;
+            }
+
+            $rotacion[] = array_merge($fila, [
+                'indice' => $indice,
+                'clasificacion' => $clasificacion,
+                'dias_sin_movimiento' => $diasSinMovimiento,
+                'salidas' => $salidas,
+                'entradas' => $entradas,
+            ]);
+        }
+
+        if (isset($_GET['export'])) {
+            $filename = 'rotacion_inventario_' . date('Ymd_His');
+            if ($_GET['export'] === 'csv') {
+                header('Content-Type: text/csv; charset=utf-8');
+                header('Content-Disposition: attachment; filename=' . $filename . '.csv');
+                $out = fopen('php://output', 'w');
+                fputs($out, chr(239) . chr(187) . chr(191));
+                fputcsv($out, ['Código', 'Producto', 'Tipo', 'Almacén', 'Stock actual', 'Salidas', 'Entradas', 'Índice', 'Clasificación', 'Último movimiento']);
+                foreach ($rotacion as $row) {
+                    fputcsv($out, [
+                        $row['codigo'],
+                        $row['nombre'],
+                        $row['tipo'],
+                        $row['almacen'],
+                        number_format((float) $row['stock_actual'], 2, '.', ''),
+                        number_format((float) $row['salidas'], 2, '.', ''),
+                        number_format((float) $row['entradas'], 2, '.', ''),
+                        number_format($row['indice'], 2, '.', ''),
+                        $row['clasificacion'],
+                        $row['ultimo_movimiento'] ? date('d/m/Y H:i', strtotime($row['ultimo_movimiento'])) : '-',
+                    ]);
+                }
+                fclose($out);
+                ActivityLogger::log('rotacion_export', 'Exportación CSV de rotación de inventario', [
+                    'tipo' => $tipoFiltro ?: null,
+                    'almacen_id' => $almacenId ?: null,
+                    'desde' => $desde,
+                    'hasta' => $hasta,
+                ]);
+            } elseif ($_GET['export'] === 'pdf') {
+                $lines = ['Rotación de inventario', "Periodo: {$desde} al {$hasta}", ''];
+                $lines[] = 'Código | Producto | Salidas | Índice | Clasificación';
+                $lines[] = str_repeat('-', 80);
+                foreach ($rotacion as $row) {
+                    $lines[] = sprintf(
+                        '%s | %s | %0.2f | %0.2f | %s',
+                        $row['codigo'],
+                        mb_strimwidth($row['nombre'], 0, 30, '…'),
+                        $row['salidas'],
+                        $row['indice'],
+                        $row['clasificacion']
+                    );
+                }
+                $pdf = $this->buildPdfDocument($lines);
+                header('Content-Type: application/pdf');
+                header('Content-Disposition: attachment; filename=' . $filename . '.pdf');
+                echo $pdf;
+                ActivityLogger::log('rotacion_export', 'Exportación PDF de rotación de inventario', [
+                    'tipo' => $tipoFiltro ?: null,
+                    'almacen_id' => $almacenId ?: null,
+                    'desde' => $desde,
+                    'hasta' => $hasta,
+                ]);
+            }
+            return;
+        }
+
+        $almacenes = $db->query('SELECT id, nombre FROM almacenes ORDER BY nombre ASC')->fetchAll();
+        $tiposDisponibles = Producto::tiposDisponibles();
+        include __DIR__ . '/../views/reportes/rotacion.php';
     }
 
     /**

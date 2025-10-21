@@ -54,6 +54,46 @@
     display: flex;
     gap: 12px;
     align-items: center;
+    flex-wrap: wrap;
+}
+
+.productos-import-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.productos-import-form .btn-file {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.productos-import-form .btn-file input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.productos-import-note {
+    margin-top: 8px;
+    color: #6d7aa4;
+    font-size: 0.92rem;
+}
+
+.alert-detail {
+    margin-top: 8px;
+    color: #465477;
+    font-size: 0.92rem;
+}
+
+.alert-detail ul {
+    margin: 6px 0 0 18px;
+    padding: 0;
 }
 
 .productos-stats-grid {

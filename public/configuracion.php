@@ -30,13 +30,18 @@ $nombre = $_SESSION['nombre'] ?? '';
                 <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestión de Usuarios</a>
                 <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
                 <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
+                <a href="compras_proveedor.php"><i class="fa-solid fa-file-invoice"></i> Compras por proveedor</a>
+                <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotación de inventario</a>
                 <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
                 <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="logs.php"><i class="fa-solid fa-clipboard-list"></i> Bitácora</a>
                 <a href="configuracion.php" class="active"><i class="fa-solid fa-gear"></i> Configuración</a>
             <?php elseif ($role === 'Almacen'): ?>
                 <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
-                <a href="revisar_solicitudes.php"><i class="fa-solid fa-inbox"></i> Solicitudes de Material</a>
                 <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
+                <a href="compras_proveedor.php"><i class="fa-solid fa-file-invoice"></i> Compras por proveedor</a>
+                <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotación de inventario</a>
+                <a href="revisar_solicitudes.php"><i class="fa-solid fa-inbox"></i> Solicitudes de Material</a>
                 <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
                 <a href="configuracion.php" class="active"><i class="fa-solid fa-gear"></i> Configuración</a>
             <?php else: ?>
@@ -44,6 +49,7 @@ $nombre = $_SESSION['nombre'] ?? '';
                 <a href="solicitar_material_general.php"><i class="fa-solid fa-cart-plus"></i> Solicitar Material General</a>
                 <a href="mis_solicitudes.php"><i class="fa-solid fa-clipboard-list"></i> Mis Solicitudes</a>
             <?php endif; ?>
+            <a href="documentacion.php"><i class="fa-solid fa-book"></i> Documentación</a>
             <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
     </aside>
@@ -120,6 +126,28 @@ $nombre = $_SESSION['nombre'] ?? '';
                         </div>
                     </div>
                     <a class="config-btn" href="clientes.php">Configurar</a>
+                </div>
+                <?php if ($role === 'Administrador'): ?>
+                <div class="config-card">
+                    <div class="config-card-header">
+                        <span class="config-card-icon config-backup"><i class="fa-solid fa-database"></i></span>
+                        <div>
+                            <div class="config-card-title">Respaldos</div>
+                            <div class="config-card-desc">Descarga la configuración en un archivo JSON</div>
+                        </div>
+                    </div>
+                    <a class="config-btn" href="config_backup.php"><i class="fa-solid fa-download"></i> Descargar respaldo</a>
+                </div>
+                <?php endif; ?>
+                <div class="config-card">
+                    <div class="config-card-header">
+                        <span class="config-card-icon config-doc"><i class="fa-solid fa-book"></i></span>
+                        <div>
+                            <div class="config-card-title">Documentación</div>
+                            <div class="config-card-desc">Guías rápidas de uso e instalación</div>
+                        </div>
+                    </div>
+                    <a class="config-btn" href="documentacion.php"><i class="fa-solid fa-book-open"></i> Ver documentación</a>
                 </div>
             </div>
         </main>

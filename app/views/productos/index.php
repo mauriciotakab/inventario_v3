@@ -9,6 +9,7 @@ if (!empty($alerta['success'])) {
         : 'Producto registrado correctamente.';
 }
 $mensajeEliminado = !empty($alerta['deleted']) ? 'Producto eliminado correctamente.' : null;
+$importResultado = $importAlert ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -47,12 +48,17 @@ $mensajeEliminado = !empty($alerta['deleted']) ? 'Producto eliminado correctamen
                 <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestión de Usuarios</a>
                 <a href="productos.php"class="active"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
                 <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
+                <a href="compras_proveedor.php"><i class="fa-solid fa-file-invoice"></i> Compras por proveedor</a>
+                <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotación de inventario</a>
                 <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
                 <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="logs.php"><i class="fa-solid fa-clipboard-list"></i> Bitácora</a>
                 <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
             <?php elseif ($role === 'Almacen'): ?>
                 <a href="productos.php" class="active"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
                 <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
+                <a href="compras_proveedor.php"><i class="fa-solid fa-file-invoice"></i> Compras por proveedor</a>
+                <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotación de inventario</a>
                 <a href="revisar_solicitudes.php"><i class="fa-solid fa-inbox"></i> Solicitudes de Material</a>
                 <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
                 <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
@@ -60,6 +66,7 @@ $mensajeEliminado = !empty($alerta['deleted']) ? 'Producto eliminado correctamen
                 <a href="solicitudes_crear.php"><i class="fa-solid fa-plus-square"></i> Solicitar Material</a>
                 <a href="mis_solicitudes.php"><i class="fa-solid fa-clipboard-list"></i> Mis Solicitudes</a>
             <?php endif; ?>
+            <a href="documentacion.php"><i class="fa-solid fa-book"></i> Documentación</a>
             <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
     </aside>
@@ -81,6 +88,32 @@ $mensajeEliminado = !empty($alerta['deleted']) ? 'Producto eliminado correctamen
             <?php if ($mensajeEliminado): ?>
                 <div class="alert alert-danger"><i class="fa fa-trash"></i> <?= htmlspecialchars($mensajeEliminado) ?></div>
             <?php endif; ?>
+            <?php if (!empty($importResultado)): ?>
+                <?php
+                    $importSuccess = (int) ($importResultado['success'] ?? 0);
+                    $importProcessed = (int) ($importResultado['processed'] ?? 0);
+                    $importSkipped = (int) ($importResultado['skipped'] ?? 0);
+                    $importErrors = $importResultado['errors'] ?? [];
+                    $hayErroresImport = !empty($importErrors);
+                ?>
+                <div class="alert <?= $hayErroresImport ? 'alert-danger' : 'alert-success' ?>">
+                    <i class="fa <?= $hayErroresImport ? 'fa-circle-exclamation' : 'fa-check-circle' ?>"></i>
+                    Se procesaron <?= $importProcessed ?> filas. Importados correctamente: <?= $importSuccess ?><?= $importSkipped > 0 ? " · Saltados: {$importSkipped}" : '' ?>.
+                    <?php if ($hayErroresImport): ?>
+                        <div class="alert-detail">
+                            <strong>Observaciones:</strong>
+                            <ul>
+                                <?php foreach (array_slice($importErrors, 0, 8) as $error): ?>
+                                    <li><?= htmlspecialchars($error) ?></li>
+                                <?php endforeach; ?>
+                                <?php if (count($importErrors) > 8): ?>
+                                    <li>Se omitieron <?= count($importErrors) - 8 ?> mensajes adicionales.</li>
+                                <?php endif; ?>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
 
             <div class="productos-header">
                 <div>
@@ -88,8 +121,17 @@ $mensajeEliminado = !empty($alerta['deleted']) ? 'Producto eliminado correctamen
                     <p class="productos-header-desc">Administra el catálogo de materiales y herramientas de TAKAB.</p>
                 </div>
                 <div class="productos-header-actions">
+                    <a class="btn-secondary" href="productos_template.php"><i class="fa-solid fa-download"></i> Descargar plantilla</a>
+                    <form class="productos-import-form" action="productos_import.php" method="post" enctype="multipart/form-data">
+                        <label class="btn-secondary btn-file">
+                            <i class="fa-solid fa-file-csv"></i> Seleccionar CSV
+                            <input type="file" name="productos_archivo" accept=".csv,text/csv" required>
+                        </label>
+                        <button type="submit" class="btn-main"><i class="fa-solid fa-upload"></i> Importar productos</button>
+                    </form>
                     <a class="btn-main" href="productos_create.php"><i class="fa fa-plus"></i> Nuevo producto</a>
                 </div>
+                <p class="productos-import-note">Usa la plantilla para cargar múltiples productos. Los valores deben corresponder con los IDs de catálogos ya registrados (categorías, proveedores, almacenes, unidades).</p>
             </div>
 
             <section class="productos-stats-grid">

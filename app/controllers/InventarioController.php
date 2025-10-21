@@ -3,6 +3,7 @@ require_once __DIR__ . '/../models/MovimientoInventario.php';
 require_once __DIR__ . '/../models/Producto.php';
 require_once __DIR__ . '/../models/Almacen.php';
 require_once __DIR__ . '/../helpers/Session.php';
+require_once __DIR__ . '/../helpers/ActivityLogger.php';
 
 class InventarioController
 {
@@ -32,6 +33,11 @@ class InventarioController
                 MovimientoInventario::registrar($data);
                 Producto::sumarStock($data['producto_id'], $data['cantidad']);
                 $msg = "Entrada registrada correctamente.";
+                ActivityLogger::log('inventario_entrada', 'Entrada de inventario registrada', [
+                    'producto_id' => $productoId,
+                    'almacen_id' => $almacenId,
+                    'cantidad' => $cantidad,
+                ]);
             } else {
                 $msg = "Por favor completa los campos obligatorios.";
             }
@@ -68,6 +74,11 @@ class InventarioController
                 MovimientoInventario::registrar($data);
                 Producto::restarStock($data['producto_id'], $data['cantidad']);
                 $msg = "Salida registrada correctamente.";
+                ActivityLogger::log('inventario_salida', 'Salida de inventario registrada', [
+                    'producto_id' => $productoId,
+                    'almacen_id' => $almacenId,
+                    'cantidad' => $cantidad,
+                ]);
             } else {
                 $msg = "Por favor completa los campos obligatorios.";
             }
@@ -122,6 +133,12 @@ class InventarioController
                 if (MovimientoInventario::registrar($data)) {
                     Producto::actualizarAlmacen($productoId, $destinoId);
                     $msg = "Transferencia registrada correctamente.";
+                    ActivityLogger::log('inventario_transferencia', 'Transferencia entre almacenes', [
+                        'producto_id' => $productoId,
+                        'origen' => $origenId,
+                        'destino' => $destinoId,
+                        'cantidad' => $cantidad,
+                    ]);
                 } else {
                     $error = "No fue posible registrar la transferencia. Intenta nuevamente.";
                 }

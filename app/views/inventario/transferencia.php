@@ -37,8 +37,14 @@ $observaciones = $_POST['observaciones'] ?? '';
             <a href="inventario_entradas.php"><i class="fa-solid fa-arrow-down-wide-short"></i> Entradas</a>
             <a href="inventario_salidas.php"><i class="fa-solid fa-arrow-up-short-wide"></i> Salidas</a>
             <a href="inventario_transferencias.php" class="active"><i class="fa-solid fa-right-left"></i> Transferencias</a>
+            <a href="compras_proveedor.php"><i class="fa-solid fa-file-invoice"></i> Compras por proveedor</a>
+            <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotación de inventario</a>
             <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
+            <?php if ($role === 'Administrador'): ?>
+            <a href="logs.php"><i class="fa-solid fa-clipboard-list"></i> Bitácora</a>
+            <?php endif; ?>
             <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
+            <a href="documentacion.php"><i class="fa-solid fa-book"></i> Documentación</a>
             <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
     </aside>

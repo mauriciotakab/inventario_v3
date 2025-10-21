@@ -269,6 +269,14 @@
     background: #ede9ff;
     color: #5b34c9;
 }
+.badge-tipo.consumible {
+    background: #e6f7ff;
+    color: #1e6aa8;
+}
+.badge-tipo.herramienta {
+    background: #f1e6ff;
+    color: #6a36c2;
+}
 
 .badge-warning {
     background: #ffe9e9;
