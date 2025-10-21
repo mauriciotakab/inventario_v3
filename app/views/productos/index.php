@@ -119,6 +119,7 @@ $importResultado = $importAlert ?? null;
                 <div>
                     <h1>Gestión de Productos</h1>
                     <p class="productos-header-desc">Administra el catálogo de materiales y herramientas de TAKAB.</p>
+                    <p class="productos-import-note desktop-only">Usa la plantilla para cargar múltiples productos. Los valores deben corresponder con los IDs de catálogos ya registrados (categorías, proveedores, almacenes, unidades).</p>
                 </div>
                 <div class="productos-header-actions">
                     <a class="btn-secondary" href="productos_template.php"><i class="fa-solid fa-download"></i> Descargar plantilla</a>
@@ -131,7 +132,7 @@ $importResultado = $importAlert ?? null;
                     </form>
                     <a class="btn-main" href="productos_create.php"><i class="fa fa-plus"></i> Nuevo producto</a>
                 </div>
-                <p class="productos-import-note">Usa la plantilla para cargar múltiples productos. Los valores deben corresponder con los IDs de catálogos ya registrados (categorías, proveedores, almacenes, unidades).</p>
+                <p class="productos-import-note mobile-only">Usa la plantilla para cargar múltiples productos. Los valores deben corresponder con los IDs de catálogos ya registrados (categorías, proveedores, almacenes, unidades).</p>
             </div>
 
             <section class="productos-stats-grid">
