@@ -16,7 +16,7 @@ class Session {
         $_SESSION['user_id'] = (int)$u['id'];
         $_SESSION['username'] = $u['username'];
         $_SESSION['nombre'] = $u['nombre_completo'] ?? $u['nombre'] ?? $u['username'];
-        $_SESSION['role'] = $u['role']; // 'Administrador'|'Almacen'|'Empleado'
+        $_SESSION['role'] = $u['role']; // 'Administrador'|'Almacen'|'Empleado'|'Compras'
     }
 
     public static function user(): ?array {
@@ -61,4 +61,5 @@ class Session {
     public const R_ADMIN = 'Administrador';
     public const R_ALMACEN = 'Almacen';
     public const R_EMPLEADO = 'Empleado';
+    public const R_COMPRAS = 'Compras';
 }

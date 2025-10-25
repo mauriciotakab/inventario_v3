@@ -61,6 +61,7 @@
                     <select name="role" required>
                         <option value="Empleado" <?= $usuario['role'] === 'Empleado' ? 'selected' : '' ?>>Empleado</option>
                         <option value="Almacen" <?= $usuario['role'] === 'Almacen' ? 'selected' : '' ?>>Almacén</option>
+                        <option value="Compras" <?= $usuario['role'] === 'Compras' ? 'selected' : '' ?>>Compras</option>
                         <option value="Administrador" <?= $usuario['role'] === 'Administrador' ? 'selected' : '' ?>>Administrador</option>
                     </select>
                     <label class="check-label">

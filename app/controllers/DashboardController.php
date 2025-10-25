@@ -28,6 +28,9 @@ class DashboardController
             case 'Almacen':
                 $datos = array_merge($datos, $this->datosAlmacen($db));
                 break;
+            case 'Compras':
+                $datos = array_merge($datos, $this->datosCompras($db));
+                break;
             case 'Empleado':
                 $datos = array_merge($datos, $this->datosEmpleado($db, $userId));
                 break;
@@ -101,6 +104,28 @@ class DashboardController
             'pendientesAprobar' => $pendientesAprobacion,
             'entregadas' => $entregadas,
             'alertas' => $alertas->fetchAll() ?: [],
+        ];
+    }
+
+    private function datosCompras($db): array
+    {
+        $totalOrdenes = (int) $db->query('SELECT COUNT(*) FROM ordenes_compra')->fetchColumn();
+        $pendientes = (int) $db->query("SELECT COUNT(*) FROM ordenes_compra WHERE estado IN ('Pendiente','Enviada')")->fetchColumn();
+        $recibidasMes = (int) $db->query("SELECT COUNT(*) FROM ordenes_compra WHERE estado = 'Recibida' AND MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())")->fetchColumn();
+        $montoPendiente = (float) $db->query("SELECT COALESCE(SUM(total),0) FROM ordenes_compra WHERE estado IN ('Pendiente','Enviada')")->fetchColumn();
+
+        $ultimasOrdenes = $db->query("SELECT oc.id, oc.fecha, oc.estado, pr.nombre AS proveedor, oc.total
+                                      FROM ordenes_compra oc
+                                      LEFT JOIN proveedores pr ON oc.proveedor_id = pr.id
+                                      ORDER BY oc.fecha DESC
+                                      LIMIT 5")->fetchAll();
+
+        return [
+            'totalOrdenes' => $totalOrdenes,
+            'ordenesPendientes' => $pendientes,
+            'ordenesRecibidasMes' => $recibidasMes,
+            'montoPendiente' => $montoPendiente,
+            'ultimasOrdenes' => $ultimasOrdenes ?: [],
         ];
     }
 

@@ -61,13 +61,22 @@ $alertas = $datos['alertas'] ?? [];
             </div>
         </header>
 
+        <?php
+            $dashboardTitle = match ($role) {
+                'Administrador' => 'Dashboard administrativo',
+                'Almacen' => 'Dashboard almacén',
+                'Compras' => 'Dashboard compras',
+                default => 'Dashboard empleado',
+            };
+        ?>
         <main class="dashboard-main">
             <div class="dashboard-header-row">
                 <div>
-                    <h1><?= $role === 'Administrador' ? 'Dashboard administrativo' : ($role === 'Almacen' ? 'Dashboard almacén' : 'Dashboard empleado') ?></h1>
+                    <h1><?= $dashboardTitle ?></h1>
                     <span class="dashboard-desc">
                         <?php if ($role === 'Administrador'): ?>Resumen general del sistema de inventario TAKAB.
                         <?php elseif ($role === 'Almacen'): ?>Panel para gestión de inventario y solicitudes.
+                        <?php elseif ($role === 'Compras'): ?>Monitorea órdenes de compra y sus estados.
                         <?php else: ?>Resumen de tus solicitudes y actividades.
                         <?php endif; ?>
                     </span>
@@ -115,6 +124,27 @@ $alertas = $datos['alertas'] ?? [];
                         <div class="card-label">Stock bajo</div>
                         <div class="card-value"><?= number_format($datos['stockBajo'] ?? 0) ?></div>
                         <div elass="card-sub">Productos en alerta</div>
+                    </div>
+                <?php elseif ($role === 'Compras'): ?>
+                    <div class="dashboard-card blue">
+                        <div class="card-label">Órdenes registradas</div>
+                        <div class="card-value"><?= number_format($datos['totalOrdenes'] ?? 0) ?></div>
+                        <div class="card-sub">Histórico total</div>
+                    </div>
+                    <div class="dashboard-card yellow">
+                        <div class="card-label">Pendientes</div>
+                        <div class="card-value"><?= number_format($datos['ordenesPendientes'] ?? 0) ?></div>
+                        <div class="card-sub">En proceso o no recibidas</div>
+                    </div>
+                    <div class="dashboard-card red">
+                        <div class="card-label">Recibidas este mes</div>
+                        <div class="card-value"><?= number_format($datos['ordenesRecibidasMes'] ?? 0) ?></div>
+                        <div class="card-sub">Órdenes con ingreso</div>
+                    </div>
+                    <div class="dashboard-card success">
+                        <div class="card-label">Monto pendiente</div>
+                        <div class="card-value">$<?= number_format($datos['montoPendiente'] ?? 0, 2) ?></div>
+                        <div class="card-sub">Suma de órdenes abiertas</div>
                     </div>
                 <?php else: ?>
                     <div class="dashboard-card blue">
@@ -184,6 +214,27 @@ $alertas = $datos['alertas'] ?? [];
                         </table>
                     <?php else: ?>
                         <p class="widget-empty">Sin movimientos recientes en este almacén.</p>
+                    <?php endif; ?>
+                </section>
+            <?php elseif ($role === 'Compras'): ?>
+                <section class="dashboard-widget">
+                    <div class="widget-title primary"><i class="fa-solid fa-file-invoice"></i> Últimas órdenes de compra</div>
+                    <?php if (!empty($datos['ultimasOrdenes'])): ?>
+                        <table class="dashboard-mini-table">
+                            <thead><tr><th>Fecha</th><th>Proveedor</th><th>Estado</th><th>Total</th></tr></thead>
+                            <tbody>
+                            <?php foreach ($datos['ultimasOrdenes'] as $orden): ?>
+                                <tr>
+                                    <td><?= date('d/m', strtotime($orden['fecha'])) ?></td>
+                                    <td><?= htmlspecialchars($orden['proveedor'] ?? '-') ?></td>
+                                    <td><?= htmlspecialchars($orden['estado'] ?? '-') ?></td>
+                                    <td>$<?= number_format((float) ($orden['total'] ?? 0), 2) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p class="widget-empty">Aún no registras órdenes de compra.</p>
                     <?php endif; ?>
                 </section>
             <?php else: ?>

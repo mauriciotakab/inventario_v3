@@ -69,13 +69,14 @@ $buildQuery = function(array $overrides = []) {
             <?php endif; ?>
             <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
             <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-            <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
             <a href="compras_proveedor.php" class="active"><i class="fa-solid fa-file-invoice"></i> Compras por proveedor</a>
+            <a href="compras_nueva.php"><i class="fa-solid fa-plus"></i> Nueva orden</a>
             <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotación de inventario</a>
+            <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
             <?php if ($role === 'Administrador'): ?>
                 <a href="logs.php"><i class="fa-solid fa-clipboard-list"></i> Bitácora</a>
+                <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
             <?php endif; ?>
-            <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
             <a href="documentacion.php"><i class="fa-solid fa-book"></i> Documentación</a>
             <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
@@ -97,6 +98,9 @@ $buildQuery = function(array $overrides = []) {
                     <p class="reportes-desc">Consulta las órdenes de compra registradas por proveedor y periodo.</p>
                 </div>
                 <div class="section-actions">
+                    <?php if (in_array($role, ['Administrador','Compras'], true)): ?>
+                        <a class="btn-main" href="compras_nueva.php"><i class="fa-solid fa-plus"></i> Nueva orden</a>
+                    <?php endif; ?>
                     <a class="btn-secondary" href="<?= $buildQuery(['export' => 'csv', 'section' => 'compras']) ?>"><i class="fa-solid fa-file-csv"></i> Exportar CSV</a>
                 </div>
             </div>
@@ -143,18 +147,21 @@ $buildQuery = function(array $overrides = []) {
 
             <section class="reportes-section">
                 <div class="reportes-table-wrapper">
-                    <table class="compras-table">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Proveedor</th>
-                                <th>Estado</th>
-                                <th>Productos</th>
-                                <th>Importe detalle</th>
-                                <th>Total registrado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                        <table class="compras-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Proveedor</th>
+                                    <th>RFC</th>
+                                    <th>Factura</th>
+                                    <th>Estado</th>
+                                    <th>Productos</th>
+                                    <th>Importe detalle</th>
+                                    <th>Total registrado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                             <?php if (empty($ordenes)): ?>
                                 <tr><td colspan="6" style="text-align:center; padding:24px; color:#7d8bb0;">Sin órdenes en el periodo seleccionado.</td></tr>
                             <?php else: ?>
@@ -162,6 +169,8 @@ $buildQuery = function(array $overrides = []) {
                                     <tr>
                                         <td><?= date('d/m/Y H:i', strtotime($orden['fecha'])) ?></td>
                                         <td><?= htmlspecialchars($orden['proveedor'] ?? 'Desconocido') ?></td>
+                                        <td><?= htmlspecialchars($orden['rfc'] ?? '-') ?></td>
+                                        <td><?= htmlspecialchars($orden['numero_factura'] ?? '-') ?></td>
                                         <td>
                                             <?php
                                                 $estado = strtolower($orden['estado'] ?? 'Pendiente');
@@ -177,6 +186,7 @@ $buildQuery = function(array $overrides = []) {
                                         <td><?= number_format((float) ($orden['total_items'] ?? 0), 2) ?></td>
                                         <td>$<?= number_format((float) ($orden['subtotal'] ?? 0), 2) ?></td>
                                         <td>$<?= number_format((float) ($orden['total'] ?? $orden['subtotal'] ?? 0), 2) ?></td>
+                                        <td><a class="btn-ghost" href="compras_detalle.php?id=<?= $orden['id'] ?>"><i class="fa fa-eye"></i> Ver</a></td>
                                     </tr>
                                     <?php if (!empty($detalles[$orden['id']])): ?>
                                         <tr class="compras-detalle">

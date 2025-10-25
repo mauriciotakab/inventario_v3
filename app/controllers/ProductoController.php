@@ -7,7 +7,7 @@ class ProductoController
 {
     public function index()
     {
-        Session::requireLogin(['Administrador', 'Almacen']);
+        Session::requireLogin(['Administrador', 'Almacen','Compras']);
 
         $filtros = [
             'buscar' => trim($_GET['buscar'] ?? ''),
@@ -98,7 +98,7 @@ class ProductoController
 
     public function create()
     {
-        Session::requireLogin(['Administrador', 'Almacen']);
+        Session::requireLogin(['Administrador', 'Almacen','Compras']);
         $db = Database::getInstance()->getConnection();
         $categorias = $db->query("SELECT id, nombre FROM categorias ORDER BY nombre ASC")->fetchAll();
         $proveedores = $db->query("SELECT id, nombre FROM proveedores ORDER BY nombre ASC")->fetchAll();
@@ -154,7 +154,7 @@ class ProductoController
 
     public function edit($id)
     {
-        Session::requireLogin(['Administrador', 'Almacen']);
+        Session::requireLogin(['Administrador', 'Almacen','Compras']);
         $producto = Producto::find($id);
         if (!$producto) {
             die('Producto no encontrado.');
@@ -215,7 +215,7 @@ class ProductoController
 
     public function view($id)
     {
-        Session::requireLogin(['Administrador', 'Almacen']);
+        Session::requireLogin(['Administrador', 'Almacen','Compras']);
         $producto = Producto::find($id);
         if (!$producto) {
             die('Producto no encontrado.');
@@ -225,7 +225,7 @@ class ProductoController
 
     public function delete($id)
     {
-        Session::requireLogin(['Administrador', 'Almacen']);
+        Session::requireLogin(['Administrador', 'Almacen','Compras']);
         $producto = Producto::find($id);
         Producto::delete($id);
         if ($producto) {

@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../helpers/Session.php';
-Session::requireLogin(['Administrador', 'Almacen']);
+Session::requireLogin(['Administrador', 'Almacen','Compras']);
 
 $role = $_SESSION['role'] ?? 'Administrador';
 $nombre = $_SESSION['nombre'] ?? '';

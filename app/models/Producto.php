@@ -4,7 +4,7 @@ require_once __DIR__ . '/../helpers/Database.php';
 class Producto
 {
     private const ESTADOS = ['Nuevo', 'Usado', 'Dañado', 'En reparación'];
-    private const TIPOS = ['Consumible', 'Herramienta'];
+    private const TIPOS = ['Consumible', 'Herramienta','Equipo'];
 
     public static function all($filtros = [])
     {

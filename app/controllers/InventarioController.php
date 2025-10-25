@@ -9,7 +9,7 @@ class InventarioController
 {
     public function entrada()
     {
-        Session::requireLogin(['Administrador', 'Almacen']);
+        Session::requireLogin(['Administrador', 'Almacen','Compras']);
 
         $productos = Producto::all();
         $almacenes = Almacen::all();
@@ -50,7 +50,7 @@ class InventarioController
 
     public function salida()
     {
-        Session::requireLogin(['Administrador', 'Almacen']);
+        Session::requireLogin(['Administrador', 'Almacen','Compras']);
 
         $productos = Producto::all();
         $almacenes = Almacen::all();
@@ -91,7 +91,7 @@ class InventarioController
 
     public function transferencia()
     {
-        Session::requireLogin(['Administrador', 'Almacen']);
+        Session::requireLogin(['Administrador', 'Almacen','Compras']);
 
         $productos = Producto::all();
         $almacenes = Almacen::all();
