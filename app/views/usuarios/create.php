@@ -1,3 +1,4 @@
+<?php Session::requireLogin('Administrador'); ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -24,6 +25,7 @@
             <div class="form-box">
                 <?php if (!empty($error)) echo "<p class='form-error'>$error</p>"; ?>
                 <form class="usuario-form" method="post" action="">
+                    <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
                     <label>Nombre completo:</label>
                     <input type="text" name="nombre_completo" required>
                     <label>Usuario:</label>

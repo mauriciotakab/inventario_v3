@@ -1,101 +1,132 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../models/Usuario.php';
 require_once __DIR__ . '/../helpers/Session.php';
 
 class UsuarioController
 {
-    public function index()
+    private array $rolesPermitidos = ['Administrador', 'Almacen', 'Empleado', 'Compras'];
+
+    public function index(): void
     {
         Session::requireLogin('Administrador');
         $usuarios = Usuario::all();
         include __DIR__ . '/../views/usuarios/index.php';
     }
 
-    public function create()
+    public function create(): void
     {
         Session::requireLogin('Administrador');
         $error = '';
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Validaciones básicas
-            $username = trim($_POST['username']);
-            $nombre = trim($_POST['nombre_completo']);
-            $password = $_POST['password'];
-            $role = $_POST['role'];
-            $activo = isset($_POST['activo']) ? 1 : 0;
 
-            if (empty($username) || empty($nombre) || empty($password) || empty($role)) {
-                $error = "Todos los campos son obligatorios.";
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+                $error = 'Token CSRF inválido.';
             } else {
-                // Verificar que no exista el usuario
-                if (Usuario::findByUsername($username)) {
-                    $error = "Ese nombre de usuario ya está registrado.";
+                $username = trim($_POST['username'] ?? '');
+                $nombre = trim($_POST['nombre_completo'] ?? '');
+                $password = $_POST['password'] ?? '';
+                $role = $_POST['role'] ?? '';
+                $activo = isset($_POST['activo']);
+
+                if ($username === '' || $nombre === '' || $password === '' || $role === '') {
+                    $error = 'Todos los campos son obligatorios.';
+                } elseif (!in_array($role, $this->rolesPermitidos, true)) {
+                    $error = 'El rol seleccionado no es válido.';
+                } elseif (strlen($password) < 6) {
+                    $error = 'La contraseña debe tener al menos 6 caracteres.';
+                } elseif (Usuario::findByUsername($username)) {
+                    $error = 'Ese nombre de usuario ya está registrado.';
                 } else {
                     Usuario::create([
                         'username' => $username,
                         'password' => $password,
                         'nombre_completo' => $nombre,
                         'role' => $role,
-                        'activo' => $activo
+                        'activo' => $activo ? 1 : 0,
                     ]);
-                    header("Location: usuarios.php?success=1");
+                    header('Location: usuarios.php?success=1');
                     exit();
                 }
             }
         }
+
         include __DIR__ . '/../views/usuarios/create.php';
     }
 
-    public function edit($id)
+    public function edit($id): void
     {
         Session::requireLogin('Administrador');
         $usuario = Usuario::findById($id);
         $error = '';
+
         if (!$usuario) {
-            die("Usuario no encontrado.");
+            die('Usuario no encontrado.');
         }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = trim($_POST['username']);
-            $nombre = trim($_POST['nombre_completo']);
-            $password = $_POST['password'];
-            $role = $_POST['role'];
-            $activo = isset($_POST['activo']) ? 1 : 0;
-            Usuario::update($id, [
-                'username' => $username,
-                'nombre_completo' => $nombre,
-                'password' => $password,
-                'role' => $role,
-                'activo' => $activo
-            ]);
-            header("Location: usuarios.php?success=2");
-            exit();
+            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+                $error = 'Token CSRF inválido.';
+            } else {
+                $username = trim($_POST['username'] ?? '');
+                $nombre = trim($_POST['nombre_completo'] ?? '');
+                $password = $_POST['password'] ?? '';
+                $role = $_POST['role'] ?? '';
+                $activo = isset($_POST['activo']);
+
+                if ($username === '' || $nombre === '' || $role === '') {
+                    $error = 'Todos los campos son obligatorios.';
+                } elseif (!in_array($role, $this->rolesPermitidos, true)) {
+                    $error = 'El rol seleccionado no es válido.';
+                } else {
+                    Usuario::update($id, [
+                        'username' => $username,
+                        'nombre_completo' => $nombre,
+                        'password' => $password,
+                        'role' => $role,
+                        'activo' => $activo ? 1 : 0,
+                    ]);
+                    header('Location: usuarios.php?success=2');
+                    exit();
+                }
+            }
         }
+
         include __DIR__ . '/../views/usuarios/edit.php';
     }
 
     public function delete($id): void
-{
-    Session::requireLogin('Administrador');
+    {
+        Session::requireLogin('Administrador');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Session::checkCsrf($_POST['csrf'] ?? '')) {
+            header('Location: usuarios.php?deleted=0&error=csrf');
+            exit();
+        }
 
-    $id = (int)$id;
-    if ($id <= 0) {
-        header("Location: usuarios.php?deleted=0");
+        $usuarioId = (int) ($id ?: ($_POST['id'] ?? 0));
+        if ($usuarioId <= 0) {
+            header('Location: usuarios.php?deleted=0');
+            exit();
+        }
+
+        try {
+            $ok = Usuario::delete($usuarioId);
+            header('Location: usuarios.php?' . ($ok ? 'deleted=1' : 'deleted=0'));
+        } catch (PDOException $e) {
+            header('Location: usuarios.php?deleted=0&error=fk');
+        }
         exit();
     }
 
-    try {
-        $ok = Usuario::delete($id);
-        header("Location: usuarios.php?" . ($ok ? "deleted=1" : "deleted=0"));
-    } catch (PDOException $e) {
-        header("Location: usuarios.php?deleted=0&error=fk");
-    }
-    exit();
-}
-
-    public function setActive($id, $active)
+    public function setActive($id, $active): void
     {
         Session::requireLogin('Administrador');
-        Usuario::setActive($id, $active);
-        header("Location: usuarios.php");
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Session::checkCsrf($_POST['csrf'] ?? '')) {
+            header('Location: usuarios.php?error=csrf');
+            exit();
+        }
+
+        Usuario::setActive($id, (int) $active);
+        header('Location: usuarios.php');
         exit();
     }
 }

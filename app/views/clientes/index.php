@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin(['Administrador', 'Almacen']);
 $role = $_SESSION['role'] ?? '';
@@ -40,18 +40,25 @@ $role = $_SESSION['role'] ?? '';
     <div class="main-content">
         <div class="page-title">
             <i class="fa fa-building"></i> Clientes
-            <a href="clientes_create.php" class="btn-principal" style="float:right;"><i class="fa fa-plus"></i> Nuevo Cliente</a>
+            <a href="clientes_create.php" class="btn-principal" style="float:right;"><i class="fa fa-plus"></i> Nuevo cliente</a>
         </div>
+
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'csrf'): ?>
+            <div class="alert-error">No pudimos completar la acción solicitada. Inténtalo de nuevo.</div>
+        <?php endif; ?>
+        <?php if (isset($_GET['deleted'])): ?>
+            <div class="alert-success">Cliente eliminado correctamente.</div>
+        <?php endif; ?>
 
         <table class="takab-table">
             <thead>
                 <tr>
-                    <th>Nombre / Razón Social</th>
+                    <th>Nombre / Razón social</th>
                     <th>Contacto</th>
                     <th>Teléfono</th>
                     <th>Email</th>
                     <th>Dirección</th>
-                    <th style="width:160px;">Acciones</th>
+                    <th style="width:180px;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -63,8 +70,12 @@ $role = $_SESSION['role'] ?? '';
                         <td><?= htmlspecialchars($c['email']) ?></td>
                         <td><?= htmlspecialchars($c['direccion']) ?></td>
                         <td>
-                            <a class="btn-secundario" href="clientes_edit.php?id=<?= $c['id'] ?>"><i class="fa fa-edit"></i> Editar</a>
-                            <a class="btn-eliminar" href="clientes_delete.php?id=<?= $c['id'] ?>" onclick="return confirm('¿Eliminar este cliente?')"><i class="fa fa-trash"></i></a>
+                            <a class="btn-secundario" href="clientes_edit.php?id=<?= (int) $c['id'] ?>"><i class="fa fa-edit"></i> Editar</a>
+                            <form method="post" action="clientes_delete.php" style="display:inline-block" onsubmit="return confirm('¿Eliminar este cliente?');">
+                                <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
+                                <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
+                                <button type="submit" class="btn-eliminar"><i class="fa fa-trash"></i></button>
+                            </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>

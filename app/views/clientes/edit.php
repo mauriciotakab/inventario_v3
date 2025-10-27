@@ -1,13 +1,14 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin(['Administrador', 'Almacen']);
 $role = $_SESSION['role'] ?? '';
+$nombre = $_SESSION['nombre'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Editar Cliente | TAKAB</title>
+    <title>Editar cliente | TAKAB</title>
     <link rel="stylesheet" href="/assets/css/dashboard.css">
 </head>
 <body>
@@ -28,26 +29,40 @@ $role = $_SESSION['role'] ?? '';
     </aside>
 
     <div class="main-content">
-        <h2><i class="fa fa-edit"></i> Editar Cliente</h2>
-        <?php if (!empty($msg)) echo "<div class='alert-success'>$msg</div>"; ?>
+        <h2><i class="fa fa-pen"></i> Editar cliente</h2>
+        <?php if (!empty($msg)): ?>
+            <div class="alert-success"><?= htmlspecialchars($msg) ?></div>
+        <?php endif; ?>
+        <?php if (!empty($errors)): ?>
+            <div class="alert-error">
+                <ul>
+                    <?php foreach ($errors as $err): ?>
+                        <li><?= htmlspecialchars($err) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
         <form method="post" class="form-takab">
-            <label>Nombre / Razón Social:
-                <input type="text" name="nombre" required value="<?= htmlspecialchars($cliente['nombre']) ?>">
+            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
+            <label for="nombre">Nombre / Razón social:
+                <input id="nombre" type="text" name="nombre" value="<?= htmlspecialchars($cliente['nombre'] ?? '') ?>" required>
             </label>
-            <label>Contacto:
-                <input type="text" name="contacto" required value="<?= htmlspecialchars($cliente['contacto']) ?>">
+            <label for="contacto">Contacto:
+                <input id="contacto" type="text" name="contacto" value="<?= htmlspecialchars($cliente['contacto'] ?? '') ?>">
             </label>
-            <label>Teléfono:
-                <input type="text" name="telefono" value="<?= htmlspecialchars($cliente['telefono']) ?>">
+            <label for="telefono">Teléfono:
+                <input id="telefono" type="text" name="telefono" value="<?= htmlspecialchars($cliente['telefono'] ?? '') ?>">
             </label>
-            <label>Email:
-                <input type="email" name="email" value="<?= htmlspecialchars($cliente['email']) ?>">
+            <label for="email">Email:
+                <input id="email" type="email" name="email" value="<?= htmlspecialchars($cliente['email'] ?? '') ?>">
             </label>
-            <label>Dirección:
-                <input type="text" name="direccion" value="<?= htmlspecialchars($cliente['direccion']) ?>">
+            <label for="direccion">Dirección:
+                <input id="direccion" type="text" name="direccion" value="<?= htmlspecialchars($cliente['direccion'] ?? '') ?>">
             </label>
-            <button type="submit" class="btn-principal">Guardar Cambios</button>
-            <a href="clientes.php" class="btn-secundario">Cancelar</a>
+            <div class="form-actions">
+                <button type="submit" class="btn-principal">Guardar</button>
+                <a href="clientes.php" class="btn-secundario">Cancelar</a>
+            </div>
         </form>
     </div>
 </div>

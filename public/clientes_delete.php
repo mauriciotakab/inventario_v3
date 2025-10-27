@@ -1,5 +1,5 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../app/controllers/ClienteController.php';
-$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $controller = new ClienteController();
+$id = $_POST['id'] ?? 0;
 $controller->delete($id);

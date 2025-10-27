@@ -1,9 +1,8 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin(['Administrador', 'Almacen']);
 
-$role = $_SESSION['role'];
-
+$role = $_SESSION['role'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -16,10 +15,9 @@ $role = $_SESSION['role'];
 </head>
 <body>
 <div class="main-layout">
-        <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55""></div>
+            <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
             <div>
                 <div class="sidebar-title">TAKAB</div>
                 <div class="sidebar-desc">Dashboard</div>
@@ -31,23 +29,19 @@ $role = $_SESSION['role'];
                 <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestión de Usuarios</a>
                 <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
                 <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-                <a href='revisar_solicitudes.php'><i class="fa-solid fa-comment-medical"></i>Solicitudes de Material</a>
+                <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
                 <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
                 <a href="configuracion.php" class="active"><i class="fa-solid fa-gear"></i> Configuración</a>
- 
             <?php elseif ($role === 'Almacen'): ?>
                 <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
                 <a href="solicitudes.php"><i class="fa-solid fa-inbox"></i> Gestionar Solicitudes</a>
-                <a href='revisar_solicitudes.php'>Solicitudes de Material</a>
-                <a href="configuracion_almacen">Configuración</a>
-
+                <a href="revisar_solicitudes.php"><i class="fa-solid fa-comments"></i> Solicitudes de Material</a>
+                <a href="configuracion_almacen.php"><i class="fa-solid fa-gear"></i> Configuración</a>
             <?php elseif ($role === 'Empleado'): ?>
                 <a href="solicitudes_crear.php"><i class="fa-solid fa-plus-square"></i> Solicitar Material</a>
                 <a href="mis_solicitudes.php"><i class="fa-solid fa-clipboard-list"></i> Mis Solicitudes</a>
-                <a href='solicitar_material_general.php'><i class="bi bi-gear"></i> Solicitar Material/Herramienta General</a>
-
-
-                <?php endif; ?>
+                <a href="solicitar_material_general.php"><i class="fa-solid fa-toolbox"></i> Solicitud general</a>
+            <?php endif; ?>
             <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
     </aside>
@@ -57,8 +51,14 @@ $role = $_SESSION['role'];
                 <div class="prov-title"><i class="fa-solid fa-truck"></i> Proveedores</div>
                 <div class="prov-desc">Listado y gestión de proveedores</div>
             </div>
-            <a href="proveedores_create.php" class="btn-principal"><i class="fa fa-plus"></i> Nuevo Proveedor</a>
+            <a href="proveedores_create.php" class="btn-principal"><i class="fa fa-plus"></i> Nuevo proveedor</a>
         </div>
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'csrf'): ?>
+            <div class="alert-error">No pudimos completar la acción por motivos de seguridad.</div>
+        <?php endif; ?>
+        <?php if (isset($_GET['deleted'])): ?>
+            <div class="alert-success">Proveedor eliminado correctamente.</div>
+        <?php endif; ?>
         <div class="prov-table-card">
             <table class="prov-table">
                 <thead>
@@ -68,7 +68,7 @@ $role = $_SESSION['role'];
                         <th>Teléfono</th>
                         <th>Email</th>
                         <th>Dirección</th>
-                        <th>Condiciones de Pago</th>
+                        <th>Condiciones de pago</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -82,14 +82,14 @@ $role = $_SESSION['role'];
                             <td><?= htmlspecialchars($prov['direccion']) ?></td>
                             <td><?= htmlspecialchars($prov['condiciones_pago']) ?></td>
                             <td>
-                                <a href="proveedores_edit.php?id=<?= $prov['id'] ?>" class="btn-secundario" title="Editar">
+                                <a href="proveedores_edit.php?id=<?= (int) $prov['id'] ?>" class="btn-secundario" title="Editar">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <a href="proveedores_delete.php?id=<?= $prov['id'] ?>" 
-                                   onclick="return confirm('¿Seguro que deseas eliminar este proveedor?')" 
-                                   class="btn-eliminar" title="Eliminar">
-                                    <i class="fa fa-trash"></i>
-                                </a>
+                                <form method="post" action="proveedores_delete.php" style="display:inline-block" onsubmit="return confirm('¿Eliminar este proveedor?');">
+                                    <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
+                                    <input type="hidden" name="id" value="<?= (int) $prov['id'] ?>">
+                                    <button type="submit" class="btn-eliminar" title="Eliminar"><i class="fa fa-trash"></i></button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

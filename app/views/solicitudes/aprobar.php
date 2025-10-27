@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin(['Administrador', 'Almacen']);
 ?>
@@ -94,6 +94,7 @@ Session::requireLogin(['Administrador', 'Almacen']);
         <?php endif; endif; ?>
 
         <form method="post" class="aprobar-form" id="aprobarForm">
+            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
             <label>
                 Observación (opcional, visible para el empleado):
                 <input type="text" name="observacion" class="aprobar-input">

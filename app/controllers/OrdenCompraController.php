@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../helpers/Session.php';
 require_once __DIR__ . '/../helpers/Database.php';
 require_once __DIR__ . '/../helpers/ActivityLogger.php';
@@ -52,6 +52,10 @@ class OrdenCompraController
 
         $errors = [];
         $msg = '';
+
+        if (\['REQUEST_METHOD'] === 'POST' && !Session::checkCsrf(\['csrf'] ?? '')) {
+            \[] = 'Token CSRF inválido.';
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $cabecera = $this->buildCabeceraFromRequest($_POST);
@@ -159,7 +163,7 @@ class OrdenCompraController
                 ];
                 $extras['almacen_destino_id'] = $extras['almacen_destino_id'] ? (int) $extras['almacen_destino_id'] : null;
                 if (empty($extras['almacen_destino_id'])) {
-                    $error = 'Debes seleccionar el almacén destino para registrar la recepción.';
+                    $error = 'Debes seleccionar el almacÃ©n destino para registrar la recepciÃ³n.';
                 } else {
                     try {
                         OrdenCompra::actualizarEstado($id, 'Recibida', $extras);
@@ -170,7 +174,7 @@ class OrdenCompraController
                         header('Location: ordenes_compra_detalle.php?id=' . $id . '&received=1');
                         exit();
                     } catch (\Throwable $e) {
-                        $error = 'No fue posible registrar la recepción: ' . $e->getMessage();
+                        $error = 'No fue posible registrar la recepciÃ³n: ' . $e->getMessage();
                     }
                 }
             } elseif ($accion === 'cancelar' && strtolower($orden['estado']) !== 'cancelada') {
@@ -260,11 +264,11 @@ class OrdenCompraController
                     continue;
                 }
                 if ($codigo === '') {
-                    $errors[] = "El código del nuevo producto es obligatorio (fila " . ($index + 1) . ").";
+                    $errors[] = "El cÃ³digo del nuevo producto es obligatorio (fila " . ($index + 1) . ").";
                     continue;
                 }
                 if (!in_array($tipoProducto, Producto::tiposDisponibles(), true)) {
-                    $errors[] = "El tipo del nuevo producto no es válido (fila " . ($index + 1) . ").";
+                    $errors[] = "El tipo del nuevo producto no es vÃ¡lido (fila " . ($index + 1) . ").";
                     continue;
                 }
 
@@ -341,3 +345,5 @@ class OrdenCompraController
         return (int) $db->lastInsertId();
     }
 }
+
+
