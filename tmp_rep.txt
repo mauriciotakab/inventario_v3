@@ -138,16 +138,14 @@ class ReporteController
     private function reporteValorPorAlmacen(): array
     {
         $db = Database::getInstance()->getConnection();
-        // Agregar por stock por almacén cuando la tabla stock_almacen existe
         $sql = "SELECT a.nombre AS almacen,
-                       COUNT(DISTINCT sa.producto_id) AS productos,
-                       COALESCE(SUM(sa.stock), 0) AS unidades,
-                       COALESCE(SUM(sa.stock * p.costo_compra), 0) AS valor_total
+                       COUNT(p.id) AS productos,
+                       SUM(p.stock_actual) AS unidades,
+                       SUM(p.stock_actual * p.costo_compra) AS valor_total
                 FROM almacenes a
-                LEFT JOIN stock_almacen sa ON sa.almacen_id = a.id
-                LEFT JOIN productos p ON p.id = sa.producto_id
+                LEFT JOIN productos p ON p.almacen_id = a.id
                 GROUP BY a.id
-                ORDER BY valor_total DESC, a.nombre ASC";
+                ORDER BY valor_total DESC";
         return $db->query($sql)->fetchAll();
     }
 
@@ -786,3 +784,4 @@ class ReporteController
         return mb_convert_encoding($text, 'UTF-8', 'UTF-8');
     }
 }
+

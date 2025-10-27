@@ -42,32 +42,31 @@ $importResultado = $importAlert ?? null;
                 <div class="sidebar-desc">Dashboard</div>
             </div>
         </div>
-	<nav class="sidebar-nav">
+        <nav class="sidebar-nav">
             <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
             <?php if ($role === 'Administrador'): ?>
-                <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestión de Usuarios</a>
-                <a href="productos.php"class="active"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
-                <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-                <a href="compras_proveedor.php"><i class="fa-solid fa-file-invoice"></i> Compras por proveedor</a>
-                <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotación de inventario</a>
-                <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
-                <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-                <a href="logs.php"><i class="fa-solid fa-clipboard-list"></i> Bitácora</a>
-                <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
-            <?php elseif ($role === 'Almacen'): ?>
-                <a href="productos.php" class="active"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
-                <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-                <a href="compras_proveedor.php"><i class="fa-solid fa-file-invoice"></i> Compras por proveedor</a>
-                <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotación de inventario</a>
-                <a href="revisar_solicitudes.php"><i class="fa-solid fa-inbox"></i> Solicitudes de Material</a>
-                <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-                <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
-            <?php elseif ($role === 'Empleado'): ?>
-                <a href="solicitudes_crear.php"><i class="fa-solid fa-plus-square"></i> Solicitar Material</a>
-                <a href="mis_solicitudes.php"><i class="fa-solid fa-clipboard-list"></i> Mis Solicitudes</a>
+                <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestion de Usuarios</a>
             <?php endif; ?>
-            <a href="documentacion.php"><i class="fa-solid fa-book"></i> Documentación</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+            <a href="productos.php" class="active"><i class="fa-solid fa-boxes-stacked"></i> Productos</a>
+            <?php if (in_array($role, ['Administrador','Compras','Almacen'], true)): ?>
+                <a href="ordenes_compra.php"><i class="fa-solid fa-file-invoice-dollar"></i> Ordenes de compra</a>
+            <?php endif; ?>
+            <?php if (in_array($role, ['Administrador','Compras'], true)): ?>
+                <a href="ordenes_compra_crear.php"><i class="fa-solid fa-plus"></i> Registrar orden</a>
+            <?php endif; ?>
+            <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
+            <a href="compras_proveedor.php"><i class="fa-solid fa-file-invoice"></i> Compras por proveedor</a>
+            <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotacion de inventario</a>
+            <?php if ($role === 'Administrador' || $role === 'Almacen'): ?>
+                <a href="revisar_solicitudes.php"><i class="fa-solid fa-inbox"></i> Solicitudes de Material</a>
+            <?php endif; ?>
+            <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+            <?php if ($role === 'Administrador'): ?>
+                <a href="logs.php"><i class="fa-solid fa-clipboard-list"></i> Bitacora</a>
+            <?php endif; ?>
+            <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
+            <a href="documentacion.php"><i class="fa-solid fa-book"></i> Documentacion</a>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesion</a>
         </nav>
     </aside>
 

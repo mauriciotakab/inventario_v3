@@ -235,18 +235,96 @@ class Producto
         return $stmt->execute([$estado, $id]);
     }
 
-    public static function sumarStock($id, $cantidad)
+    private static bool $stockTableChecked = false;
+
+    private static function ensureStockTable(\PDO $db): void
     {
-        $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("UPDATE productos SET stock_actual = stock_actual + ? WHERE id = ?");
-        return $stmt->execute([$cantidad, $id]);
+        if (self::$stockTableChecked) return;
+        $sql = "CREATE TABLE IF NOT EXISTS stock_almacen (
+                    producto_id INT NOT NULL,
+                    almacen_id INT NOT NULL,
+                    stock DECIMAL(10,2) NOT NULL DEFAULT 0,
+                    PRIMARY KEY (producto_id, almacen_id),
+                    KEY idx_stock_almacen_prod (producto_id),
+                    KEY idx_stock_almacen_alm (almacen_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+        $db->exec($sql);
+        self::$stockTableChecked = true;
     }
 
-    public static function restarStock($id, $cantidad)
+    public static function sumarStock($id, $cantidad, ?int $almacenId = null)
     {
         $db = Database::getInstance()->getConnection();
+        // Stock global
+        $stmt = $db->prepare("UPDATE productos SET stock_actual = stock_actual + ? WHERE id = ?");
+        $ok = $stmt->execute([$cantidad, $id]);
+        if (!$ok) return false;
+
+        // Stock por almacén
+        if ($almacenId) {
+            self::ensureStockTable($db);
+            $up = $db->prepare("INSERT INTO stock_almacen (producto_id, almacen_id, stock)
+                                VALUES (?, ?, ?)
+                                ON DUPLICATE KEY UPDATE stock = stock + VALUES(stock)");
+            return $up->execute([(int)$id, (int)$almacenId, (float)$cantidad]);
+        }
+        return true;
+    }
+
+    public static function restarStock($id, $cantidad, ?int $almacenId = null)
+    {
+        $db = Database::getInstance()->getConnection();
+        // Stock global
         $stmt = $db->prepare("UPDATE productos SET stock_actual = GREATEST(stock_actual - ?, 0) WHERE id = ?");
-        return $stmt->execute([$cantidad, $id]);
+        $ok = $stmt->execute([$cantidad, $id]);
+        if (!$ok) return false;
+
+        // Stock por almacén
+        if ($almacenId) {
+            self::ensureStockTable($db);
+            // Asegurar no bajar de 0
+            $current = self::stockEnAlmacen($id, $almacenId);
+            $nuevo = max(0.0, (float)$current - (float)$cantidad);
+            $up = $db->prepare("INSERT INTO stock_almacen (producto_id, almacen_id, stock)
+                                VALUES (?, ?, ?)
+                                ON DUPLICATE KEY UPDATE stock = VALUES(stock)");
+            return $up->execute([(int)$id, (int)$almacenId, $nuevo]);
+        }
+        return true;
+    }
+
+    public static function stockEnAlmacen(int $productoId, int $almacenId): float
+    {
+        $db = Database::getInstance()->getConnection();
+        self::ensureStockTable($db);
+        $stmt = $db->prepare("SELECT stock FROM stock_almacen WHERE producto_id = ? AND almacen_id = ?");
+        $stmt->execute([$productoId, $almacenId]);
+        $row = $stmt->fetch();
+        return (float)($row['stock'] ?? 0);
+    }
+
+    public static function moverStock(int $productoId, int $origenId, int $destinoId, float $cantidad): bool
+    {
+        if ($cantidad <= 0) return false;
+        $db = Database::getInstance()->getConnection();
+        self::ensureStockTable($db);
+        $db->beginTransaction();
+        try {
+            $disp = self::stockEnAlmacen($productoId, $origenId);
+            if ($cantidad > $disp) {
+                $db->rollBack();
+                return false;
+            }
+            // Restar en origen (no dejar negativo)
+            self::restarStock($productoId, $cantidad, $origenId);
+            // Sumar en destino
+            self::sumarStock($productoId, $cantidad, $destinoId);
+            $db->commit();
+            return true;
+        } catch (\Throwable $e) {
+            $db->rollBack();
+            return false;
+        }
     }
 
     public static function actualizarAlmacen(int $id, int $almacenId): bool

@@ -141,7 +141,7 @@ if (empty($ordenDatos['detalles'])) {
                 <div class="alert-success"><?= htmlspecialchars($msg) ?></div>
             <?php endif; ?>
 
-            <form method="post">
+            <form method="post" enctype="application/x-www-form-urlencoded"><input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
                 <section class="orden-grid">
                     <div>
                         <label for="proveedor_id">Proveedor *</label>
@@ -432,3 +432,4 @@ if (empty($ordenDatos['detalles'])) {
 </script>
 </body>
 </html>
+

@@ -136,6 +136,7 @@ $nombre = $_SESSION['nombre'] ?? '';
             </section>
 
             <form method="post" id="solicitudForm">
+                <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
                 <input type="hidden" name="material" id="input_materiales">
                 <div class="solicitud-grid">
                     <section class="solicitud-card">

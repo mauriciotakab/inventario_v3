@@ -1,0 +1,68 @@
+public function transferencia()
+    {
+        Session::requireLogin(['Administrador', 'Almacen']);
+
+         = Producto::all();
+         = Almacen::all();
+         = '';
+         = '';
+
+        if (
+            ['REQUEST_METHOD'] === 'POST'
+        ) {
+             = isset(['producto_id']) ? (int) ['producto_id'] : 0;
+             = isset(['almacen_origen_id']) ? (int) ['almacen_origen_id'] : 0;
+             = isset(['almacen_destino_id']) ? (int) ['almacen_destino_id'] : 0;
+             = isset(['cantidad']) ? (float) ['cantidad'] : 0;
+             = trim(['observaciones'] ?? '');
+
+             =  ? Producto::find() : null;
+
+            if ( <= 0 ||  <= 0 ||  <= 0 || !) {
+                 = 'Selecciona un producto y almacenes válidos.';
+            } elseif ( === ) {
+                 = 'El almacén de origen y destino deben ser diferentes.';
+            } elseif ( <= 0) {
+                 = 'Indica una cantidad mayor a cero.';
+            } else {
+                 = Producto::stockEnAlmacen(, );
+                if ( > ) {
+                     = 'La cantidad supera el inventario disponible en el almacén de origen.';
+                } else {
+                     = [
+                        'producto_id' => ,
+                        'tipo' => 'Transferencia',
+                        'cantidad' => ,
+                        'usuario_id' => ['user_id'],
+                        'almacen_origen_id' => ,
+                        'almacen_destino_id' => ,
+                        'observaciones' => 
+                    ];
+
+                    if (
+                        MovimientoInventario::registrar()
+                        && Producto::moverStock(, , , )
+                    ) {
+                         = Producto::stockEnAlmacen(, );
+                        if ((int)(['almacen_id'] ?? 0) ===  &&  <= 0.0) {
+                            Producto::actualizarAlmacen(, );
+                        }
+                         = 'Transferencia registrada correctamente.';
+                        ActivityLogger::log('inventario_transferencia', 'Transferencia entre almacenes', [
+                            'producto_id' => ,
+                            'origen' => ,
+                            'destino' => ,
+                            'cantidad' => ,
+                        ]);
+                    } else {
+                         = 'No fue posible registrar la transferencia. Intenta nuevamente.';
+                    }
+                }
+            }
+        }
+
+         = MovimientoInventario::ultimos('Transferencia', 6);
+
+        include __DIR__ . '/../views/inventario/transferencia.php';
+    }
+

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin(['Administrador', 'Almacen']);
 ?>
@@ -94,9 +94,14 @@ Session::requireLogin(['Administrador', 'Almacen']);
         <?php endif; endif; ?>
 
         <form method="post" class="entregar-form" id="entregarForm">
+            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
             <label>
                 Observación de entrega (opcional):
                 <input type="text" name="observacion" class="entregar-input">
+            </label>
+            <label>
+                Fecha estimada de devolución (solo herramientas):
+                <input type="date" name="fecha_estimada_devolucion" class="entregar-input">
             </label>
             <div class="entregar-actions">
                 <button type="submit" class="btn-entregar" onclick="return confirmarEntrega(event);">

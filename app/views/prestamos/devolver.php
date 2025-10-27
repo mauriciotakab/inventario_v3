@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin(['Administrador', 'Almacen']);
 ?>
@@ -39,6 +39,7 @@ Session::requireLogin(['Administrador', 'Almacen']);
             </div>
         </div>
         <form method="post" class="devolver-form">
+            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
             <label for="estado_devolucion">Estado al devolver:</label>
             <select name="estado_devolucion" id="estado_devolucion" class="devolver-select" required>
                 <option value="Bueno">Bueno</option>

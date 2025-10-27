@@ -1,9 +1,10 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../models/MovimientoInventario.php';
 require_once __DIR__ . '/../models/Producto.php';
 require_once __DIR__ . '/../models/Almacen.php';
 require_once __DIR__ . '/../helpers/Session.php';
 require_once __DIR__ . '/../helpers/ActivityLogger.php';
+require_once __DIR__ . '/../helpers/Database.php';
 
 class InventarioController
 {
@@ -16,30 +17,34 @@ class InventarioController
         $msg = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $productoId = $_POST['producto_id'] ?? null;
-            $almacenId = $_POST['almacen_id'] ?? null;
-            $cantidad = isset($_POST['cantidad']) ? (float) $_POST['cantidad'] : 0;
-
-            if ($productoId && $almacenId && $cantidad > 0) {
-                $data = [
-                    'producto_id' => $productoId,
-                    'tipo' => 'Entrada',
-                    'cantidad' => $cantidad,
-                    'usuario_id' => $_SESSION['user_id'],
-                    'almacen_destino_id' => $almacenId,
-                    'observaciones' => trim($_POST['observaciones'] ?? '')
-                ];
-
-                MovimientoInventario::registrar($data);
-                Producto::sumarStock($data['producto_id'], $data['cantidad']);
-                $msg = "Entrada registrada correctamente.";
-                ActivityLogger::log('inventario_entrada', 'Entrada de inventario registrada', [
-                    'producto_id' => $productoId,
-                    'almacen_id' => $almacenId,
-                    'cantidad' => $cantidad,
-                ]);
+            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+                $msg = 'Token CSRF inválido.';
             } else {
-                $msg = "Por favor completa los campos obligatorios.";
+                $productoId = $_POST['producto_id'] ?? null;
+                $almacenId = $_POST['almacen_id'] ?? null;
+                $cantidad = isset($_POST['cantidad']) ? (float) $_POST['cantidad'] : 0;
+
+                if ($productoId && $almacenId && $cantidad > 0) {
+                    $data = [
+                        'producto_id' => $productoId,
+                        'tipo' => 'Entrada',
+                        'cantidad' => $cantidad,
+                        'usuario_id' => $_SESSION['user_id'],
+                        'almacen_destino_id' => $almacenId,
+                        'observaciones' => trim($_POST['observaciones'] ?? '')
+                    ];
+
+                    MovimientoInventario::registrar($data);
+                    Producto::sumarStock($data['producto_id'], $data['cantidad'], (int)$almacenId);
+                    $msg = "Entrada registrada correctamente.";
+                    ActivityLogger::log('inventario_entrada', 'Entrada de inventario registrada', [
+                        'producto_id' => $productoId,
+                        'almacen_id' => $almacenId,
+                        'cantidad' => $cantidad,
+                    ]);
+                } else {
+                    $msg = "Por favor completa los campos obligatorios.";
+                }
             }
         }
 
@@ -57,30 +62,34 @@ class InventarioController
         $msg = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $productoId = $_POST['producto_id'] ?? null;
-            $almacenId = $_POST['almacen_id'] ?? null;
-            $cantidad = isset($_POST['cantidad']) ? (float) $_POST['cantidad'] : 0;
-
-            if ($productoId && $almacenId && $cantidad > 0) {
-                $data = [
-                    'producto_id' => $productoId,
-                    'tipo' => 'Salida',
-                    'cantidad' => $cantidad,
-                    'usuario_id' => $_SESSION['user_id'],
-                    'almacen_origen_id' => $almacenId,
-                    'observaciones' => trim($_POST['observaciones'] ?? '')
-                ];
-
-                MovimientoInventario::registrar($data);
-                Producto::restarStock($data['producto_id'], $data['cantidad']);
-                $msg = "Salida registrada correctamente.";
-                ActivityLogger::log('inventario_salida', 'Salida de inventario registrada', [
-                    'producto_id' => $productoId,
-                    'almacen_id' => $almacenId,
-                    'cantidad' => $cantidad,
-                ]);
+            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+                $msg = 'Token CSRF inválido.';
             } else {
-                $msg = "Por favor completa los campos obligatorios.";
+                $productoId = $_POST['producto_id'] ?? null;
+                $almacenId = $_POST['almacen_id'] ?? null;
+                $cantidad = isset($_POST['cantidad']) ? (float) $_POST['cantidad'] : 0;
+
+                if ($productoId && $almacenId && $cantidad > 0) {
+                    $data = [
+                        'producto_id' => $productoId,
+                        'tipo' => 'Salida',
+                        'cantidad' => $cantidad,
+                        'usuario_id' => $_SESSION['user_id'],
+                        'almacen_origen_id' => $almacenId,
+                        'observaciones' => trim($_POST['observaciones'] ?? '')
+                    ];
+
+                    MovimientoInventario::registrar($data);
+                    Producto::restarStock($data['producto_id'], $data['cantidad'], (int)$almacenId);
+                    $msg = "Salida registrada correctamente.";
+                    ActivityLogger::log('inventario_salida', 'Salida de inventario registrada', [
+                        'producto_id' => $productoId,
+                        'almacen_id' => $almacenId,
+                        'cantidad' => $cantidad,
+                    ]);
+                } else {
+                    $msg = "Por favor completa los campos obligatorios.";
+                }
             }
         }
 
@@ -91,7 +100,7 @@ class InventarioController
 
     public function transferencia()
     {
-        Session::requireLogin(['Administrador', 'Almacen']);
+        Session::requireLogin(["Administrador", "Almacen"]);
 
         $productos = Producto::all();
         $almacenes = Almacen::all();
@@ -99,48 +108,54 @@ class InventarioController
         $error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $productoId = isset($_POST['producto_id']) ? (int) $_POST['producto_id'] : 0;
-            $origenId = isset($_POST['almacen_origen_id']) ? (int) $_POST['almacen_origen_id'] : 0;
-            $destinoId = isset($_POST['almacen_destino_id']) ? (int) $_POST['almacen_destino_id'] : 0;
-            $cantidad = isset($_POST['cantidad']) ? (float) $_POST['cantidad'] : 0;
-            $observaciones = trim($_POST['observaciones'] ?? '');
-
-            $producto = $productoId ? Producto::find($productoId) : null;
-
-            if ($productoId <= 0 || $origenId <= 0 || $destinoId <= 0 || !$producto) {
-                $error = "Selecciona un producto y almacenes válidos.";
-            } elseif ($origenId === $destinoId) {
-                $error = "El almacén de origen y destino deben ser diferentes.";
-            } elseif ((int) ($producto['almacen_id'] ?? 0) !== $origenId) {
-                $error = "El producto seleccionado no pertenece al almacén de origen.";
-            } elseif ($cantidad <= 0) {
-                $error = "Indica una cantidad mayor a cero.";
-            } elseif ($cantidad > (float) ($producto['stock_actual'] ?? 0)) {
-                $error = "La cantidad supera el inventario disponible del producto.";
-            } elseif ($cantidad < (float) ($producto['stock_actual'] ?? 0)) {
-                $error = "Por ahora solo se permite trasladar la totalidad del stock del producto.";
+            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+                $error = 'Token CSRF inválido.';
             } else {
-                $data = [
-                    'producto_id' => $productoId,
-                    'tipo' => 'Transferencia',
-                    'cantidad' => $cantidad,
-                    'usuario_id' => $_SESSION['user_id'],
-                    'almacen_origen_id' => $origenId,
-                    'almacen_destino_id' => $destinoId,
-                    'observaciones' => $observaciones
-                ];
+                $productoId = isset($_POST['producto_id']) ? (int) $_POST['producto_id'] : 0;
+                $origenId = isset($_POST['almacen_origen_id']) ? (int) $_POST['almacen_origen_id'] : 0;
+                $destinoId = isset($_POST['almacen_destino_id']) ? (int) $_POST['almacen_destino_id'] : 0;
+                $cantidad = isset($_POST['cantidad']) ? (float) $_POST['cantidad'] : 0;
+                $observaciones = trim($_POST['observaciones'] ?? '');
 
-                if (MovimientoInventario::registrar($data)) {
-                    Producto::actualizarAlmacen($productoId, $destinoId);
-                    $msg = "Transferencia registrada correctamente.";
-                    ActivityLogger::log('inventario_transferencia', 'Transferencia entre almacenes', [
-                        'producto_id' => $productoId,
-                        'origen' => $origenId,
-                        'destino' => $destinoId,
-                        'cantidad' => $cantidad,
-                    ]);
+                $producto = $productoId ? Producto::find($productoId) : null;
+
+                if ($productoId <= 0 || $origenId <= 0 || $destinoId <= 0 || !$producto) {
+                    $error = "Selecciona un producto y almacenes válidos.";
+                } elseif ($origenId === $destinoId) {
+                    $error = "El almacén de origen y destino deben ser diferentes.";
+                } elseif ($cantidad <= 0) {
+                    $error = "Indica una cantidad mayor a cero.";
                 } else {
-                    $error = "No fue posible registrar la transferencia. Intenta nuevamente.";
+                    $disponible = Producto::stockEnAlmacen($productoId, $origenId);
+                    if ($cantidad > $disponible) {
+                        $error = "La cantidad supera el inventario disponible en el almacén de origen.";
+                    } else {
+                        $data = [
+                            'producto_id' => $productoId,
+                            'tipo' => 'Transferencia',
+                            'cantidad' => $cantidad,
+                            'usuario_id' => $_SESSION['user_id'],
+                            'almacen_origen_id' => $origenId,
+                            'almacen_destino_id' => $destinoId,
+                            'observaciones' => $observaciones
+                        ];
+
+                        if (MovimientoInventario::registrar($data) && Producto::moverStock($productoId, $origenId, $destinoId, $cantidad)) {
+                            $restante = Producto::stockEnAlmacen($productoId, $origenId);
+                            if ((int)($producto['almacen_id'] ?? 0) === $origenId && $restante <= 0.0) {
+                                Producto::actualizarAlmacen($productoId, $destinoId);
+                            }
+                            $msg = "Transferencia registrada correctamente.";
+                            ActivityLogger::log('inventario_transferencia', 'Transferencia entre almacenes', [
+                                'producto_id' => $productoId,
+                                'origen' => $origenId,
+                                'destino' => $destinoId,
+                                'cantidad' => $cantidad,
+                            ]);
+                        } else {
+                            $error = "No fue posible registrar la transferencia. Intenta nuevamente.";
+                        }
+                    }
                 }
             }
         }
@@ -219,3 +234,4 @@ class InventarioController
         include __DIR__ . '/../views/inventario/actual.php';
     }
 }
+?>

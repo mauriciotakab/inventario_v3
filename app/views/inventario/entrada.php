@@ -31,20 +31,26 @@ $observaciones = $_POST['observaciones'] ?? '';
         </div>
         <nav class="sidebar-nav">
             <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
+            <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Productos</a>
+            <?php if (in_array($role, ['Administrador','Compras','Almacen'], true)): ?>
+                <a href="ordenes_compra.php"><i class="fa-solid fa-file-invoice-dollar"></i> Ordenes de compra</a>
+            <?php endif; ?>
+            <?php if (in_array($role, ['Administrador','Compras'], true)): ?>
+                <a href="ordenes_compra_crear.php"><i class="fa-solid fa-plus"></i> Registrar orden</a>
+            <?php endif; ?>
             <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
             <a href="inventario_entradas.php" class="active"><i class="fa-solid fa-arrow-down"></i> Entradas</a>
             <a href="inventario_salidas.php"><i class="fa-solid fa-arrow-up"></i> Salidas</a>
             <a href="inventario_transferencias.php"><i class="fa-solid fa-right-left"></i> Transferencias</a>
             <a href="compras_proveedor.php"><i class="fa-solid fa-file-invoice"></i> Compras por proveedor</a>
-            <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotación de inventario</a>
+            <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotacion de inventario</a>
             <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
             <?php if ($role === 'Administrador'): ?>
-            <a href="logs.php"><i class="fa-solid fa-clipboard-list"></i> Bitácora</a>
+            <a href="logs.php"><i class="fa-solid fa-clipboard-list"></i> Bitacora</a>
             <?php endif; ?>
-            <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
-            <a href="documentacion.php"><i class="fa-solid fa-book"></i> Documentación</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+            <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
+            <a href="documentacion.php"><i class="fa-solid fa-book"></i> Documentacion</a>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesion</a>
         </nav>
     </aside>
 
@@ -74,7 +80,7 @@ $observaciones = $_POST['observaciones'] ?? '';
             <div class="inventario-form-grid">
                 <section class="inventario-form-card">
                     <h2><i class="fa fa-clipboard"></i> Detalles de la entrada</h2>
-                    <form method="post" autocomplete="off" class="inventario-entry-form">
+                    <form method="post" enctype="application/x-www-form-urlencoded"><input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>" autocomplete="off" class="inventario-entry-form">
                         <div class="form-field">
                             <label for="producto_id">Producto *</label>
                             <select id="producto_id" name="producto_id" required>
@@ -243,3 +249,4 @@ if (productosSelect.value) {
 </script>
 </body>
 </html>
+

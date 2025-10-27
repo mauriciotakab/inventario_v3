@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin(['Administrador', 'Almacen']);
 require_once __DIR__ . '/../../models/Prestamo.php';
@@ -7,12 +7,21 @@ $nombre = $_SESSION['nombre'] ?? '';
 
 // Parámetros de búsqueda y paginación
 $busqueda = trim($_GET['q'] ?? '');
+$estado = trim($_GET['estado'] ?? '');
+$desde = trim($_GET['desde'] ?? '');
+$hasta = trim($_GET['hasta'] ?? '');
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $porPagina = 9;
 
-$prestamos = Prestamo::historialPaginado($busqueda, $page, $porPagina);
-$total = Prestamo::totalHistorial($busqueda);
-$totalPages = ceil($total / $porPagina);
+$filtros = [
+    'estado' => $estado,
+    'desde' => $desde,
+    'hasta' => $hasta,
+];
+
+$prestamos = Prestamo::historialPaginado($busqueda, $page, $porPagina, $filtros);
+$total = Prestamo::totalHistorial($busqueda, $filtros);
+$totalPages = ceil(($total ?: 0) / $porPagina);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -25,10 +34,10 @@ $totalPages = ceil($total / $porPagina);
 </head>
 <body>
 <div class="main-layout">
-            <!-- Sidebar -->
+    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55""></div>
+            <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
             <div>
                 <div class="sidebar-title">TAKAB</div>
                 <div class="sidebar-desc">Dashboard</div>
@@ -42,16 +51,16 @@ $totalPages = ceil($total / $porPagina);
                 <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
                 <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
                 <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
-                <a href='prestamos_pendientes.php'>- Préstamos Pendientes</a>
-                <a href='prestamos_historial.php' class="active">- Historial de Préstamos</a>
+                <a href="prestamos_pendientes.php">- Préstamos Pendientes</a>
+                <a href="prestamos_historial.php" class="active">- Historial de Préstamos</a>
                 <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
                 <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
             <?php elseif ($role === 'Almacen'): ?>
                 <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
                 <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
                 <a href="revisar_solicitudes.php"><i class="fa-solid fa-inbox"></i> Solicitudes de Material</a>
-                <a href='prestamos_pendientes.php'>- Préstamos Pendientes</a>
-                <a href='prestamos_historial.php' class="active">- Historial de Préstamos</a>
+                <a href="prestamos_pendientes.php">- Préstamos Pendientes</a>
+                <a href="prestamos_historial.php" class="active">- Historial de Préstamos</a>
                 <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
                 <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
             <?php elseif ($role === 'Empleado'): ?>
@@ -60,24 +69,30 @@ $totalPages = ceil($total / $porPagina);
             <?php endif; ?>
             <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
-
-
     </aside>
+
     <div class="historial-main">
         <div class="historial-title">
             <i class="fa-solid fa-history"></i>
             Historial de Préstamos de Herramientas
         </div>
-<div class="search-bar">
-    <form method="get" action="">
-        <input type="text" name="q" value="<?= htmlspecialchars($busqueda) ?>"
-            placeholder="Buscar por código o trabajador..." class="takab-search-input">
-        <button type="submit" class="takab-search-btn">
-            <i class="fa fa-search"></i>
-            <span class="hidden-xs">Buscar</span>
-        </button>
-    </form>
-</div>
+
+        <div class="search-bar">
+            <form method="get" action="">
+                <input type="text" name="q" value="<?= htmlspecialchars($busqueda) ?>" placeholder="Buscar por código o trabajador..." class="takab-search-input">
+                <select name="estado" class="takab-search-input">
+                    <option value="">Todos los estados</option>
+                    <option value="Prestado" <?= $estado === 'Prestado' ? 'selected' : '' ?>>Prestado</option>
+                    <option value="Devuelto" <?= $estado === 'Devuelto' ? 'selected' : '' ?>>Devuelto</option>
+                </select>
+                <input type="date" name="desde" value="<?= htmlspecialchars($desde) ?>" class="takab-search-input" title="Desde">
+                <input type="date" name="hasta" value="<?= htmlspecialchars($hasta) ?>" class="takab-search-input" title="Hasta">
+                <button type="submit" class="takab-search-btn">
+                    <i class="fa fa-filter"></i>
+                    <span class="hidden-xs">Filtrar</span>
+                </button>
+            </form>
+        </div>
 
         <table class="takab-table">
             <thead>
@@ -102,8 +117,8 @@ $totalPages = ceil($total / $porPagina);
                         <td><?= htmlspecialchars($p['fecha_devolucion']) ?></td>
                         <td>
                             <?php
-                            $estado = strtolower($p['estado']);
-                            $clase = match($estado) {
+                            $estadoPrestamo = strtolower($p['estado']);
+                            $clase = match($estadoPrestamo) {
                                 'pendiente' => 'badge-pendiente',
                                 'devuelto', 'devuelta' => 'badge-devuelto',
                                 'vencido' => 'badge-vencido',
@@ -124,8 +139,7 @@ $totalPages = ceil($total / $porPagina);
                             echo "<span class='badge $claseEd'>" . ucfirst(htmlspecialchars($p['estado_devolucion'])) . "</span>";
                             ?>
                         </td>
-                        <td><?= htmlspecialchars($p['observaciones']) ?></td>
-                        <td><?= htmlspecialchars($p['observaciones_devolucion'] ?? '') ?></td>
+                        <td><?= htmlspecialchars($p['observaciones_devolucion'] ?? $p['observaciones'] ?? '') ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -136,7 +150,7 @@ $totalPages = ceil($total / $porPagina);
                 <?php if ($i == $page): ?>
                     <span class="active"><?= $i ?></span>
                 <?php else: ?>
-                    <a href="?q=<?= urlencode($busqueda) ?>&page=<?= $i ?>"><?= $i ?></a>
+                    <a href="?q=<?= urlencode($busqueda) ?>&estado=<?= urlencode($estado) ?>&desde=<?= urlencode($desde) ?>&hasta=<?= urlencode($hasta) ?>&page=<?= $i ?>"><?= $i ?></a>
                 <?php endif; ?>
             <?php endfor; ?>
         </div>

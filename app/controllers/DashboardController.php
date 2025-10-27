@@ -45,13 +45,15 @@ class DashboardController
         $stockBajo = (int) $db->query('SELECT COUNT(*) FROM productos WHERE stock_actual < stock_minimo')->fetchColumn();
         $valorTotal = (float) $db->query('SELECT SUM(stock_actual * costo_compra) FROM productos')->fetchColumn();
         $herramientasPrestadas = (int) $db->query("SELECT COUNT(*) FROM prestamos WHERE estado = 'Prestado'")->fetchColumn();
+        $prestamosVencidos = (int) $db->query("SELECT COUNT(*) FROM prestamos WHERE estado = 'Prestado' AND fecha_estimada_devolucion IS NOT NULL AND fecha_estimada_devolucion < NOW()")->fetchColumn();
 
         return [
             'totalProductos' => $totalProductos,
             'stockBajo' => $stockBajo,
             'valorTotalInventario' => $valorTotal,
             'herramientasPrestadas' => $herramientasPrestadas,
-            'alertas' => $this->alertasInventario($db),
+            'alertas' => array_merge($this->alertasInventario($db), $this->alertasPrestamosVencidos($db)),
+            'prestamosVencidos' => $prestamosVencidos,
         ];
     }
 
@@ -118,6 +120,30 @@ class DashboardController
             $alertas[] = [
                 $p['nombre'] . ' por debajo del stock mínimo',
                 $p['fecha'],
+                'alta',
+            ];
+        }
+        return $alertas;
+    }
+
+    private function alertasPrestamosVencidos($db): array
+    {
+        $stmt = $db->query("SELECT p.nombre AS producto, pr.fecha_estimada_devolucion, u.nombre_completo AS empleado
+                             FROM prestamos pr
+                             LEFT JOIN productos p ON pr.producto_id = p.id
+                             LEFT JOIN usuarios u ON pr.empleado_id = u.id
+                             WHERE pr.estado = 'Prestado'
+                               AND pr.fecha_estimada_devolucion IS NOT NULL
+                               AND pr.fecha_estimada_devolucion < NOW()
+                             ORDER BY pr.fecha_estimada_devolucion ASC
+                             LIMIT 5");
+        $rows = $stmt->fetchAll() ?: [];
+        $alertas = [];
+        foreach ($rows as $r) {
+            $fecha = date('d/m/Y', strtotime($r['fecha_estimada_devolucion']));
+            $alertas[] = [
+                'Préstamo vencido: ' . ($r['producto'] ?? 'Herramienta') . ' (' . ($r['empleado'] ?? 'Empleado') . ')',
+                $fecha,
                 'alta',
             ];
         }
