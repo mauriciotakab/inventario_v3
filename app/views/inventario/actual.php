@@ -32,6 +32,7 @@ $valorMax = htmlspecialchars($filtros['valor_max'] ?? '', ENT_QUOTES, 'UTF-8');
 $fechaDesde = htmlspecialchars($filtros['fecha_desde'] ?? '', ENT_QUOTES, 'UTF-8');
 $fechaHasta = htmlspecialchars($filtros['fecha_hasta'] ?? '', ENT_QUOTES, 'UTF-8');
 $unidadMedidaId = htmlspecialchars($filtros['unidad_medida_id'] ?? '', ENT_QUOTES, 'UTF-8');
+$codigoBarrasFiltro = htmlspecialchars($filtros['codigo_barras'] ?? '', ENT_QUOTES, 'UTF-8');
 
 $buildQuery = function(array $overrides = []) {
     $params = array_merge($_GET, $overrides);
@@ -145,6 +146,10 @@ $buildQuery = function(array $overrides = []) {
                                 <i class="fa fa-search"></i>
                                 <input type="text" id="buscar" name="buscar" placeholder="Nombre, código, descripción o proveedor" value="<?= $buscar ?>">
                             </div>
+                        </div>
+                        <div class="inv-filter-field">
+                            <label for="codigo_barras">Codigo de barras</label>
+                            <input type="text" id="codigo_barras" name="codigo_barras" value="<?= htmlspecialchars($filtros['codigo_barras'] ?? '') ?>" placeholder="Escanea o escribe codigo">
                         </div>
                         <div class="inv-filter-field">
                             <label for="categoria_id">Categoría</label>

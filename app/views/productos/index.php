@@ -129,6 +129,7 @@ $importResultado = $importAlert ?? null;
                         </label>
                         <button type="submit" class="btn-main"><i class="fa-solid fa-upload"></i> Importar productos</button>
                     </form>
+                    <a class="btn-secondary" href="productos_barcode.php"><i class="fa fa-barcode"></i> Buscar por codigo</a>
                     <a class="btn-main" href="productos_create.php"><i class="fa fa-plus"></i> Nuevo producto</a>
                 </div>
                 <p class="productos-import-note mobile-only">Usa la plantilla para cargar mAoltiples productos. Los valores deben corresponder con los IDs de catAlogos ya registrados (categorAas, proveedores, almacenes, unidades).</p>
@@ -330,6 +331,7 @@ $importResultado = $importAlert ?? null;
                                 ?>
                                 <tr>
                                     <td><span class="mono"><?= htmlspecialchars($producto['codigo']) ?></span></td>
+                                    <td><span class="mono"><?= htmlspecialchars($producto['codigo_barras'] ?? '') ?></span></td>
                                     <td>
                                         <strong><?= htmlspecialchars($producto['nombre']) ?></strong>
                                         <?php if (!empty($producto['tags'])): ?>
@@ -356,6 +358,7 @@ $importResultado = $importAlert ?? null;
                                     <td class="col-actions">
                                         <a class="btn-table" title="Ver detalle" href="productos_view.php?id=<?= $producto['id'] ?>"><i class="fa fa-eye"></i></a>
                                         <a class="btn-table" title="Editar" href="productos_edit.php?id=<?= $producto['id'] ?>"><i class="fa fa-pen"></i></a>
+                                        <a class="btn-table" title="Imprimir etiqueta" href="productos_etiqueta.php?id=<?= $producto['id'] ?>"><i class="fa fa-barcode"></i></a>
                                         <form method="post" action="productos_setactive.php" class="inline-form" style="display:inline-block">
                                             <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
                                             <input type="hidden" name="id" value="<?= (int) $producto['id'] ?>">

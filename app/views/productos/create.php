@@ -83,6 +83,11 @@ $error = $error ?? '';
                             <input type="text" id="codigo" name="codigo" value="<?= htmlspecialchars($values['codigo'] ?? '') ?>" required>
                         </div>
                         <div class="productos-form-field">
+                            <label for="codigo_barras">Codigo de barras</label>
+                            <input type="text" id="codigo_barras" name="codigo_barras" value="<?= htmlspecialchars($values['codigo_barras'] ?? '') ?>" placeholder="Generado automaticamente si se deja vacio">
+                            <span class="productos-form-note">Escanea o deja vacio para autogenerar.</span>
+                        </div>
+                        <div class="productos-form-field">
                             <label for="nombre">Nombre *</label>
                             <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars($values['nombre'] ?? '') ?>" required>
                         </div>

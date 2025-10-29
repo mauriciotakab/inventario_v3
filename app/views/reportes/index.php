@@ -7,6 +7,19 @@ $filters = $filters ?? [];
 $fechaInicio = htmlspecialchars($filters['from'] ?? date('Y-m-01'), ENT_QUOTES, 'UTF-8');
 $fechaFin = htmlspecialchars($filters['to'] ?? date('Y-m-d'), ENT_QUOTES, 'UTF-8');
 $movTipo = htmlspecialchars($filters['mov_tipo'] ?? '', ENT_QUOTES, 'UTF-8');
+$movAlmacenSeleccionado = htmlspecialchars($filters['mov_almacen_id'] ?? '', ENT_QUOTES, 'UTF-8');
+$invAlmacenSeleccionado = htmlspecialchars($filters['inv_almacen_id'] ?? '', ENT_QUOTES, 'UTF-8');
+$invCategoriaSeleccionada = htmlspecialchars($filters['inv_categoria_id'] ?? '', ENT_QUOTES, 'UTF-8');
+$proveedorSeleccionado = htmlspecialchars($filters['proveedor_id'] ?? '', ENT_QUOTES, 'UTF-8');
+$topTipoSeleccionado = htmlspecialchars($filters['top_tipo'] ?? '', ENT_QUOTES, 'UTF-8');
+$topAlmacenSeleccionado = htmlspecialchars($filters['top_almacen_id'] ?? '', ENT_QUOTES, 'UTF-8');
+
+$proveedores = is_array($proveedores ?? null) ? $proveedores : [];
+$almacenes = is_array($almacenes ?? null) ? $almacenes : [];
+$categorias = is_array($categorias ?? null) ? $categorias : [];
+$tiposProducto = is_array($tiposProducto ?? null) ? $tiposProducto : [];
+$comprasListado = is_array($comprasListado ?? null) ? $comprasListado : [];
+$comprasResumen = is_array($comprasResumen ?? null) ? $comprasResumen : ['total' => 0, 'proveedores' => []];
 
 $buildQuery = function(array $overrides = []) {
     $params = array_merge($_GET, $overrides);
@@ -152,6 +165,80 @@ $buildQuery = function(array $overrides = []) {
                 <?php endif; ?>
             </section>
             <?php endif; ?>
+
+            <?php if ($mostrarCostos): ?>
+            <section class="reportes-section">
+                <div class="section-header">
+                    <div>
+                        <h2><i class="fa fa-file-invoice-dollar"></i> Compras por proveedor</h2>
+                        <span class="section-sub">Órdenes registradas entre <?= $fechaInicio ?> y <?= $fechaFin ?>.</span>
+                    </div>
+                    <div class="section-actions">
+                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'compras_proveedor']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
+                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'compras_proveedor']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
+                    </div>
+                </div>
+                <?php if (empty($comprasListado)): ?>
+                    <div class="reportes-empty">
+                        <i class="fa fa-info-circle"></i>
+                        <p>No se registraron compras en el periodo seleccionado.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="reportes-summary-inline">
+                        <div class="reportes-summary-card success">
+                            <span class="label">Total periodo</span>
+                            <span class="value">$<?= number_format((float) ($comprasResumen['total'] ?? 0), 2) ?></span>
+                        </div>
+                        <?php foreach (array_slice($comprasResumen['proveedores'] ?? [], 0, 3) as $resProveedor): ?>
+                            <div class="reportes-summary-card sky">
+                                <span class="label"><?= htmlspecialchars($resProveedor['proveedor']) ?></span>
+                                <span class="value">$<?= number_format((float) $resProveedor['importe'], 2) ?></span>
+                                <span class="foot">Órdenes: <?= number_format((int) $resProveedor['ordenes']) ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="reportes-table-wrapper">
+                        <table class="reportes-table">
+                            <thead>
+                                <tr>
+                                    <th>Orden</th>
+                                    <th>Fecha</th>
+                                    <th>Proveedor</th>
+                                    <th>RFC proveedor</th>
+                                    <th>RFC orden</th>
+                                    <th>Factura</th>
+                                    <th>Estado</th>
+                                    <th>Almacen</th>
+                                    <th>Productos</th>
+                                    <th>Importe detalle</th>
+                                    <th>Importe total</th>
+                                    <th>Registrado por</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($comprasListado as $compra): ?>
+                                    <tr>
+                                        <td>#<?= (int) $compra['orden_id'] ?></td>
+                                        <td><?= date('d/m/Y', strtotime($compra['fecha'])) ?></td>
+                                        <td><?= htmlspecialchars($compra['proveedor']) ?></td>
+                                        <td><?= htmlspecialchars($compra['proveedor_rfc'] ?? '-') ?></td>
+                                        <td><?= htmlspecialchars($compra['orden_rfc'] ?? '-') ?></td>
+                                        <td><?= htmlspecialchars($compra['numero_factura'] ?? '-') ?></td>
+                                        <td><?= htmlspecialchars($compra['estado']) ?></td>
+                                        <td><?= htmlspecialchars($compra['almacen']) ?></td>
+                                        <td><?= number_format((float) $compra['total_items'], 2) ?></td>
+                                        <td>$<?= number_format((float) $compra['importe_detalle'], 2) ?></td>
+                                        <td>$<?= number_format((float) $compra['importe_total'], 2) ?></td>
+                                        <td><?= htmlspecialchars($compra['creado_por'] ?? '-') ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </section>
+            <?php endif; ?>
+
             <?php
                 $consumiblesListado = $productosPorTipo['consumibles'] ?? [];
                 $herramientasListado = $productosPorTipo['herramientas'] ?? [];
@@ -225,9 +312,67 @@ $buildQuery = function(array $overrides = []) {
                                 <option value="Transferencia" <?= $movTipo === 'Transferencia' ? 'selected' : '' ?>>Transferencia</option>
                             </select>
                         </div>
+                        <div class="filter-field">
+                            <label for="mov_almacen_id">Movimientos (almacen)</label>
+                            <select id="mov_almacen_id" name="mov_almacen_id">
+                                <option value="">Todos</option>
+                                <?php foreach ($almacenes as $almacen): ?>
+                                    <option value="<?= (int) $almacen['id'] ?>" <?= $movAlmacenSeleccionado === (string) $almacen['id'] ? 'selected' : '' ?>><?= htmlspecialchars($almacen['nombre']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <div class="filter-actions">
                             <button type="submit" class="btn-main"><i class="fa fa-filter"></i> Actualizar</button>
                             <a class="btn-ghost" href="reportes.php"><i class="fa fa-eraser"></i> Limpiar</a>
+                        </div>
+                    </div>
+                    <div class="filter-row">
+                        <div class="filter-field">
+                            <label for="proveedor_id">Proveedor (compras)</label>
+                            <select id="proveedor_id" name="proveedor_id">
+                                <option value="">Todos</option>
+                                <?php foreach ($proveedores as $proveedor): ?>
+                                    <option value="<?= (int) $proveedor['id'] ?>" <?= $proveedorSeleccionado === (string) $proveedor['id'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($proveedor['nombre']) ?><?= !empty($proveedor['rfc']) ? ' - ' . htmlspecialchars($proveedor['rfc']) : '' ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="filter-field">
+                            <label for="inv_almacen_id">Inventario bajo (almacen)</label>
+                            <select id="inv_almacen_id" name="inv_almacen_id">
+                                <option value="">Todos</option>
+                                <?php foreach ($almacenes as $almacen): ?>
+                                    <option value="<?= (int) $almacen['id'] ?>" <?= $invAlmacenSeleccionado === (string) $almacen['id'] ? 'selected' : '' ?>><?= htmlspecialchars($almacen['nombre']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="filter-field">
+                            <label for="inv_categoria_id">Inventario bajo (categoria)</label>
+                            <select id="inv_categoria_id" name="inv_categoria_id">
+                                <option value="">Todas</option>
+                                <?php foreach ($categorias as $categoria): ?>
+                                    <option value="<?= (int) $categoria['id'] ?>" <?= $invCategoriaSeleccionada === (string) $categoria['id'] ? 'selected' : '' ?>><?= htmlspecialchars($categoria['nombre']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="filter-field">
+                            <label for="top_tipo">Top salidas (tipo)</label>
+                            <select id="top_tipo" name="top_tipo">
+                                <option value="">Todos</option>
+                                <?php foreach ($tiposProducto as $tipoProducto): ?>
+                                    <option value="<?= htmlspecialchars($tipoProducto) ?>" <?= $topTipoSeleccionado === $tipoProducto ? 'selected' : '' ?>><?= htmlspecialchars($tipoProducto) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="filter-field">
+                            <label for="top_almacen_id">Top salidas (almacen)</label>
+                            <select id="top_almacen_id" name="top_almacen_id">
+                                <option value="">Todos</option>
+                                <?php foreach ($almacenes as $almacen): ?>
+                                    <option value="<?= (int) $almacen['id'] ?>" <?= $topAlmacenSeleccionado === (string) $almacen['id'] ? 'selected' : '' ?>><?= htmlspecialchars($almacen['nombre']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
                 </form>
@@ -487,6 +632,8 @@ $buildQuery = function(array $overrides = []) {
                                 <tr>
                                     <th>Codigo</th>
                                     <th>Producto</th>
+                                    <th>Tipo</th>
+                                    <th>Almacen</th>
                                     <th>Cantidad salida</th>
                                     <?php if ($mostrarCostos): ?><th>Costo estimado (MXN)</th><?php endif; ?>
                                 </tr>
@@ -496,6 +643,8 @@ $buildQuery = function(array $overrides = []) {
                                     <tr>
                                         <td><span class="mono"><?= htmlspecialchars($row['codigo']) ?></span></td>
                                         <td><?= htmlspecialchars($row['nombre']) ?></td>
+                                        <td><?= htmlspecialchars($row['tipo'] ?? '-') ?></td>
+                                        <td><?= htmlspecialchars($row['almacen'] ?? '-') ?></td>
                                         <td><?= number_format((float) $row['total_salidas'], 2) ?></td>
                                         <?php if ($mostrarCostos): ?><td>$<?= number_format((float) $row['costo_estimado'], 2) ?></td><?php endif; ?>
                                     </tr>

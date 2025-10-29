@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../models/Producto.php';
 require_once __DIR__ . '/../helpers/Session.php';
 require_once __DIR__ . '/../helpers/ActivityLogger.php';
+require_once __DIR__ . '/../helpers/BarcodeGenerator.php';
 
 class ProductoController
 {
@@ -21,6 +22,7 @@ class ProductoController
             'activo_id' => $_GET['activo_id'] ?? '',
             'stock_flag' => $_GET['stock_flag'] ?? '',
             'unidad_medida_id' => $_GET['unidad_medida_id'] ?? '',
+            'codigo_barras' => trim($_GET['codigo_barras'] ?? ''),
             'tags' => trim($_GET['tags'] ?? ''),
             'fecha_desde' => $_GET['fecha_desde'] ?? '',
             'fecha_hasta' => $_GET['fecha_hasta'] ?? '',
@@ -122,6 +124,10 @@ class ProductoController
                     $errors[] = 'Ya existe un producto con ese codigo.';
                 }
 
+                if ($data['codigo_barras'] === '') {
+                    $data['codigo_barras'] = $this->generarCodigoBarras($data['codigo'], (int) $id);
+                }
+
                 $nuevaImagen = $this->handleImagenUpload($_FILES['imagen_url'] ?? null, $errors);
                 if ($nuevaImagen === false) {
                     $errors[] = 'No fue posible procesar la imagen adjunta.';
@@ -182,6 +188,10 @@ class ProductoController
                     $errors[] = 'Ya existe otro producto con ese codigo.';
                 }
 
+                if ($data['codigo_barras'] === '') {
+                    $data['codigo_barras'] = $this->generarCodigoBarras($data['codigo']);
+                }
+
                 $nuevaImagen = $this->handleImagenUpload($_FILES['imagen_url'] ?? null, $errors, $producto['imagen_url'] ?? null);
                 if ($nuevaImagen === false) {
                     $errors[] = 'No fue posible procesar la imagen adjunta.';
@@ -217,6 +227,106 @@ class ProductoController
             die('Producto no encontrado.');
         }
         include __DIR__ . '/../views/productos/view.php';
+    }
+
+    public function etiqueta($id)
+    {
+        Session::requireLogin(['Administrador', 'Almacen', 'Compras']);
+        $producto = Producto::find($id);
+        if (!$producto) {
+            die('Producto no encontrado.');
+        }
+
+        $db = Database::getInstance()->getConnection();
+        $almacenes = $db->query('SELECT id, nombre FROM almacenes ORDER BY nombre ASC')->fetchAll();
+
+        if (empty($producto['codigo_barras'])) {
+            $nuevoCodigo = $this->generarCodigoBarras($producto['codigo'] ?? '', (int) $id);
+            Producto::actualizarCodigoBarras((int) $id, $nuevoCodigo);
+            $producto['codigo_barras'] = $nuevoCodigo;
+        }
+
+        $unidadSugerida = $producto['unidad_abreviacion'] ?? $producto['unidad_medida_nombre'] ?? '';
+        $error = '';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+                $error = 'Token CSRF invalido.';
+            } else {
+                $lote = trim($_POST['lote'] ?? '');
+                $almacenId = (int) ($_POST['almacen_id'] ?? 0);
+                $cantidad = max(1, min(50, (int) ($_POST['cantidad'] ?? 1)));
+                $unidadEtiqueta = trim($_POST['unidad_etiqueta'] ?? $unidadSugerida);
+
+                $almacenNombre = $producto['almacen'] ?? '';
+                foreach ($almacenes as $almacen) {
+                    if ((int) $almacen['id'] === $almacenId) {
+                        $almacenNombre = $almacen['nombre'];
+                        break;
+                    }
+                }
+
+                $labels = [];
+                for ($i = 0; $i < $cantidad; $i++) {
+                    $labels[] = [
+                        'nombre' => $producto['nombre'],
+                        'codigo' => $producto['codigo'],
+                        'codigo_barras' => $producto['codigo_barras'],
+                        'almacen' => $almacenNombre !== '' ? $almacenNombre : 'N/D',
+                        'lote' => $lote !== '' ? $lote : 'N/D',
+                        'unidad' => $unidadEtiqueta !== '' ? $unidadEtiqueta : 'N/D',
+                    ];
+                }
+
+                try {
+                    $pdf = $this->buildEtiquetasPdf($labels);
+                    header('Content-Type: application/pdf');
+                    header('Content-Disposition: inline; filename=etiquetas_producto_' . preg_replace('/[^A-Za-z0-9_-]/', '', $producto['codigo'] ?? 'producto') . '.pdf');
+                    echo $pdf;
+                    return;
+                } catch (\Throwable $e) {
+                    $error = 'No fue posible generar el PDF de etiquetas.';
+                }
+            }
+        }
+
+        include __DIR__ . '/../views/productos/etiqueta.php';
+    }
+
+    public function buscarCodigoBarras()
+    {
+        Session::requireLogin(['Administrador', 'Almacen', 'Compras']);
+        $codigo = '';
+        $error = '';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+                $error = 'Token CSRF invalido.';
+            } else {
+                $codigo = trim($_POST['codigo_barras'] ?? '');
+                if ($codigo === '') {
+                    $error = 'Ingresa un codigo de barras.';
+                } else {
+                    $producto = Producto::findByCodigoBarras($codigo);
+                    if ($producto) {
+                        header('Location: productos_view.php?id=' . $producto['id'] . '&from=barcode');
+                        exit();
+                    }
+                    header('Location: productos.php?codigo_barras=' . urlencode($codigo));
+                    exit();
+                }
+            }
+        } elseif (!empty($_GET['codigo'])) {
+            $codigo = trim((string) $_GET['codigo']);
+            $producto = Producto::findByCodigoBarras($codigo);
+            if ($producto) {
+                header('Location: productos_view.php?id=' . $producto['id'] . '&from=barcode');
+                exit();
+            }
+            $error = 'No se encontro producto con ese codigo de barras.';
+        }
+
+        include __DIR__ . '/../views/productos/buscar_codigo.php';
     }
 
     public function delete($id)
@@ -265,6 +375,7 @@ class ProductoController
 
         $columns = [
             'codigo',
+            'codigo_barras',
             'nombre',
             'descripcion',
             'tipo',
@@ -431,6 +542,7 @@ class ProductoController
 
             $payload = [
                 'codigo' => $codigo,
+                'codigo_barras' => trim($rowAssoc['codigo_barras'] ?? ''),
                 'nombre' => $nombre,
                 'descripcion' => trim($rowAssoc['descripcion'] ?? ''),
                 'proveedor_id' => $this->toNullableInt($rowAssoc['proveedor_id'] ?? null),
@@ -459,6 +571,13 @@ class ProductoController
                 'tags' => trim($rowAssoc['tags'] ?? ''),
                 'activo_id' => 1,
             ];
+
+            if ($payload['codigo_barras'] === '') {
+                $payload['codigo_barras'] = $this->generarCodigoBarras($payload['codigo']);
+            } elseif (Producto::codigoBarrasExiste($payload['codigo_barras'])) {
+                $result['errors'][] = "Fila {$lineNumber}: el codigo de barras ya existe.";
+                continue;
+            }
 
             try {
                 Producto::create($payload);
@@ -512,6 +631,7 @@ class ProductoController
     {
         return [
             'codigo' => '',
+            'codigo_barras' => '',
             'nombre' => '',
             'descripcion' => '',
             'proveedor_id' => null,
@@ -549,6 +669,17 @@ class ProductoController
             $errors[] = 'El codigo interno es obligatorio.';
         } elseif (mb_strlen($data['codigo']) > 50) {
             $errors[] = 'El codigo no debe exceder 50 caracteres.';
+        }
+
+        $data['codigo_barras'] = strtoupper(trim($input['codigo_barras'] ?? ''));
+        if ($data['codigo_barras'] !== '') {
+            if (mb_strlen($data['codigo_barras']) > 64) {
+                $errors[] = 'El codigo de barras no debe exceder 64 caracteres.';
+            } elseif (!preg_match('/^[A-Z0-9\\-_.]+$/', $data['codigo_barras'])) {
+                $errors[] = 'El codigo de barras solo puede contener letras, numeros y -_. (sin espacios).';
+            } elseif (Producto::codigoBarrasExiste($data['codigo_barras'], $productoId)) {
+                $errors[] = 'Ya existe un producto con ese codigo de barras.';
+            }
         }
 
         $data['nombre'] = trim($input['nombre'] ?? '');
@@ -617,6 +748,175 @@ class ProductoController
         return $data;
     }
 
+    private function buildEtiquetasPdf(array $labels): string
+    {
+        $pageWidth = 226.0;
+        $pageHeight = 170.0;
+        $objects = [];
+        $objects[1] = '<< /Type /Catalog /Pages 2 0 R >>';
+        $fontObjNum = 3;
+        $objects[$fontObjNum] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
+        $pageRefs = [];
+
+        if (empty($labels)) {
+            $labels[] = [
+                'nombre' => 'Etiqueta',
+                'codigo' => '',
+                'codigo_barras' => '',
+                'almacen' => '',
+                'lote' => '',
+                'unidad' => '',
+            ];
+        }
+
+        foreach ($labels as $label) {
+            $content = $this->renderEtiquetaContent($label, $pageWidth, $pageHeight);
+            $contentObjNum = count($objects) + 1;
+            $objects[$contentObjNum] = $this->wrapStream($content);
+            $pageObjNum = $contentObjNum + 1;
+            $objects[$pageObjNum] = sprintf('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 %.2f %.2f] /Resources << /Font << /F1 %d 0 R >> >> /Contents %d 0 R >>', $pageWidth, $pageHeight, $fontObjNum, $contentObjNum);
+            $pageRefs[] = $pageObjNum . ' 0 R';
+        }
+
+        $objects[2] = '<< /Type /Pages /Kids [' . implode(' ', $pageRefs) . '] /Count ' . count($pageRefs) . ' >>';
+
+        $pdf = "%PDF-1.4
+";
+        $offsets = [];
+        $objectCount = count($objects);
+
+        for ($i = 1; $i <= $objectCount; $i++) {
+            $offsets[$i] = strlen($pdf);
+            $pdf .= $i . " 0 obj
+" . $objects[$i] . "
+endobj
+";
+        }
+
+        $xrefPosition = strlen($pdf);
+        $pdf .= "xref
+0 " . ($objectCount + 1) . "
+";
+        $pdf .= "0000000000 65535 f 
+";
+        for ($i = 1; $i <= $objectCount; $i++) {
+            $pdf .= sprintf("%010d 00000 n 
+", $offsets[$i]);
+        }
+        $pdf .= "trailer << /Size " . ($objectCount + 1) . " /Root 1 0 R >>
+";
+        $pdf .= "startxref
+" . $xrefPosition . "
+%%EOF";
+
+        return $pdf;
+    }
+
+    private function renderEtiquetaContent(array $label, float $pageWidth, float $pageHeight): string
+    {
+        $nombre = $label['nombre'] ?? '';
+        $codigo = $label['codigo'] ?? '';
+        $codigoBarras = $label['codigo_barras'] ?? '';
+        $almacen = $label['almacen'] ?? '';
+        $lote = $label['lote'] ?? '';
+        $unidad = $label['unidad'] ?? '';
+
+        $lines = [];
+        $lines[] = 'BT';
+        $lines[] = '/F1 12 Tf';
+        $lines[] = sprintf('1 0 0 1 %.2f %.2f Tm (%s) Tj', 20.0, $pageHeight - 30.0, $this->escapePdfText($nombre));
+        $lines[] = sprintf('1 0 0 1 %.2f %.2f Tm (Codigo: %s) Tj', 20.0, $pageHeight - 48.0, $this->escapePdfText($codigo));
+        $lines[] = sprintf('1 0 0 1 %.2f %.2f Tm (Lote: %s) Tj', 20.0, $pageHeight - 66.0, $this->escapePdfText($lote));
+        $lines[] = sprintf('1 0 0 1 %.2f %.2f Tm (Almacen: %s) Tj', 20.0, $pageHeight - 84.0, $this->escapePdfText($almacen));
+        $lines[] = sprintf('1 0 0 1 %.2f %.2f Tm (Unidad: %s) Tj', 20.0, $pageHeight - 102.0, $this->escapePdfText($unidad));
+        $lines[] = 'ET';
+
+        try {
+            $pattern = BarcodeGenerator::code39Pattern($codigoBarras);
+        } catch (\Throwable $e) {
+            $pattern = [];
+        }
+
+        if (!empty($pattern)) {
+            $lines[] = '0 0 0 rg';
+            $lines[] = rtrim($this->barcodeRectangles($pattern, 20.0, 48.0, 1.2, 38.0));
+            $lines[] = 'BT';
+            $lines[] = '/F1 10 Tf';
+            $lines[] = sprintf('1 0 0 1 %.2f %.2f Tm (%s) Tj', 20.0, 42.0, $this->escapePdfText($codigoBarras));
+            $lines[] = 'ET';
+        } else {
+            $lines[] = 'BT';
+            $lines[] = '/F1 10 Tf';
+            $lines[] = sprintf('1 0 0 1 %.2f %.2f Tm (Codigo barras: %s) Tj', 20.0, 42.0, $this->escapePdfText($codigoBarras !== '' ? $codigoBarras : 'N/D'));
+            $lines[] = 'ET';
+        }
+
+        return implode("\n", $lines) . "\n";
+    }
+
+    private function barcodeRectangles(array $pattern, float $x, float $y, float $moduleWidth, float $height): string
+    {
+        $cursor = $x;
+        $segments = '';
+        foreach ($pattern as $segment) {
+            [$type, $units] = $segment;
+            $width = $units * $moduleWidth;
+            if ($type === 'bar') {
+                $segments .= sprintf('%.2f %.2f %.2f %.2f re f\n', $cursor, $y, $width, $height);
+            }
+            $cursor += $width;
+        }
+        return $segments;
+    }
+
+    private function wrapStream(string $content): string
+    {
+        $length = strlen($content);
+        return "<< /Length {$length} >>\nstream\n{$content}endstream";
+    }
+
+    private function escapePdfText(string $text): string
+    {
+        $text = str_replace('\\', '\\\\', $text);
+        $text = str_replace('(', '\(', $text);
+        $text = str_replace(')', '\)', $text);
+        return $text;
+    }
+
+    private function generarCodigoBarras(string $codigoBase = '', ?int $ignorarId = null): string
+    {
+        $base = strtoupper(preg_replace('/[^A-Z0-9]/', '', $codigoBase));
+        if ($base === '') {
+            $base = 'PRD';
+        }
+        $base = substr($base, 0, 8);
+        $fecha = date('ymd');
+
+        for ($intentos = 0; $intentos < 8; $intentos++) {
+            try {
+                $random = strtoupper(bin2hex(random_bytes(3)));
+            } catch (\Throwable $e) {
+                $random = strtoupper(str_pad(dechex(random_int(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT));
+            }
+
+            $candidate = $base . '-' . $fecha . '-' . $random;
+            if (!Producto::codigoBarrasExiste($candidate, $ignorarId)) {
+                return $candidate;
+            }
+        }
+
+        do {
+            try {
+                $random = strtoupper(bin2hex(random_bytes(4)));
+            } catch (\Throwable $e) {
+                $random = strtoupper(str_pad(dechex(random_int(0, 0xFFFFFFFF)), 8, '0', STR_PAD_LEFT));
+            }
+            $candidate = $base . '-' . $fecha . '-' . $random;
+        } while (Producto::codigoBarrasExiste($candidate, $ignorarId));
+
+        return $candidate;
+    }
+
     private function normalizeDecimal($value): ?float
     {
         if ($value === null || $value === '') {
@@ -677,8 +977,6 @@ class ProductoController
         return 'assets/images/' . $filename;
     }
 }
-
-
 
 
 

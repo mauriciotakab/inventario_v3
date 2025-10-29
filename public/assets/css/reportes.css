@@ -35,6 +35,18 @@
     margin-bottom: 28px;
 }
 
+.reportes-summary-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.reportes-summary-inline .reportes-summary-card {
+    flex: 1 1 220px;
+    min-width: 220px;
+}
+
 .reportes-summary-card {
     background: #fff;
     border-radius: 14px;

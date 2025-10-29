@@ -72,7 +72,8 @@ function safe_css_class($s) {
 				</div>
 				<div class="productos-header-actions">
 					<a class="btn-secondary" href="productos.php"><i class="fa fa-arrow-left"></i> Volver</a>
-					<a class="btn-main" href="productos_edit.php?id=<?= (int)($producto['id'] ?? 0) ?>"><i class="fa fa-pen"></i> Editar</a>
+					<a class="btn-secondary" href="productos_etiqueta.php?id=<?= (int)($producto['id'] ?? 0) ?>"><i class="fa fa-barcode"></i> Imprimir etiqueta</a>
+				<a class="btn-main" href="productos_edit.php?id=<?= (int)($producto['id'] ?? 0) ?>"><i class="fa fa-pen"></i> Editar</a>
 				</div>
 			</div>
 			<section class="productos-detail-card productos-hero">
@@ -137,6 +138,10 @@ function safe_css_class($s) {
 						<span class="label">Código interno</span>
 						<span class="value mono"><?= htmlspecialchars($producto['codigo'] ?? '') ?></span>
 					</div>
+                    <div class="detail-item">
+                    	<span class="label">Codigo de barras</span>
+                    	<span class="value mono"><?= htmlspecialchars($producto['codigo_barras'] ?? '-') ?></span>
+                    </div>
 					<div class="detail-item">
 						<span class="label">Categoría</span>
 						<span class="value"><?= htmlspecialchars($producto['categoria'] ?? '-') ?></span>

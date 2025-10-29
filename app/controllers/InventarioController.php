@@ -185,6 +185,7 @@ class InventarioController
             'fecha_desde' => $_GET['fecha_desde'] ?? '',
             'fecha_hasta' => $_GET['fecha_hasta'] ?? '',
             'unidad_medida_id' => $_GET['unidad_medida_id'] ?? '',
+            'codigo_barras' => trim($_GET['codigo_barras'] ?? ''),
         ];
 
         if (!empty($_GET['cat']) && empty($filtros['categoria_id'])) {
