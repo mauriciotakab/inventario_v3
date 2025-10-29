@@ -56,7 +56,7 @@ $alertas = $datos['alertas'] ?? [];
                 <a href="solicitar_material_general.php"><i class="fa-solid fa-box-open"></i> Solicitar Herramienta General</a>
                 <a href="mis_solicitudes.php"><i class="fa-solid fa-clipboard-list"></i> Mis Solicitudes</a>
             <?php endif; ?>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesion</a>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
     </aside>
 
@@ -66,7 +66,7 @@ $alertas = $datos['alertas'] ?? [];
             <div class="top-header-user">
                 <span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
                 <i class="fa-solid fa-user-circle"></i>
-                <a href="logout.php" class="logout-btn" title="Cerrar sesion"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+                <a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
             </div>
         </header>
 
@@ -232,3 +232,4 @@ $alertas = $datos['alertas'] ?? [];
 </div>
 </body>
 </html>
+

@@ -50,7 +50,7 @@ $observaciones = $_POST['observaciones'] ?? '';
             <?php endif; ?>
             <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
             <a href="documentacion.php"><i class="fa-solid fa-book"></i> Documentacion</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesion</a>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
     </aside>
 
@@ -245,4 +245,5 @@ if (productosSelect.value) {
 </script>
 </body>
 </html>
+
 

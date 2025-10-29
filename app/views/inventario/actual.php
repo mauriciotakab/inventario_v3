@@ -83,7 +83,7 @@ $buildQuery = function(array $overrides = []) {
             <a href="logs.php"><i class="fa-solid fa-clipboard-list"></i> Bitacora</a>
             <?php endif; ?>
             <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesion</a>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
     </aside>
 
@@ -358,3 +358,4 @@ $buildQuery = function(array $overrides = []) {
 </div>
 </body>
 </html>
+

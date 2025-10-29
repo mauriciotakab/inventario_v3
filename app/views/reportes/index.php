@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $role = $_SESSION['role'] ?? 'Almacen';
 $nombre = $_SESSION['nombre'] ?? '';
 $mostrarCostos = $role === 'Administrador';
@@ -71,7 +71,7 @@ $buildQuery = function(array $overrides = []) {
             <?php endif; ?>
             <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
             <a href="documentacion.php"><i class="fa-solid fa-book"></i> Documentacion</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesion</a>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
     </aside>
 
@@ -81,7 +81,7 @@ $buildQuery = function(array $overrides = []) {
             <div class="top-header-user">
                 <span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
                 <i class="fa-solid fa-user-circle"></i>
-                <a href="logout.php" class="logout-btn" title="Cerrar sesion"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+                <a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
             </div>
         </header>
 
@@ -694,4 +694,5 @@ $buildQuery = function(array $overrides = []) {
 </div>
 </body>
 </html>
+
 

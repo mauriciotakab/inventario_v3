@@ -57,7 +57,7 @@ $error = $error ?? '';
             <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
             <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
             <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesion</a>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
     </aside>
 
@@ -67,7 +67,7 @@ $error = $error ?? '';
             <div class="top-header-user">
                 <span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
                 <i class="fa-solid fa-user-circle"></i>
-                <a href="logout.php" class="logout-btn" title="Cerrar sesion"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+                <a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
             </div>
         </header>
 
@@ -104,3 +104,4 @@ $error = $error ?? '';
 </div>
 </body>
 </html>
+

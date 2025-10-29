@@ -3,7 +3,7 @@ require_once __DIR__ . '/../helpers/Database.php';
 
 class Producto
 {
-    private const ESTADOS = ['Nuevo', 'Usado', 'DaÃ±ado', 'En reparaciÃ³n'];
+    private const ESTADOS = ['Nuevo', 'Usado', 'Dañado', 'En reparación'];
     private const TIPOS = ['Consumible', 'Herramienta', 'Equipo'];
 
     public static function all($filtros = [])
@@ -293,7 +293,7 @@ class Producto
         $ok = $stmt->execute([$cantidad, $id]);
         if (!$ok) return false;
 
-        // Stock por almacÃ©n
+        // Stock por almacén
         if ($almacenId) {
             self::ensureStockTable($db);
             $up = $db->prepare("INSERT INTO stock_almacen (producto_id, almacen_id, stock)
@@ -312,7 +312,7 @@ class Producto
         $ok = $stmt->execute([$cantidad, $id]);
         if (!$ok) return false;
 
-        // Stock por almacÃ©n
+        // Stock por almacén
         if ($almacenId) {
             self::ensureStockTable($db);
             // Asegurar no bajar de 0
