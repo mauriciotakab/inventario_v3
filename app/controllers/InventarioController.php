@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../models/MovimientoInventario.php';
 require_once __DIR__ . '/../models/Producto.php';
 require_once __DIR__ . '/../models/Almacen.php';
@@ -18,7 +18,7 @@ class InventarioController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
-                $msg = 'Token CSRF inválido.';
+                $msg = 'Token CSRF invalido.';
             } else {
                 $productoId = $_POST['producto_id'] ?? null;
                 $almacenId = $_POST['almacen_id'] ?? null;
@@ -63,7 +63,7 @@ class InventarioController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
-                $msg = 'Token CSRF inválido.';
+                $msg = 'Token CSRF invalido.';
             } else {
                 $productoId = $_POST['producto_id'] ?? null;
                 $almacenId = $_POST['almacen_id'] ?? null;
@@ -109,7 +109,7 @@ class InventarioController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
-                $error = 'Token CSRF inválido.';
+                $error = 'Token CSRF invalido.';
             } else {
                 $productoId = isset($_POST['producto_id']) ? (int) $_POST['producto_id'] : 0;
                 $origenId = isset($_POST['almacen_origen_id']) ? (int) $_POST['almacen_origen_id'] : 0;
@@ -120,15 +120,15 @@ class InventarioController
                 $producto = $productoId ? Producto::find($productoId) : null;
 
                 if ($productoId <= 0 || $origenId <= 0 || $destinoId <= 0 || !$producto) {
-                    $error = "Selecciona un producto y almacenes válidos.";
+                    $error = "Selecciona un producto y almacenes validos.";
                 } elseif ($origenId === $destinoId) {
-                    $error = "El almacén de origen y destino deben ser diferentes.";
+                    $error = "El almacen de origen y destino deben ser diferentes.";
                 } elseif ($cantidad <= 0) {
                     $error = "Indica una cantidad mayor a cero.";
                 } else {
                     $disponible = Producto::stockEnAlmacen($productoId, $origenId);
                     if ($cantidad > $disponible) {
-                        $error = "La cantidad supera el inventario disponible en el almacén de origen.";
+                        $error = "La cantidad supera el inventario disponible en el almacen de origen.";
                     } else {
                         $data = [
                             'producto_id' => $productoId,
@@ -235,3 +235,4 @@ class InventarioController
     }
 }
 ?>
+

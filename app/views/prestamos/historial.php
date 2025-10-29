@@ -1,33 +1,19 @@
-﻿<?php
-require_once __DIR__ . '/../../helpers/Session.php';
-Session::requireLogin(['Administrador', 'Almacen']);
-require_once __DIR__ . '/../../models/Prestamo.php';
+<?php
 $role = $_SESSION['role'] ?? '';
 $nombre = $_SESSION['nombre'] ?? '';
-
-// Parámetros de búsqueda y paginación
-$busqueda = trim($_GET['q'] ?? '');
-$estado = trim($_GET['estado'] ?? '');
-$desde = trim($_GET['desde'] ?? '');
-$hasta = trim($_GET['hasta'] ?? '');
-$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$porPagina = 9;
-
-$filtros = [
-    'estado' => $estado,
-    'desde' => $desde,
-    'hasta' => $hasta,
-];
-
-$prestamos = Prestamo::historialPaginado($busqueda, $page, $porPagina, $filtros);
-$total = Prestamo::totalHistorial($busqueda, $filtros);
-$totalPages = ceil(($total ?: 0) / $porPagina);
+$busqueda = $busqueda ?? '';
+$estado = $estado ?? '';
+$desde = $desde ?? '';
+$hasta = $hasta ?? '';
+$page = $page ?? 1;
+$porPagina = $porPagina ?? 9;
+$totalPages = max(1, $totalPages ?? 1);
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Historial de Préstamos de Herramientas | TAKAB</title>
+    <title>Historial de Prestamos de Herramientas | TAKAB</title>
     <link rel="stylesheet" href="/assets/css/prestamo-historial.css">
     <link rel="stylesheet" href="/assets/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -47,39 +33,39 @@ $totalPages = ceil(($total ?: 0) / $porPagina);
         <nav class="sidebar-nav">
             <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
             <?php if ($role === 'Administrador'): ?>
-                <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestión de Usuarios</a>
-                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
+                <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestion de Usuarios</a>
+                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestion de Productos</a>
                 <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
                 <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
-                <a href="prestamos_pendientes.php">- Préstamos Pendientes</a>
-                <a href="prestamos_historial.php" class="active">- Historial de Préstamos</a>
+                <a href="prestamos_pendientes.php">- Prestamos Pendientes</a>
+                <a href="prestamos_historial.php" class="active">- Historial de Prestamos</a>
                 <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-                <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
+                <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
             <?php elseif ($role === 'Almacen'): ?>
-                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
+                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestion de Productos</a>
                 <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
                 <a href="revisar_solicitudes.php"><i class="fa-solid fa-inbox"></i> Solicitudes de Material</a>
-                <a href="prestamos_pendientes.php">- Préstamos Pendientes</a>
-                <a href="prestamos_historial.php" class="active">- Historial de Préstamos</a>
+                <a href="prestamos_pendientes.php">- Prestamos Pendientes</a>
+                <a href="prestamos_historial.php" class="active">- Historial de Prestamos</a>
                 <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-                <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
+                <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
             <?php elseif ($role === 'Empleado'): ?>
                 <a href="solicitudes_crear.php"><i class="fa-solid fa-plus-square"></i> Solicitar Material</a>
                 <a href="mis_solicitudes.php"><i class="fa-solid fa-clipboard-list"></i> Mis Solicitudes</a>
             <?php endif; ?>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesion</a>
         </nav>
     </aside>
 
     <div class="historial-main">
         <div class="historial-title">
             <i class="fa-solid fa-history"></i>
-            Historial de Préstamos de Herramientas
+            Historial de Prestamos de Herramientas
         </div>
 
         <div class="search-bar">
             <form method="get" action="">
-                <input type="text" name="q" value="<?= htmlspecialchars($busqueda) ?>" placeholder="Buscar por código o trabajador..." class="takab-search-input">
+                <input type="text" name="q" value="<?= htmlspecialchars($busqueda) ?>" placeholder="Buscar por codigo o trabajador..." class="takab-search-input">
                 <select name="estado" class="takab-search-input">
                     <option value="">Todos los estados</option>
                     <option value="Prestado" <?= $estado === 'Prestado' ? 'selected' : '' ?>>Prestado</option>
@@ -98,11 +84,11 @@ $totalPages = ceil(($total ?: 0) / $porPagina);
             <thead>
                 <tr>
                     <th>Empleado</th>
-                    <th>Código</th>
+                    <th>Codigo</th>
                     <th>Herramienta</th>
-                    <th>Fecha Préstamo</th>
-                    <th>Fecha Devolución</th>
-                    <th>Estado del Préstamo</th>
+                    <th>Fecha Prestamo</th>
+                    <th>Fecha Devolucion</th>
+                    <th>Estado del Prestamo</th>
                     <th>Estado al devolver</th>
                     <th>Observaciones al devolver</th>
                 </tr>
@@ -132,7 +118,7 @@ $totalPages = ceil(($total ?: 0) / $porPagina);
                             $ed = strtolower($p['estado_devolucion']);
                             $claseEd = match($ed) {
                                 'bueno' => 'badge-bueno',
-                                'dañado' => 'badge-danado',
+                                'danado' => 'badge-danado',
                                 'perdido' => 'badge-perdido',
                                 default => 'badge'
                             };

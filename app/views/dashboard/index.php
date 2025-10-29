@@ -48,15 +48,15 @@ $alertas = $datos['alertas'] ?? [];
                 <a href="ordenes_compra.php"><i class="fa-solid fa-file-invoice-dollar"></i> Ordenes de compra</a>
                 <a href="ordenes_compra_crear.php"><i class="fa-solid fa-plus"></i> Registrar orden</a>
                 <a href="compras_proveedor.php"><i class="fa-solid fa-chart-pie"></i> Historial de compras</a>
-                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Productos</a>
+                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestion de Productos</a>
                 <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
                 <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
             <?php elseif ($role === 'Empleado'): ?>
-                <a href="solicitudes_crear.php"><i class="fa-solid fa-plus-square"></i> Solicitar Material</a>
+                <a href="solicitudes_crear.php"><i class="fa-solid fa-plus-square"></i> Solicitar Material para Servicio</a>
+                <a href="solicitar_material_general.php"><i class="fa-solid fa-box-open"></i> Solicitar Herramienta General</a>
                 <a href="mis_solicitudes.php"><i class="fa-solid fa-clipboard-list"></i> Mis Solicitudes</a>
             <?php endif; ?>
-            <a href="documentacion.php"><i class="fa-solid fa-book"></i> Documentación</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesion</a>
         </nav>
     </aside>
 
@@ -66,23 +66,23 @@ $alertas = $datos['alertas'] ?? [];
             <div class="top-header-user">
                 <span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
                 <i class="fa-solid fa-user-circle"></i>
-                <a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+                <a href="logout.php" class="logout-btn" title="Cerrar sesion"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
             </div>
         </header>
 
         <main class="dashboard-main">
             <div class="dashboard-header-row">
                 <div>
-                    <h1><?= $role === 'Administrador' ? 'Dashboard administrativo' : ($role === 'Almacen' ? 'Dashboard almacén' : 'Dashboard empleado') ?></h1>
+                    <h1><?= $role === 'Administrador' ? 'Dashboard administrativo' : ($role === 'Almacen' ? 'Dashboard almacen' : 'Dashboard empleado') ?></h1>
                     <span class="dashboard-desc">
                         <?php if ($role === 'Administrador'): ?>Resumen general del sistema de inventario TAKAB.
-                        <?php elseif ($role === 'Almacen'): ?>Panel para gestión de inventario y solicitudes.
+                        <?php elseif ($role === 'Almacen'): ?>Panel para gestion de inventario y solicitudes.
                         <?php else: ?>Resumen de tus solicitudes y actividades.
                         <?php endif; ?>
                     </span>
                 </div>
                 <div class="dashboard-updated">
-                    <div>Último actualizado</div>
+                    <div>Ultimo actualizado</div>
                     <div><?= htmlspecialchars($datos['last_update']) ?></div>
                 </div>
             </div>
@@ -97,12 +97,12 @@ $alertas = $datos['alertas'] ?? [];
                     <div class="dashboard-card red">
                         <div class="card-label">Stock bajo</div>
                         <div class="card-value"><?= number_format($datos['stockBajo'] ?? 0) ?></div>
-                        <div class="card-sub">Productos requieren reposición</div>
+                        <div class="card-sub">Productos requieren reposicion</div>
                     </div>
                     <div class="dashboard-card yellow">
                         <div class="card-label">Solicitudes pendientes</div>
                         <div class="card-value"><?= number_format($datos['solicitudesPendientes'] ?? 0) ?></div>
-                        <div class="card-sub">En espera de aprobación</div>
+                        <div class="card-sub">En espera de aprobacion</div>
                     </div>
                     <div class="dashboard-card sky">
                         <div class="card-label">Herramientas prestadas</div>
@@ -113,12 +113,12 @@ $alertas = $datos['alertas'] ?? [];
                     <div class="dashboard-card blue">
                         <div class="card-label">Productos registrados</div>
                         <div class="card-value"><?= number_format($datos['productosAlmacen'] ?? 0) ?></div>
-                        <div class="card-sub">En este almacén</div>
+                        <div class="card-sub">En este almacen</div>
                     </div>
                     <div class="dashboard-card yellow">
                         <div class="card-label">Solicitudes por gestionar</div>
                         <div class="card-value"><?= number_format($datos['solicitudesAlmacen'] ?? 0) ?></div>
-                        <div class="card-sub">Pendientes de atención</div>
+                        <div class="card-sub">Pendientes de atencion</div>
                     </div>
                     <div class="dashboard-card red">
                         <div class="card-label">Stock bajo</div>
@@ -132,9 +132,9 @@ $alertas = $datos['alertas'] ?? [];
                         <div class="card-sub">Totales enviadas</div>
                     </div>
                     <div class="dashboard-card yellow">
-                        <div class="card-label">Pendientes de aprobación</div>
+                        <div class="card-label">Pendientes de aprobacion</div>
                         <div class="card-value"><?= number_format($datos['pendientesAprobar'] ?? 0) ?></div>
-                        <div class="card-sub">En espera de almacén</div>
+                        <div class="card-sub">En espera de almacen</div>
                     </div>
                     <div class="dashboard-card sky">
                         <div class="card-label">Entregadas</div>
@@ -154,10 +154,10 @@ $alertas = $datos['alertas'] ?? [];
 
             <?php if ($role === 'Administrador'): ?>
                 <section class="dashboard-widget">
-                    <div class="widget-title sky"><i class="fa-solid fa-history"></i> Últimos movimientos</div>
+                    <div class="widget-title sky"><i class="fa-solid fa-history"></i> Ultimos movimientos</div>
                     <?php if (!empty($datos['ultimaActualizacion'])): ?>
                         <table class="dashboard-mini-table">
-                            <thead><tr><th>Fecha</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Almacén</th></tr></thead>
+                            <thead><tr><th>Fecha</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Almacen</th></tr></thead>
                             <tbody>
                             <?php foreach ($datos['ultimaActualizacion'] as $mov): ?>
                                 <tr>
@@ -192,23 +192,23 @@ $alertas = $datos['alertas'] ?? [];
                             </tbody>
                         </table>
                     <?php else: ?>
-                        <p class="widget-empty">Sin movimientos recientes en este almacén.</p>
+                        <p class="widget-empty">Sin movimientos recientes en este almacen.</p>
                     <?php endif; ?>
                 </section>
             <?php else: ?>
                 <section class="dashboard-widget">
-                    <div class="widget-title blue"><i class="fa-solid fa-info-circle"></i> Últimas solicitudes</div>
+                    <div class="widget-title blue"><i class="fa-solid fa-info-circle"></i> Ultimas solicitudes</div>
                     <?php if (!empty($alertas)): ?>
                         <ul class="dashboard-alert-list">
                             <?php foreach ($alertas as $al): ?>
                                 <li>
                                     <strong><?= htmlspecialchars($al['comentario'] ?? $al[0] ?? '-') ?></strong>
-                                    <span><?= htmlspecialchars($al['fecha'] ?? '-') ?> · Estado: <?= htmlspecialchars($al['estado'] ?? '-') ?></span>
+                                    <span><?= htmlspecialchars($al['fecha'] ?? '-') ?>  Estado: <?= htmlspecialchars($al['estado'] ?? '-') ?></span>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
                     <?php else: ?>
-                        <p class="widget-empty">Aún no tienes solicitudes recientes.</p>
+                        <p class="widget-empty">Aun no tienes solicitudes recientes.</p>
                     <?php endif; ?>
                 </section>
             <?php endif; ?>

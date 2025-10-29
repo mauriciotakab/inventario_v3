@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../models/SolicitudMaterial.php';
 require_once __DIR__ . '/../models/Producto.php';
 require_once __DIR__ . '/../helpers/Session.php';
@@ -18,7 +18,7 @@ class SolicitudMaterialController
         $this->crearSolicitud(true);
     }
 
-    // Lógica compartida
+    // Logica compartida
     private function crearSolicitud($isGeneral = false)
     {
         Session::requireLogin('Empleado');
@@ -28,7 +28,7 @@ class SolicitudMaterialController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
-                $msg = 'Token CSRF inválido.';
+                $msg = 'Token CSRF invalido.';
                 if ($isGeneral) {
                     include __DIR__ . '/../views/solicitudes/crear_general.php';
                 } else {
@@ -47,7 +47,7 @@ class SolicitudMaterialController
             if (empty($comentario)) {
                 $msg = $isGeneral
                     ? 'Debes especificar el motivo de la solicitud.'
-                    : 'Debes especificar para qué proyecto/destino se va a utilizar el material.';
+                    : 'Debes especificar para que proyecto/destino se va a utilizar el material.';
             } elseif (empty($_POST['material'])) {
                 $msg = 'Debes agregar al menos un material o herramienta a la solicitud.';
             } else {
@@ -84,7 +84,7 @@ class SolicitudMaterialController
                 }
 
                 if (count($detalles) === 0 && count($extras) === 0) {
-                    $msg = 'Debes agregar al menos un material, herramienta o material extra válido.';
+                    $msg = 'Debes agregar al menos un material, herramienta o material extra valido.';
                 } else {
                     $data = [
                         'usuario_id' => $_SESSION['user_id'],
@@ -122,7 +122,7 @@ class SolicitudMaterialController
         include __DIR__ . '/../views/solicitudes/detalle.php';
     }
 
-    // Listar solicitudes pendientes para revisión/entrega
+    // Listar solicitudes pendientes para revision/entrega
     public function revisar()
     {
         Session::requireLogin(['Administrador', 'Almacen']);
@@ -138,21 +138,25 @@ class SolicitudMaterialController
         $detalles = $solicitud ? SolicitudMaterial::detalles($id) : [];
         $msg = '';
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $accion = $_POST['accion'] ?? '';
-            $observacion = trim($_POST['observacion'] ?? '');
-            if ($accion === 'aprobar') {
-                SolicitudMaterial::actualizarEstado($id, 'aprobada', $_SESSION['user_id'], $observacion);
-                $msg = 'Solicitud aprobada correctamente.';
+            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+                $msg = 'Token CSRF invalido.';
+            } else {
+                $accion = $_POST['accion'] ?? '';
+                $observacion = trim($_POST['observacion'] ?? '');
+                if ($accion === 'aprobar') {
+                    SolicitudMaterial::actualizarEstado($id, 'aprobada', $_SESSION['user_id'], $observacion);
+                    $msg = 'Solicitud aprobada correctamente.';
             } elseif ($accion === 'rechazar') {
                 SolicitudMaterial::actualizarEstado($id, 'rechazada', $_SESSION['user_id'], $observacion);
-                $msg = 'Solicitud rechazada.';
+                    $msg = 'Solicitud rechazada.';
+                }
             }
             $solicitud = SolicitudMaterial::find($id);
         }
         include __DIR__ . '/../views/solicitudes/aprobar.php';
     }
 
-    // Entregar materiales (solo si ya está aprobada)
+    // Entregar materiales (solo si ya esta aprobada)
     public function entregar($id)
     {
         Session::requireLogin(["Administrador", "Almacen"]);
@@ -160,14 +164,14 @@ class SolicitudMaterialController
         $detalles = $solicitud ? SolicitudMaterial::detalles($id) : [];
         $msg = '';
         if (!$solicitud || strtolower($solicitud['estado']) !== 'aprobada') {
-            $msg = 'La solicitud no está aprobada o no existe.';
+            $msg = 'La solicitud no esta aprobada o no existe.';
             include __DIR__ . '/../views/solicitudes/entregar.php';
             return;
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
-                $msg = 'Token CSRF inválido.';
+                $msg = 'Token CSRF invalido.';
                 include __DIR__ . '/../views/solicitudes/entregar.php';
                 return;
             }
@@ -183,7 +187,7 @@ class SolicitudMaterialController
                 }
             }
             if ($tieneHerramienta && $fechaEstim === '') {
-                $msg = 'Debes indicar la fecha estimada de devolución para las herramientas.';
+                $msg = 'Debes indicar la fecha estimada de devolucion para las herramientas.';
                 include __DIR__ . '/../views/solicitudes/entregar.php';
                 return;
             }

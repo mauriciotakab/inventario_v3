@@ -15,7 +15,7 @@ $importResultado = $importAlert ?? null;
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Gestión de Productos | TAKAB</title>
+    <title>GestiA3n de Productos | TAKAB</title>
     <link rel="stylesheet" href="/assets/css/dashboard.css">
     <link rel="stylesheet" href="/assets/css/config.css">
     <link rel="stylesheet" href="/assets/css/productos.css">
@@ -76,7 +76,7 @@ $importResultado = $importAlert ?? null;
             <div class="top-header-user">
                 <span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
                 <i class="fa-solid fa-user-circle"></i>
-                <a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+                <a href="logout.php" class="logout-btn" title="Cerrar sesiA3n"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
             </div>
         </header>
 
@@ -97,7 +97,7 @@ $importResultado = $importAlert ?? null;
                 ?>
                 <div class="alert <?= $hayErroresImport ? 'alert-danger' : 'alert-success' ?>">
                     <i class="fa <?= $hayErroresImport ? 'fa-circle-exclamation' : 'fa-check-circle' ?>"></i>
-                    Se procesaron <?= $importProcessed ?> filas. Importados correctamente: <?= $importSuccess ?><?= $importSkipped > 0 ? " · Saltados: {$importSkipped}" : '' ?>.
+                    Se procesaron <?= $importProcessed ?> filas. Importados correctamente: <?= $importSuccess ?><?= $importSkipped > 0 ? " A Saltados: {$importSkipped}" : '' ?>.
                     <?php if ($hayErroresImport): ?>
                         <div class="alert-detail">
                             <strong>Observaciones:</strong>
@@ -116,9 +116,9 @@ $importResultado = $importAlert ?? null;
 
             <div class="productos-header">
                 <div>
-                    <h1>Gestión de Productos</h1>
-                    <p class="productos-header-desc">Administra el catálogo de materiales y herramientas de TAKAB.</p>
-                    <p class="productos-import-note desktop-only">Usa la plantilla para cargar múltiples productos. Los valores deben corresponder con los IDs de catálogos ya registrados (categorías, proveedores, almacenes, unidades).</p>
+                    <h1>GestiA3n de Productos</h1>
+                    <p class="productos-header-desc">Administra el catAlogo de materiales y herramientas de TAKAB.</p>
+                    <p class="productos-import-note desktop-only">Usa la plantilla para cargar mAoltiples productos. Los valores deben corresponder con los IDs de catAlogos ya registrados (categorAas, proveedores, almacenes, unidades).</p>
                 </div>
                 <div class="productos-header-actions">
                     <a class="btn-secondary" href="productos_template.php"><i class="fa-solid fa-download"></i> Descargar plantilla</a>
@@ -131,14 +131,14 @@ $importResultado = $importAlert ?? null;
                     </form>
                     <a class="btn-main" href="productos_create.php"><i class="fa fa-plus"></i> Nuevo producto</a>
                 </div>
-                <p class="productos-import-note mobile-only">Usa la plantilla para cargar múltiples productos. Los valores deben corresponder con los IDs de catálogos ya registrados (categorías, proveedores, almacenes, unidades).</p>
+                <p class="productos-import-note mobile-only">Usa la plantilla para cargar mAoltiples productos. Los valores deben corresponder con los IDs de catAlogos ya registrados (categorAas, proveedores, almacenes, unidades).</p>
             </div>
 
             <section class="productos-stats-grid">
                 <div class="productos-stat-card primary">
                     <span class="stat-label">Productos totales</span>
                     <span class="stat-value"><?= number_format($stats['total']) ?></span>
-                    <span class="stat-foot">Activos: <?= number_format($stats['activos']) ?> · Inactivos: <?= number_format($stats['inactivos']) ?></span>
+                    <span class="stat-foot">Activos: <?= number_format($stats['activos']) ?> A Inactivos: <?= number_format($stats['inactivos']) ?></span>
                 </div>
                 <div class="productos-stat-card sky">
                     <span class="stat-label">Consumibles</span>
@@ -161,14 +161,14 @@ $importResultado = $importAlert ?? null;
                 <form method="get" class="productos-filters-form">
                     <div class="filter-row">
                         <div class="filter-field">
-                            <label for="buscar">Búsqueda global</label>
+                            <label for="buscar">BAosqueda global</label>
                             <div class="filter-input-icon">
                                 <i class="fa fa-search"></i>
-                                <input type="text" id="buscar" name="buscar" placeholder="Nombre, código, descripción o tags" value="<?= htmlspecialchars($filtros['buscar']) ?>">
+                                <input type="text" id="buscar" name="buscar" placeholder="Nombre, cA3digo, descripciA3n o tags" value="<?= htmlspecialchars($filtros['buscar']) ?>">
                             </div>
                         </div>
                         <div class="filter-field">
-                            <label for="codigo">Código interno</label>
+                            <label for="codigo">CA3digo interno</label>
                             <input type="text" id="codigo" name="codigo" value="<?= htmlspecialchars($filtros['codigo']) ?>" placeholder="Ej. H001">
                         </div>
                         <div class="filter-field">
@@ -188,7 +188,7 @@ $importResultado = $importAlert ?? null;
 
                     <div class="filter-row">
                         <div class="filter-field">
-                            <label for="categoria_id">Categoría</label>
+                            <label for="categoria_id">CategorAa</label>
                             <select id="categoria_id" name="categoria_id">
                                 <option value="">Todas</option>
                                 <?php foreach ($categorias as $categoria): ?>
@@ -197,7 +197,7 @@ $importResultado = $importAlert ?? null;
                             </select>
                         </div>
                         <div class="filter-field">
-                            <label for="almacen_id">Almacén</label>
+                            <label for="almacen_id">AlmacAn</label>
                             <select id="almacen_id" name="almacen_id">
                                 <option value="">Todos</option>
                                 <?php foreach ($almacenes as $almacen): ?>
@@ -215,7 +215,7 @@ $importResultado = $importAlert ?? null;
                             </select>
                         </div>
                         <div class="filter-field">
-                            <label for="estado">Estado físico</label>
+                            <label for="estado">Estado fAsico</label>
                             <select id="estado" name="estado">
                                 <option value="">Todos</option>
                                 <?php foreach ($estadosProducto as $estado): ?>
@@ -269,11 +269,11 @@ $importResultado = $importAlert ?? null;
                             <input type="date" id="fecha_hasta" name="fecha_hasta" value="<?= htmlspecialchars($filtros['fecha_hasta']) ?>">
                         </div>
                         <div class="filter-field">
-                            <label for="valor_min">Valor inventario mínimo</label>
+                            <label for="valor_min">Valor inventario mAnimo</label>
                             <input type="number" step="0.01" id="valor_min" name="valor_min" value="<?= htmlspecialchars($filtros['valor_min']) ?>" placeholder="Ej. 1000">
                         </div>
                         <div class="filter-field">
-                            <label for="valor_max">Valor inventario máximo</label>
+                            <label for="valor_max">Valor inventario mAximo</label>
                             <input type="number" step="0.01" id="valor_max" name="valor_max" value="<?= htmlspecialchars($filtros['valor_max']) ?>" placeholder="Ej. 5000">
                         </div>
                     </div>
@@ -289,8 +289,8 @@ $importResultado = $importAlert ?? null;
 
             <section class="productos-table-card">
                 <div class="productos-table-header">
-                    <h2><i class="fa-solid fa-cubes"></i> Catálogo (<?= number_format($stats['total']) ?>)</h2>
-                    <span class="productos-table-sub">Resultados según filtros aplicados</span>
+                    <h2><i class="fa-solid fa-cubes"></i> CatAlogo (<?= number_format($stats['total']) ?>)</h2>
+                    <span class="productos-table-sub">Resultados segAon filtros aplicados</span>
                 </div>
                 <div class="productos-table-wrapper">
                     <?php if (empty($productos)): ?>
@@ -302,14 +302,14 @@ $importResultado = $importAlert ?? null;
                         <table class="productos-table">
                             <thead>
                             <tr>
-                                <th>Código</th>
+                                <th>CA3digo</th>
                                 <th>Producto</th>
                                 <th>Tipo</th>
-                                <th>Categoría</th>
+                                <th>CategorAa</th>
                                 <th class="col-stock">Stock</th>
                                 <th>Estado</th>
                                 <th>Disponibilidad</th>
-                                <th>Almacén</th>
+                                <th>AlmacAn</th>
                                 <th>Proveedor</th>
                                 <th>Valor</th>
                                 <th class="col-actions">Acciones</th>
@@ -337,12 +337,12 @@ $importResultado = $importAlert ?? null;
                                         <?php endif; ?>
                                     </td>
                                     <td><span class="badge badge-tipo <?= strtolower($producto['tipo'] ?? '') ?>"><?= htmlspecialchars($producto['tipo']) ?></span></td>
-                                    <td><?= htmlspecialchars($producto['categoria'] ?? 'Sin categoría') ?></td>
+                                    <td><?= htmlspecialchars($producto['categoria'] ?? 'Sin categorAa') ?></td>
                                     <td class="col-stock">
                                         <span class="badge badge-stock <?= $badgeStock ?>">
                                             <?= number_format($stockActual) ?> <?= htmlspecialchars($producto['unidad_abreviacion'] ?? '') ?>
                                         </span>
-                                        <small>Mín: <?= number_format($stockMinimo) ?></small>
+                                        <small>MAn: <?= number_format($stockMinimo) ?></small>
                                     </td>
                                     <td><?= htmlspecialchars($producto['estado'] ?? '-') ?></td>
                                     <td>
@@ -356,12 +356,21 @@ $importResultado = $importAlert ?? null;
                                     <td class="col-actions">
                                         <a class="btn-table" title="Ver detalle" href="productos_view.php?id=<?= $producto['id'] ?>"><i class="fa fa-eye"></i></a>
                                         <a class="btn-table" title="Editar" href="productos_edit.php?id=<?= $producto['id'] ?>"><i class="fa fa-pen"></i></a>
-                                        <?php if ((int)($producto['activo_id'] ?? 1) === 1): ?>
-                                            <a class="btn-table" title="Desactivar" href="productos_setactive.php?id=<?= $producto['id'] ?>&active=0" onclick="return confirm('¿Desactivar este producto?');"><i class="fa fa-toggle-off"></i></a>
-                                        <?php else: ?>
-                                            <a class="btn-table" title="Activar" href="productos_setactive.php?id=<?= $producto['id'] ?>&active=1" onclick="return confirm('¿Activar este producto?');"><i class="fa fa-toggle-on"></i></a>
-                                        <?php endif; ?>
-                                        <a class="btn-table btn-danger" title="Eliminar" href="productos_delete.php?id=<?= $producto['id'] ?>" onclick="return confirm('¿Eliminar el producto seleccionado? Esta acción no se puede deshacer.');"><i class="fa fa-trash"></i></a>
+                                        <form method="post" action="productos_setactive.php" class="inline-form" style="display:inline-block">
+                                            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
+                                            <input type="hidden" name="id" value="<?= (int) $producto['id'] ?>">
+                                            <input type="hidden" name="active" value="<?= (int)($producto['activo_id'] ?? 1) === 1 ? 0 : 1 ?>">
+                                            <button type="submit" class="btn-table" title="<?= (int)($producto['activo_id'] ?? 1) === 1 ? 'Desactivar' : 'Activar' ?>" onclick="return confirm('<?= (int)($producto['activo_id'] ?? 1) === 1 ? 'ADesactivar este producto?' : 'AActivar este producto?' ?>');">
+                                                <i class="fa <?= (int)($producto['activo_id'] ?? 1) === 1 ? 'fa-toggle-off' : 'fa-toggle-on' ?>"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="productos_delete.php" class="inline-form" style="display:inline-block" onsubmit="return confirm('AEliminar el producto seleccionado? Esta acciA3n no se puede deshacer.');">
+                                            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
+                                            <input type="hidden" name="id" value="<?= (int) $producto['id'] ?>">
+                                            <button type="submit" class="btn-table btn-danger" title="Eliminar">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -375,3 +384,4 @@ $importResultado = $importAlert ?? null;
 </div>
 </body>
 </html>
+

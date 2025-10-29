@@ -1,56 +1,72 @@
-<?php
+﻿<?php
+require_once __DIR__ . '/../helpers/Session.php';
 require_once __DIR__ . '/../models/Usuario.php';
 require_once __DIR__ . '/../helpers/ActivityLogger.php';
-session_start();
 
 class AuthController
 {
-    public function login()
+    public function login(): void
     {
+        Session::start();
+        $error = '';
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = trim($_POST['username'] ?? '');
-            $password = $_POST['password'] ?? '';
-            $user = Usuario::findByUsername($username);
-            if ($user && password_verify($password, $user['password'])) {
-                // Guardar datos en sesión
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['role'] = $user['role'];
-                $_SESSION['nombre'] = $user['nombre_completo'];
-                ActivityLogger::log('login', 'Inicio de sesión exitoso');
-                header("Location: dashboard.php");
-                exit();
+            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+                $error = 'La sesion expiro. Intenta nuevamente.';
             } else {
-                ActivityLogger::log('login_fallido', 'Intento de inicio de sesión fallido', ['username' => $username]);
-                $error = "Usuario o contraseña incorrectos.";
+                $username = trim($_POST['username'] ?? '');
+                $password = (string) ($_POST['password'] ?? '');
+                $user = $username !== '' ? Usuario::findByUsername($username) : null;
+
+                if ($user && password_verify($password, $user['password'])) {
+                    Session::setUser($user);
+                    Session::regen();
+                    ActivityLogger::log('login', 'Inicio de sesion exitoso');
+                    header('Location: dashboard.php');
+                    exit();
+                }
+
+                ActivityLogger::log('login_fallido', 'Intento de inicio de sesion fallido', ['username' => $username]);
+                $error = 'Usuario o contrasena incorrectos.';
             }
         }
+
         include __DIR__ . '/../views/auth/login.php';
     }
 
-    public function logout()
+    public function logout(): void
     {
-        session_start();
-        ActivityLogger::log('logout', 'Cierre de sesión');
-        session_unset();
-        session_destroy();
-        header("Location: login.php");
+        Session::start();
+        ActivityLogger::log('logout', 'Cierre de sesion');
+        Session::logout();
+        header('Location: login.php');
         exit();
     }
-    public function forgotPassword()
-{
-    $mensaje = '';
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $username = trim($_POST['username'] ?? '');
-        $user = Usuario::findByUsername($username);
-        if ($user) {
-            $mensaje = "Por favor contacta al administrador para restablecer tu contraseña.";
-            ActivityLogger::log('forgot_password', 'Solicitud de recuperación de contraseña', ['username' => $username]);
-            // O aquí puedes implementar envío de correo o generación de código temporal
-        } else {
-            $mensaje = "Usuario no encontrado.";
+
+    public function forgotPassword(): void
+    {
+        Session::start();
+        $mensaje = '';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+                $mensaje = 'La sesion expiro. Intenta nuevamente.';
+            } else {
+                $username = trim($_POST['username'] ?? '');
+                $user = $username !== '' ? Usuario::findByUsername($username) : null;
+
+                if ($user) {
+                    $mensaje = 'Por favor contacta al administrador para restablecer tu contrasena.';
+                    ActivityLogger::log('forgot_password', 'Solicitud de recuperacion de contrasena', ['username' => $username]);
+                } else {
+                    $mensaje = 'Usuario no encontrado.';
+                }
+            }
         }
+
+        include __DIR__ . '/../views/auth/forgot.php';
     }
-    include __DIR__ . '/../views/auth/forgot.php';
 }
 
-}
+
+

@@ -61,13 +61,13 @@ $totalDetalle = array_sum(array_map(fn($item) => (float) ($item['cantidad'] ?? 0
         </div>
         <nav class="sidebar-nav">
             <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <a href="ordenes_compra.php" class="active"><i class="fa-solid fa-file-invoice-dollar"></i> Órdenes de compra</a>
+            <a href="ordenes_compra.php" class="active"><i class="fa-solid fa-file-invoice-dollar"></i> Ordenes de compra</a>
             <a href="compras_proveedor.php"><i class="fa-solid fa-chart-pie"></i> Historial de compras</a>
             <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Productos</a>
             <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
             <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-            <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+            <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesion</a>
         </nav>
     </aside>
     <div class="content-area">
@@ -75,7 +75,7 @@ $totalDetalle = array_sum(array_map(fn($item) => (float) ($item['cantidad'] ?? 0
             <div class="top-header-user">
                 <span><?= htmlspecialchars($nombre ?: 'Usuario') ?></span>
                 <i class="fa-solid fa-user-circle"></i>
-                <a href="logout.php" class="logout-btn" title="Cerrar sesión">
+                <a href="logout.php" class="logout-btn" title="Cerrar sesion">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </a>
             </div>
@@ -101,13 +101,13 @@ $totalDetalle = array_sum(array_map(fn($item) => (float) ($item['cantidad'] ?? 0
                 <div class="alert-success"><i class="fa-solid fa-circle-check"></i> Orden actualizada correctamente.</div>
             <?php endif; ?>
             <?php if (!empty($_GET['received'])): ?>
-                <div class="alert-success"><i class="fa-solid fa-box-open"></i> Se registró la recepción y se actualizó el inventario.</div>
+                <div class="alert-success"><i class="fa-solid fa-box-open"></i> Se registro la recepcion y se actualizo el inventario.</div>
             <?php endif; ?>
             <?php if (!empty($_GET['cancelled'])): ?>
                 <div class="alert-success"><i class="fa-solid fa-ban"></i> Orden cancelada correctamente.</div>
             <?php endif; ?>
             <?php if (!empty($_GET['locked'])): ?>
-                <div class="alert-error"><i class="fa-solid fa-circle-info"></i> La orden no puede editarse porque está cerrada.</div>
+                <div class="alert-error"><i class="fa-solid fa-circle-info"></i> La orden no puede editarse porque esta cerrada.</div>
             <?php endif; ?>
             <?php if (!empty($msg)): ?>
                 <div class="alert-success"><?= htmlspecialchars($msg) ?></div>
@@ -138,7 +138,7 @@ $totalDetalle = array_sum(array_map(fn($item) => (float) ($item['cantidad'] ?? 0
                     <span class="value">$<?= number_format((float) ($orden['total'] ?? $totalDetalle), 2) ?></span>
                 </div>
                 <div class="summary-card">
-                    <span class="label">Almacén destino</span>
+                    <span class="label">Almacen destino</span>
                     <span class="value" style="font-size:1.1rem;"><?= htmlspecialchars($orden['almacen_destino'] ?? '-') ?></span>
                 </div>
                 <div class="summary-card">
@@ -158,7 +158,7 @@ $totalDetalle = array_sum(array_map(fn($item) => (float) ($item['cantidad'] ?? 0
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Código</th>
+                            <th>Codigo</th>
                             <th>Producto</th>
                             <th>Tipo</th>
                             <th>Cantidad</th>
@@ -195,12 +195,13 @@ $totalDetalle = array_sum(array_map(fn($item) => (float) ($item['cantidad'] ?? 0
 
             <?php if ($puedeRecibir): ?>
                 <section id="recepcion" class="form-recepcion">
-                    <h2><i class="fa-solid fa-box-open"></i> Registrar recepción</h2>
+                    <h2><i class="fa-solid fa-box-open"></i> Registrar recepcion</h2>
                     <form method="post">
+                        <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
                         <input type="hidden" name="accion" value="recibir">
                         <div class="form-grid">
                             <div>
-                                <label for="numero_factura">Número de factura</label>
+                                <label for="numero_factura">Numero de factura</label>
                                 <input type="text" name="numero_factura" id="numero_factura" value="<?= htmlspecialchars($orden['numero_factura'] ?? '') ?>">
                             </div>
                             <div>
@@ -208,7 +209,7 @@ $totalDetalle = array_sum(array_map(fn($item) => (float) ($item['cantidad'] ?? 0
                                 <input type="text" name="rfc" id="rfc" maxlength="13" value="<?= htmlspecialchars($orden['rfc'] ?? '') ?>">
                             </div>
                             <div>
-                                <label for="almacen_destino_id">Almacén que recibe *</label>
+                                <label for="almacen_destino_id">Almacen que recibe *</label>
                                 <select name="almacen_destino_id" id="almacen_destino_id" required>
                                     <option value="">Selecciona</option>
                                     <?php foreach ($almacenes as $almacen): ?>
@@ -219,14 +220,15 @@ $totalDetalle = array_sum(array_map(fn($item) => (float) ($item['cantidad'] ?? 0
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" class="btn-action"><i class="fa-solid fa-box"></i> Confirmar recepción</button>
+                        <button type="submit" class="btn-action"><i class="fa-solid fa-box"></i> Confirmar recepcion</button>
                     </form>
                 </section>
             <?php endif; ?>
 
             <?php if (in_array($role, ['Administrador', 'Compras'], true) && $estado === 'pendiente'): ?>
                 <section style="margin-top:24px;">
-                    <form method="post" onsubmit="return confirm('¿Cancelar la orden? Esta acción no afecta el inventario.');">
+                    <form method="post" onsubmit="return confirm('Cancelar la orden? Esta accion no afecta el inventario.');">
+                        <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
                         <input type="hidden" name="accion" value="cancelar">
                         <button type="submit" class="btn-danger"><i class="fa-solid fa-ban"></i> Cancelar orden</button>
                     </form>

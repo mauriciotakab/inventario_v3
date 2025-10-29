@@ -1,6 +1,13 @@
 <?php
+require_once __DIR__ . '/../app/helpers/Session.php';
 require_once __DIR__ . '/../app/controllers/ProductoController.php';
-$id = $_GET['id'] ?? 0;
-$active = $_GET['active'] ?? 0;
+
+Session::start();
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: productos.php');
+    exit();
+}
+
 $controller = new ProductoController();
-$controller->setActive($id, $active);
+$controller->setActive($_POST['id'] ?? 0, $_POST['active'] ?? 0);

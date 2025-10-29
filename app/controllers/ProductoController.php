@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../models/Producto.php';
 require_once __DIR__ . '/../helpers/Session.php';
 require_once __DIR__ . '/../helpers/ActivityLogger.php';
@@ -42,8 +42,8 @@ class ProductoController
         ];
 
         foreach ($productos as $producto) {
-            $cantidad = (int) ($producto['stock_actual'] ?? 0);
-            $minimo = (int) ($producto['stock_minimo'] ?? 0);
+            $cantidad = (float) ($producto['stock_actual'] ?? 0);
+            $minimo = (float) ($producto['stock_minimo'] ?? 0);
             $valorProducto = (float) ($producto['costo_compra'] ?? 0) * $cantidad;
             $stats['valor_total'] += $valorProducto;
 
@@ -67,10 +67,10 @@ class ProductoController
         }
 
         $db = Database::getInstance()->getConnection();
-        $categorias = $db->query("SELECT id, nombre FROM categorias ORDER BY nombre ASC")->fetchAll();
-        $almacenes = $db->query("SELECT id, nombre FROM almacenes ORDER BY nombre ASC")->fetchAll();
-        $proveedores = $db->query("SELECT id, nombre FROM proveedores ORDER BY nombre ASC")->fetchAll();
-        $unidades = $db->query("SELECT id, nombre, abreviacion FROM unidades_medida ORDER BY nombre ASC")->fetchAll();
+        $categorias = $db->query('SELECT id, nombre FROM categorias ORDER BY nombre ASC')->fetchAll();
+        $almacenes = $db->query('SELECT id, nombre FROM almacenes ORDER BY nombre ASC')->fetchAll();
+        $proveedores = $db->query('SELECT id, nombre FROM proveedores ORDER BY nombre ASC')->fetchAll();
+        $unidades = $db->query('SELECT id, nombre, abreviacion FROM unidades_medida ORDER BY nombre ASC')->fetchAll();
         $estadosActivos = Producto::estadosActivos();
         $estadosProducto = Producto::estadosDisponibles();
         $tiposProducto = Producto::tiposDisponibles();
@@ -99,54 +99,53 @@ class ProductoController
     public function create()
     {
         Session::requireLogin(['Administrador', 'Almacen', 'Compras']);
+
         $db = Database::getInstance()->getConnection();
-        $categorias = $db->query("SELECT id, nombre FROM categorias ORDER BY nombre ASC")->fetchAll();
-        $proveedores = $db->query("SELECT id, nombre FROM proveedores ORDER BY nombre ASC")->fetchAll();
-        $almacenes = $db->query("SELECT id, nombre FROM almacenes ORDER BY nombre ASC")->fetchAll();
-        $unidades = $db->query("SELECT id, nombre, abreviacion FROM unidades_medida ORDER BY nombre ASC")->fetchAll();
+        $categorias = $db->query('SELECT id, nombre FROM categorias ORDER BY nombre ASC')->fetchAll();
+        $proveedores = $db->query('SELECT id, nombre FROM proveedores ORDER BY nombre ASC')->fetchAll();
+        $almacenes = $db->query('SELECT id, nombre FROM almacenes ORDER BY nombre ASC')->fetchAll();
+        $unidades = $db->query('SELECT id, nombre, abreviacion FROM unidades_medida ORDER BY nombre ASC')->fetchAll();
         $estadosProducto = Producto::estadosDisponibles();
         $tiposProducto = Producto::tiposDisponibles();
+
+        $errors = [];
+        $data = $this->defaultProductoData();
         $error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (Producto::findByCodigo($_POST['codigo'])) {
-                $error = "Ya existe un producto con ese código.";
+            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+                $errors[] = 'Token CSRF invalido.';
             } else {
-                $imagen_path = null;
-                if (!empty($_FILES['imagen_url']['name'])) {
-                    $upload_dir = __DIR__ . '/..//assets/images/';
-                    if (!is_dir($upload_dir)) {
-                        mkdir($upload_dir, 0777, true);
-                    }
-                    $nombreArchivo = uniqid() . '_' . basename($_FILES['imagen_url']['name']);
-                    $target_file = $upload_dir . $nombreArchivo;
-                    $tipoArchivo = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-                    $check = @getimagesize($_FILES['imagen_url']['tmp_name']);
-                    if ($check === false) {
-                        $error = "El archivo no es una imagen válida.";
-                    } elseif ($_FILES['imagen_url']['size'] > 2 * 1024 * 1024) {
-                        $error = "La imagen es demasiado grande (máx. 2MB).";
-                    } elseif (!in_array($tipoArchivo, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
-                        $error = "Formato de imagen no permitido.";
-                    } elseif (!move_uploaded_file($_FILES['imagen_url']['tmp_name'], $target_file)) {
-                        $error = "Error al subir la imagen.";
-                    } else {
-                        $imagen_path = 'assets/images/' . $nombreArchivo;
-                    }
+                $data = $this->collectProductoData($_POST, $errors);
+
+                if (Producto::findByCodigo($data['codigo'])) {
+                    $errors[] = 'Ya existe un producto con ese codigo.';
                 }
-                if (empty($error)) {
-                    $data = $_POST;
-                    $data['imagen_url'] = $imagen_path;
-                    $data['last_requested_by_user_id'] = null;
-                    $data['last_request_date'] = null;
-                    Producto::create($data);
-                    ActivityLogger::log('producto_creado', 'Se registró el producto ' . $data['nombre'], [
-                        'codigo' => $data['codigo'] ?? null,
+
+                $nuevaImagen = $this->handleImagenUpload($_FILES['imagen_url'] ?? null, $errors);
+                if ($nuevaImagen === false) {
+                    $errors[] = 'No fue posible procesar la imagen adjunta.';
+                } elseif (is_string($nuevaImagen)) {
+                    $data['imagen_url'] = $nuevaImagen;
+                }
+
+                if (empty($errors)) {
+                    $payload = $data;
+                    $payload['last_requested_by_user_id'] = null;
+                    $payload['last_request_date'] = null;
+
+                    Producto::create($payload);
+                    ActivityLogger::log('producto_creado', 'Se registro el producto ' . $payload['nombre'], [
+                        'codigo' => $payload['codigo'],
                     ]);
                     header('Location: productos.php?success=1');
                     exit();
                 }
             }
+        }
+
+        if (!empty($errors)) {
+            $error = implode(PHP_EOL, $errors);
         }
 
         include __DIR__ . '/../views/productos/create.php';
@@ -155,54 +154,50 @@ class ProductoController
     public function edit($id)
     {
         Session::requireLogin(['Administrador', 'Almacen', 'Compras']);
+
         $producto = Producto::find($id);
         if (!$producto) {
             die('Producto no encontrado.');
         }
 
         $db = Database::getInstance()->getConnection();
-        $categorias = $db->query("SELECT id, nombre FROM categorias ORDER BY nombre ASC")->fetchAll();
-        $proveedores = $db->query("SELECT id, nombre FROM proveedores ORDER BY nombre ASC")->fetchAll();
-        $almacenes = $db->query("SELECT id, nombre FROM almacenes ORDER BY nombre ASC")->fetchAll();
-        $unidades = $db->query("SELECT id, nombre, abreviacion FROM unidades_medida ORDER BY nombre ASC")->fetchAll();
+        $categorias = $db->query('SELECT id, nombre FROM categorias ORDER BY nombre ASC')->fetchAll();
+        $proveedores = $db->query('SELECT id, nombre FROM proveedores ORDER BY nombre ASC')->fetchAll();
+        $almacenes = $db->query('SELECT id, nombre FROM almacenes ORDER BY nombre ASC')->fetchAll();
+        $unidades = $db->query('SELECT id, nombre, abreviacion FROM unidades_medida ORDER BY nombre ASC')->fetchAll();
         $estadosProducto = Producto::estadosDisponibles();
         $tiposProducto = Producto::tiposDisponibles();
-        $error = '';
+
+        $errors = [];
+        $data = array_merge($this->defaultProductoData(), $producto);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (Producto::existsCodigoExcept($_POST['codigo'], $id)) {
-                $error = "Ya existe otro producto con ese código.";
+            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+                $errors[] = 'Token CSRF invalido.';
             } else {
-                $imagen_path = $producto['imagen_url'];
-                if (!empty($_FILES['imagen_url']['name'])) {
-                    $upload_dir = __DIR__ . '/..//assets/images/';
-                    if (!is_dir($upload_dir)) {
-                        mkdir($upload_dir, 0777, true);
-                    }
-                    $nombreArchivo = uniqid() . '_' . basename($_FILES['imagen_url']['name']);
-                    $target_file = $upload_dir . $nombreArchivo;
-                    $tipoArchivo = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-                    $check = @getimagesize($_FILES['imagen_url']['tmp_name']);
-                    if ($check === false) {
-                        $error = "El archivo no es una imagen válida.";
-                    } elseif ($_FILES['imagen_url']['size'] > 2 * 1024 * 1024) {
-                        $error = "La imagen es demasiado grande (máx. 2MB).";
-                    } elseif (!in_array($tipoArchivo, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
-                        $error = "Formato de imagen no permitido.";
-                    } elseif (!move_uploaded_file($_FILES['imagen_url']['tmp_name'], $target_file)) {
-                        $error = "Error al subir la imagen.";
-                    } else {
-                        $imagen_path = 'assets/images/' . $nombreArchivo;
-                    }
+                $data = $this->collectProductoData($_POST, $errors, (int) $id);
+
+                $existente = Producto::findByCodigo($data['codigo']);
+                if ($existente && (int) $existente['id'] !== (int) $id) {
+                    $errors[] = 'Ya existe otro producto con ese codigo.';
                 }
-                if (empty($error)) {
-                    $data = $_POST;
-                    $data['imagen_url'] = $imagen_path;
-                    $data['last_requested_by_user_id'] = $producto['last_requested_by_user_id'];
-                    $data['last_request_date'] = $producto['last_request_date'];
+
+                $nuevaImagen = $this->handleImagenUpload($_FILES['imagen_url'] ?? null, $errors, $producto['imagen_url'] ?? null);
+                if ($nuevaImagen === false) {
+                    $errors[] = 'No fue posible procesar la imagen adjunta.';
+                } elseif (is_string($nuevaImagen)) {
+                    $data['imagen_url'] = $nuevaImagen;
+                } else {
+                    $data['imagen_url'] = $producto['imagen_url'];
+                }
+
+                if (empty($errors)) {
+                    $data['last_requested_by_user_id'] = $producto['last_requested_by_user_id'] ?? null;
+                    $data['last_request_date'] = $producto['last_request_date'] ?? null;
+
                     Producto::update($id, $data);
-                    ActivityLogger::log('producto_actualizado', 'Se actualizó el producto ' . $data['nombre'], [
-                        'codigo' => $data['codigo'] ?? null,
+                    ActivityLogger::log('producto_actualizado', 'Se actualizo el producto ' . $data['nombre'], [
+                        'codigo' => $data['codigo'],
                     ]);
                     header('Location: productos.php?success=2');
                     exit();
@@ -210,9 +205,10 @@ class ProductoController
             }
         }
 
+        $error = empty($errors) ? '' : implode(PHP_EOL, $errors);
+
         include __DIR__ . '/../views/productos/edit.php';
     }
-
     public function view($id)
     {
         Session::requireLogin(['Administrador', 'Almacen', 'Compras']);
@@ -226,15 +222,22 @@ class ProductoController
     public function delete($id)
     {
         Session::requireLogin(['Administrador', 'Almacen', 'Compras']);
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Session::checkCsrf($_POST['csrf'] ?? '')) {
+            header('Location: productos.php?deleted=0&error=csrf');
+            exit();
+        }
+
         $producto = Producto::find($id);
         Producto::delete($id);
+
         if ($producto) {
-            ActivityLogger::log('producto_eliminado', 'Se eliminó el producto ' . ($producto['nombre'] ?? ''), [
+            ActivityLogger::log('producto_eliminado', 'Se elimino el producto ' . ($producto['nombre'] ?? ''), [
                 'codigo' => $producto['codigo'] ?? null,
             ]);
         } else {
-            ActivityLogger::log('producto_eliminado', 'Se eliminó un producto', ['producto_id' => $id]);
+            ActivityLogger::log('producto_eliminado', 'Se elimino un producto', ['producto_id' => $id]);
         }
+
         header('Location: productos.php?deleted=1');
         exit();
     }
@@ -242,8 +245,13 @@ class ProductoController
     public function setActive($id, $active)
     {
         Session::requireLogin(['Administrador', 'Almacen', 'Compras']);
-        Producto::setActive($id, $active);
-        ActivityLogger::log('producto_estado', 'Se cambió la disponibilidad del producto', [
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Session::checkCsrf($_POST['csrf'] ?? '')) {
+            header('Location: productos.php?error=csrf');
+            exit();
+        }
+
+        Producto::setActive($id, (int) $active);
+        ActivityLogger::log('producto_estado', 'Se cambio la disponibilidad del producto', [
             'producto_id' => (int) $id,
             'activo' => (bool) $active,
         ]);
@@ -269,62 +277,25 @@ class ProductoController
             'stock_minimo',
             'costo_compra',
             'precio_venta',
+            'peso',
+            'ancho',
+            'alto',
+            'profundidad',
             'marca',
             'color',
             'forma',
             'origen',
-            'tags'
+            'tags',
         ];
 
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename=plantilla_productos_' . date('Ymd_His') . '.csv');
 
         $output = fopen('php://output', 'w');
-        fputs($output, chr(239) . chr(187) . chr(191)); // BOM UTF-8
+        fputs($output, chr(239) . chr(187) . chr(191));
         fputcsv($output, $columns);
-        fputcsv($output, [
-            'HERR-001',
-            'Taladro percutor',
-            'Taladro 1/2" con velocidad variable.',
-            'Herramienta',
-            'Nuevo',
-            '1',
-            '1',
-            '1',
-            '1',
-            '5',
-            '2',
-            '1500',
-            '2200',
-            'Bosch',
-            'Azul',
-            'Compacto',
-            'Alemania',
-            'herramientas,taladro'
-        ]);
-        fputcsv($output, [
-            'CON-200',
-            'Cinta aislante',
-            'Cinta aislante 19mm negra.',
-            'Consumible',
-            'Nuevo',
-            '2',
-            '',
-            '1',
-            '2',
-            '120',
-            '20',
-            '12',
-            '20',
-            '3M',
-            'Negro',
-            '',
-            'México',
-            'material-electrico'
-        ]);
         fclose($output);
-        ActivityLogger::log('plantilla_productos', 'Descarga de plantilla de productos');
-        exit();
+        ActivityLogger::log('productos_template', 'Descarga de plantilla de productos');
     }
 
     public function import(): void
@@ -333,73 +304,81 @@ class ProductoController
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: productos.php');
-            exit();
+            return;
         }
+
+        if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            $_SESSION['productos_import'] = [
+                'processed' => 0,
+                'success' => 0,
+                'skipped' => 0,
+                'errors' => ['Token CSRF invalido.'],
+            ];
+            header('Location: productos.php');
+            return;
+        }
+
+        if (empty($_FILES['archivo']['tmp_name']) || $_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
+            $_SESSION['productos_import'] = [
+                'processed' => 0,
+                'success' => 0,
+                'skipped' => 0,
+                'errors' => ['Debes seleccionar un archivo CSV valido.'],
+            ];
+            header('Location: productos.php');
+            return;
+        }
+
+        $handle = fopen($_FILES['archivo']['tmp_name'], 'r');
+        if (!$handle) {
+            $_SESSION['productos_import'] = [
+                'processed' => 0,
+                'success' => 0,
+                'skipped' => 0,
+                'errors' => ['No fue posible leer el archivo.'],
+            ];
+            header('Location: productos.php');
+            return;
+        }
+
+        $columns = fgetcsv($handle);
+        if (!$columns) {
+            fclose($handle);
+            $_SESSION['productos_import'] = [
+                'processed' => 0,
+                'success' => 0,
+                'skipped' => 0,
+                'errors' => ['El archivo esta vacio.'],
+            ];
+            header('Location: productos.php');
+            return;
+        }
+
+        $columns = array_map('trim', $columns);
+        $map = array_flip($columns);
 
         $result = [
-            'success' => 0,
-            'errors' => [],
-            'skipped' => 0,
             'processed' => 0,
+            'success' => 0,
+            'skipped' => 0,
+            'errors' => [],
         ];
-
-        if (empty($_FILES['productos_archivo']) || $_FILES['productos_archivo']['error'] !== UPLOAD_ERR_OK) {
-            $result['errors'][] = 'No se pudo leer el archivo subido.';
-            $_SESSION['productos_import'] = $result;
-            header('Location: productos.php');
-            exit();
-        }
-
-        $tmpPath = $_FILES['productos_archivo']['tmp_name'];
-        $handle = fopen($tmpPath, 'r');
-        if ($handle === false) {
-            $result['errors'][] = 'No se pudo abrir el archivo para lectura.';
-            $_SESSION['productos_import'] = $result;
-            header('Location: productos.php');
-            exit();
-        }
-
-        $header = fgetcsv($handle, 0, ',');
-        if ($header === false) {
-            $result['errors'][] = 'El archivo está vacío.';
-            fclose($handle);
-            $_SESSION['productos_import'] = $result;
-            header('Location: productos.php');
-            exit();
-        }
-
-        if (!empty($header)) {
-            $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', $header[0]);
-        }
-
-        $header = array_map(static function ($value) {
-            return strtolower(trim($value ?? ''));
-        }, $header);
-
-        $required = ['codigo', 'nombre', 'tipo', 'almacen_id', 'stock_actual', 'stock_minimo'];
-        $missing = array_diff($required, $header);
-        if (!empty($missing)) {
-            $result['errors'][] = 'Faltan columnas obligatorias en la cabecera: ' . implode(', ', $missing);
-            fclose($handle);
-            $_SESSION['productos_import'] = $result;
-            header('Location: productos.php');
-            exit();
-        }
 
         $tiposValidos = Producto::tiposDisponibles();
         $estadosValidos = Producto::estadosDisponibles();
 
-        $lineNumber = 1;
-        while (($row = fgetcsv($handle, 0, ',')) !== false) {
-            $lineNumber++;
-            if ($this->filaVacia($row)) {
-                continue;
-            }
+        while (($row = fgetcsv($handle)) !== false) {
             $result['processed']++;
+            $lineNumber = $result['processed'] + 1;
 
             $rowAssoc = [];
-            foreach ($header as $index => $column) {
-                $rowAssoc[$column] = $row[$index] ?? '';
+            foreach ($map as $col => $index) {
+                $rowAssoc[$col] = $row[$index] ?? null;
+            }
+
+            if ($this->filaVacia($rowAssoc)) {
+                $result['skipped']++;
+                continue;
             }
 
             $codigo = trim($rowAssoc['codigo'] ?? '');
@@ -409,8 +388,7 @@ class ProductoController
             }
 
             if (Producto::findByCodigo($codigo)) {
-                $result['errors'][] = "Fila {$lineNumber}: ya existe un producto con el código {$codigo}.";
-                $result['skipped']++;
+                $result['errors'][] = "Fila {$lineNumber}: el codigo ya existe.";
                 continue;
             }
 
@@ -422,7 +400,7 @@ class ProductoController
 
             $tipo = ucfirst(strtolower(trim($rowAssoc['tipo'] ?? '')));
             if (!in_array($tipo, $tiposValidos, true)) {
-                $result['errors'][] = "Fila {$lineNumber}: el tipo '{$rowAssoc['tipo']}' no es válido. Valores permitidos: " . implode(', ', $tiposValidos) . '.';
+                $result['errors'][] = "Fila {$lineNumber}: el tipo '{$rowAssoc['tipo']}' no es valido. Valores permitidos: " . implode(', ', $tiposValidos) . '.';
                 continue;
             }
 
@@ -431,13 +409,13 @@ class ProductoController
                 $estado = 'Nuevo';
             }
             if (!in_array($estado, $estadosValidos, true)) {
-                $result['errors'][] = "Fila {$lineNumber}: el estado '{$rowAssoc['estado']}' no es válido. Valores permitidos: " . implode(', ', $estadosValidos) . '.';
+                $result['errors'][] = "Fila {$lineNumber}: el estado '{$rowAssoc['estado']}' no es valido. Valores permitidos: " . implode(', ', $estadosValidos) . '.';
                 continue;
             }
 
             $almacenId = (int) ($rowAssoc['almacen_id'] ?? 0);
             if ($almacenId <= 0) {
-                $result['errors'][] = "Fila {$lineNumber}: el campo 'almacen_id' debe ser un número válido.";
+                $result['errors'][] = "Fila {$lineNumber}: el campo 'almacen_id' debe ser un numero valido.";
                 continue;
             }
 
@@ -492,7 +470,7 @@ class ProductoController
 
         fclose($handle);
 
-        ActivityLogger::log('productos_import', 'Importación de productos finalizada', [
+        ActivityLogger::log('productos_import', 'Importacion de productos finalizada', [
             'exitosos' => $result['success'],
             'procesados' => $result['processed'],
             'omitidos' => $result['skipped'],
@@ -529,4 +507,183 @@ class ProductoController
         $normalized = str_replace(',', '.', (string) $value);
         return is_numeric($normalized) ? (float) $normalized : null;
     }
+
+    private function defaultProductoData(): array
+    {
+        return [
+            'codigo' => '',
+            'nombre' => '',
+            'descripcion' => '',
+            'proveedor_id' => null,
+            'categoria_id' => null,
+            'peso' => null,
+            'ancho' => null,
+            'alto' => null,
+            'profundidad' => null,
+            'unidad_medida_id' => null,
+            'clase_categoria' => '',
+            'marca' => '',
+            'color' => '',
+            'forma' => '',
+            'especificaciones_tecnicas' => '',
+            'origen' => '',
+            'costo_compra' => 0.0,
+            'precio_venta' => 0.0,
+            'stock_minimo' => 0.0,
+            'stock_actual' => 0.0,
+            'almacen_id' => null,
+            'estado' => 'Nuevo',
+            'tipo' => 'Consumible',
+            'imagen_url' => null,
+            'tags' => '',
+            'activo_id' => 1,
+        ];
+    }
+
+    private function collectProductoData(array $input, array &$errors, ?int $productoId = null): array
+    {
+        $data = $this->defaultProductoData();
+
+        $data['codigo'] = trim($input['codigo'] ?? '');
+        if ($data['codigo'] === '') {
+            $errors[] = 'El codigo interno es obligatorio.';
+        } elseif (mb_strlen($data['codigo']) > 50) {
+            $errors[] = 'El codigo no debe exceder 50 caracteres.';
+        }
+
+        $data['nombre'] = trim($input['nombre'] ?? '');
+        if ($data['nombre'] === '') {
+            $errors[] = 'El nombre del producto es obligatorio.';
+        } elseif (mb_strlen($data['nombre']) > 150) {
+            $errors[] = 'El nombre no debe exceder 150 caracteres.';
+        }
+
+        $data['descripcion'] = trim($input['descripcion'] ?? '');
+        if (mb_strlen($data['descripcion']) > 1000) {
+            $errors[] = 'La descripcion no debe exceder 1000 caracteres.';
+        }
+
+        $data['proveedor_id'] = $this->toNullableInt($input['proveedor_id'] ?? null);
+        $data['categoria_id'] = $this->toNullableInt($input['categoria_id'] ?? null);
+        $data['unidad_medida_id'] = $this->toNullableInt($input['unidad_medida_id'] ?? null);
+        $data['almacen_id'] = $this->toNullableInt($input['almacen_id'] ?? null);
+        if (empty($data['almacen_id'])) {
+            $errors[] = 'Debes seleccionar un almacen asignado.';
+        }
+
+        $data['clase_categoria'] = trim($input['clase_categoria'] ?? '');
+        $data['marca'] = trim($input['marca'] ?? '');
+        $data['color'] = trim($input['color'] ?? '');
+        $data['forma'] = trim($input['forma'] ?? '');
+        $data['especificaciones_tecnicas'] = trim($input['especificaciones_tecnicas'] ?? '');
+        $data['origen'] = trim($input['origen'] ?? '');
+        $data['tags'] = trim($input['tags'] ?? '');
+
+        $data['peso'] = $this->normalizeDecimal($input['peso'] ?? null);
+        $data['ancho'] = $this->normalizeDecimal($input['ancho'] ?? null);
+        $data['alto'] = $this->normalizeDecimal($input['alto'] ?? null);
+        $data['profundidad'] = $this->normalizeDecimal($input['profundidad'] ?? null);
+
+        $data['stock_actual'] = $this->normalizeDecimal($input['stock_actual'] ?? 0);
+        if ($data['stock_actual'] === null || $data['stock_actual'] < 0) {
+            $errors[] = 'El stock actual debe ser un numero mayor o igual a cero.';
+        }
+
+        $data['stock_minimo'] = $this->normalizeDecimal($input['stock_minimo'] ?? 0);
+        if ($data['stock_minimo'] === null || $data['stock_minimo'] < 0) {
+            $errors[] = 'El stock minimo debe ser un numero mayor o igual a cero.';
+        }
+
+        $data['costo_compra'] = $this->normalizeDecimal($input['costo_compra'] ?? 0);
+        if ($data['costo_compra'] === null || $data['costo_compra'] < 0) {
+            $errors[] = 'El costo de compra debe ser un numero mayor o igual a cero.';
+        }
+
+        $data['precio_venta'] = $this->normalizeDecimal($input['precio_venta'] ?? 0);
+        if ($data['precio_venta'] === null || $data['precio_venta'] < 0) {
+            $errors[] = 'El precio de venta debe ser un numero mayor o igual a cero.';
+        }
+
+        $data['tipo'] = $input['tipo'] ?? 'Consumible';
+        if (!in_array($data['tipo'], Producto::tiposDisponibles(), true)) {
+            $errors[] = 'El tipo seleccionado no es valido.';
+        }
+
+        $data['estado'] = $input['estado'] ?? 'Nuevo';
+        if (!in_array($data['estado'], Producto::estadosDisponibles(), true)) {
+            $errors[] = 'El estado seleccionado no es valido.';
+        }
+
+        return $data;
+    }
+
+    private function normalizeDecimal($value): ?float
+    {
+        if ($value === null || $value === '') {
+            return 0.0;
+        }
+        $normalized = str_replace(',', '.', (string) $value);
+        return is_numeric($normalized) ? round((float) $normalized, 2) : null;
+    }
+
+    private function handleImagenUpload(?array $file, array &$errors, ?string $existingPath = null)
+    {
+        if (!$file || ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            return $existingPath;
+        }
+
+        if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+            $errors[] = 'Error al cargar la imagen (codigo ' . ($file['error'] ?? 'desconocido') . ').';
+            return false;
+        }
+
+        if (($file['size'] ?? 0) > 2 * 1024 * 1024) {
+            $errors[] = 'La imagen no debe superar los 2 MB.';
+            return false;
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = $finfo ? finfo_file($finfo, $file['tmp_name']) : null;
+        if ($finfo) {
+            finfo_close($finfo);
+        }
+
+        $allowed = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+        ];
+
+        if (!$mime || !isset($allowed[$mime])) {
+            $errors[] = 'El formato de imagen no es valido.';
+            return false;
+        }
+
+        $uploadDir = dirname(__DIR__, 2) . '/public/assets/images/';
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+            $errors[] = 'No fue posible preparar el directorio de imagenes.';
+            return false;
+        }
+
+        $filename = uniqid('prod_', true) . '.' . $allowed[$mime];
+        $destination = rtrim($uploadDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename;
+
+        if (!move_uploaded_file($file['tmp_name'], $destination)) {
+            $errors[] = 'No fue posible guardar la imagen subida.';
+            return false;
+        }
+
+        return 'assets/images/' . $filename;
+    }
 }
+
+
+
+
+
+
+
+
+
+

@@ -60,7 +60,7 @@ class ReporteController
                 $this->exportPdf($section, $datasets, $mostrarCostos, $fechaInicio, $fechaFin);
             } else {
                 header('HTTP/1.1 400 Bad Request');
-                echo 'Formato de exportación no soportado.';
+                echo 'Formato de exportacion no soportado.';
             }
             return;
         }
@@ -138,7 +138,7 @@ class ReporteController
     private function reporteValorPorAlmacen(): array
     {
         $db = Database::getInstance()->getConnection();
-        // Agregar por stock por almacén cuando la tabla stock_almacen existe
+        // Agregar por stock por almacen cuando la tabla stock_almacen existe
         $sql = "SELECT a.nombre AS almacen,
                        COUNT(DISTINCT sa.producto_id) AS productos,
                        COALESCE(SUM(sa.stock), 0) AS unidades,
@@ -341,7 +341,7 @@ class ReporteController
         }
 
         fclose($output);
-        ActivityLogger::log('reporte_export', 'Exportación CSV de ' . $section, [
+        ActivityLogger::log('reporte_export', 'Exportacion CSV de ' . $section, [
             'section' => $section,
             'desde' => $desde,
             'hasta' => $hasta,
@@ -382,7 +382,7 @@ class ReporteController
         if ($subtitle) {
             $lines[] = $subtitle;
         } elseif (in_array($section, ['movimientos', 'prestamos_abiertos', 'prestamos_vencidos', 'top_salidas'], true)) {
-            $lines[] = 'Período: ' . $desde . ' al ' . $hasta;
+            $lines[] = 'Periodo: ' . $desde . ' al ' . $hasta;
         }
         $lines[] = '';
         $headerLabels = array_column($columns, 'label');
@@ -409,7 +409,7 @@ class ReporteController
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename=' . $filename);
         echo $pdf;
-        ActivityLogger::log('reporte_export', 'Exportación PDF de ' . $section, [
+        ActivityLogger::log('reporte_export', 'Exportacion PDF de ' . $section, [
             'section' => $section,
             'desde' => $desde,
             'hasta' => $hasta,
@@ -500,7 +500,7 @@ class ReporteController
                 header('Content-Disposition: attachment; filename=' . $filename . '.csv');
                 $out = fopen('php://output', 'w');
                 fputs($out, chr(239) . chr(187) . chr(191));
-                fputcsv($out, ['Código', 'Producto', 'Tipo', 'Almacén', 'Stock actual', 'Salidas', 'Entradas', 'Índice', 'Clasificación', 'Último movimiento']);
+                fputcsv($out, ['Codigo', 'Producto', 'Tipo', 'almacen', 'Stock actual', 'Salidas', 'Entradas', 'Indice', 'Clasificacion', 'Ultimo movimiento']);
                 foreach ($rotacion as $row) {
                     fputcsv($out, [
                         $row['codigo'],
@@ -516,21 +516,21 @@ class ReporteController
                     ]);
                 }
                 fclose($out);
-                ActivityLogger::log('rotacion_export', 'Exportación CSV de rotación de inventario', [
+                ActivityLogger::log('rotacion_export', 'Exportacion CSV de rotacion de inventario', [
                     'tipo' => $tipoFiltro ?: null,
                     'almacen_id' => $almacenId ?: null,
                     'desde' => $desde,
                     'hasta' => $hasta,
                 ]);
             } elseif ($_GET['export'] === 'pdf') {
-                $lines = ['Rotación de inventario', "Periodo: {$desde} al {$hasta}", ''];
-                $lines[] = 'Código | Producto | Salidas | Índice | Clasificación';
+                $lines = ['Rotacion de inventario', "Periodo: {$desde} al {$hasta}", ''];
+                $lines[] = 'Codigo | Producto | Salidas | Indice | Clasificacion';
                 $lines[] = str_repeat('-', 80);
                 foreach ($rotacion as $row) {
                     $lines[] = sprintf(
                         '%s | %s | %0.2f | %0.2f | %s',
                         $row['codigo'],
-                        mb_strimwidth($row['nombre'], 0, 30, '…'),
+                        mb_strimwidth($row['nombre'], 0, 30, '...'),
                         $row['salidas'],
                         $row['indice'],
                         $row['clasificacion']
@@ -540,7 +540,7 @@ class ReporteController
                 header('Content-Type: application/pdf');
                 header('Content-Disposition: attachment; filename=' . $filename . '.pdf');
                 echo $pdf;
-                ActivityLogger::log('rotacion_export', 'Exportación PDF de rotación de inventario', [
+                ActivityLogger::log('rotacion_export', 'Exportacion PDF de rotacion de inventario', [
                     'tipo' => $tipoFiltro ?: null,
                     'almacen_id' => $almacenId ?: null,
                     'desde' => $desde,
@@ -565,26 +565,26 @@ class ReporteController
         switch ($section) {
             case 'inventario_bajo':
                 return [
-                    'title' => 'Inventario por debajo del stock mínimo',
+                    'title' => 'Inventario por debajo del stock minimo',
                     'filename' => 'inventario_bajo',
                     'columns' => [
-                        ['label' => 'Código', 'value' => fn($row) => $row['codigo']],
+                        ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
                         ['label' => 'Producto', 'value' => fn($row) => $row['nombre']],
                         ['label' => 'Tipo', 'value' => fn($row) => $row['tipo']],
-                        ['label' => 'Categoría', 'value' => fn($row) => $row['categoria']],
-                        ['label' => 'Almacén', 'value' => fn($row) => $row['almacen']],
+                        ['label' => 'Categoria', 'value' => fn($row) => $row['categoria']],
+                        ['label' => 'Almacen', 'value' => fn($row) => $row['almacen']],
                         ['label' => 'Stock actual', 'value' => fn($row) => $formatNumber($row['stock_actual'])],
-                        ['label' => 'Stock mínimo', 'value' => fn($row) => $formatNumber($row['stock_minimo'])],
+                        ['label' => 'Stock minimo', 'value' => fn($row) => $formatNumber($row['stock_minimo'])],
                         ['label' => 'Unidad', 'value' => fn($row) => $row['unidad']],
                     ],
                 ];
             case 'valor_almacen':
                 return [
-                    'title' => 'Valor del inventario por almacén',
+                    'title' => 'Valor del inventario por almacen',
                     'filename' => 'valor_inventario_almacen',
                     'requiresCost' => true,
                     'columns' => [
-                        ['label' => 'Almacén', 'value' => fn($row) => $row['almacen']],
+                        ['label' => 'Almacen', 'value' => fn($row) => $row['almacen']],
                         ['label' => 'Productos', 'value' => fn($row) => $row['productos']],
                         ['label' => 'Unidades', 'value' => fn($row) => $formatNumber($row['unidades'])],
                         ['label' => 'Valor total (MXN)', 'value' => fn($row) => $formatNumber($row['valor_total'])],
@@ -597,11 +597,11 @@ class ReporteController
                     'columns' => [
                         ['label' => 'Fecha', 'value' => fn($row) => $row['fecha']],
                         ['label' => 'Tipo', 'value' => fn($row) => $row['tipo']],
-                        ['label' => 'Código', 'value' => fn($row) => $row['codigo']],
+                        ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
                         ['label' => 'Producto', 'value' => fn($row) => $row['producto']],
                         ['label' => 'Cantidad', 'value' => fn($row) => $formatNumber($row['cantidad'])],
-                        ['label' => 'Almacén origen', 'value' => fn($row) => $row['almacen_origen'] ?? '-'],
-                        ['label' => 'Almacén destino', 'value' => fn($row) => $row['almacen_destino'] ?? '-'],
+                        ['label' => 'Almacen origen', 'value' => fn($row) => $row['almacen_origen'] ?? '-'],
+                        ['label' => 'Almacen destino', 'value' => fn($row) => $row['almacen_destino'] ?? '-'],
                         ['label' => 'Usuario', 'value' => fn($row) => $row['usuario'] ?? '-'],
                         ['label' => 'Observaciones', 'value' => fn($row) => $row['observaciones'] ?? '-'],
                     ],
@@ -612,10 +612,10 @@ class ReporteController
                     'filename' => 'prestamos_herramientas',
                     'columns' => [
                         ['label' => 'ID', 'value' => fn($row) => $row['id']],
-                        ['label' => 'Fecha préstamo', 'value' => fn($row) => $row['fecha_prestamo']],
+                        ['label' => 'Fecha prestamo', 'value' => fn($row) => $row['fecha_prestamo']],
                         ['label' => 'Fecha estimada', 'value' => fn($row) => $row['fecha_estimada_devolucion'] ?? '-'],
                         ['label' => 'Producto', 'value' => fn($row) => $row['producto']],
-                        ['label' => 'Código', 'value' => fn($row) => $row['codigo']],
+                        ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
                         ['label' => 'Empleado', 'value' => fn($row) => $row['empleado']],
                         ['label' => 'Observaciones', 'value' => fn($row) => $row['observaciones'] ?? '-'],
                         ['label' => 'Estado', 'value' => fn($row) => $row['estado']],
@@ -623,25 +623,25 @@ class ReporteController
                 ];
             case 'prestamos_vencidos':
                 return [
-                    'title' => 'Préstamos vencidos',
+                    'title' => 'Prestamos vencidos',
                     'filename' => 'prestamos_vencidos',
                     'columns' => [
                         ['label' => 'ID', 'value' => fn($row) => $row['id']],
-                        ['label' => 'Fecha préstamo', 'value' => fn($row) => $row['fecha_prestamo']],
+                        ['label' => 'Fecha prestamo', 'value' => fn($row) => $row['fecha_prestamo']],
                         ['label' => 'Fecha estimada', 'value' => fn($row) => $row['fecha_estimada_devolucion'] ?? '-'],
-                        ['label' => 'Días vencidos', 'value' => fn($row) => $row['dias_vencidos']],
+                        ['label' => 'Dias vencidos', 'value' => fn($row) => $row['dias_vencidos']],
                         ['label' => 'Producto', 'value' => fn($row) => $row['producto']],
-                        ['label' => 'Código', 'value' => fn($row) => $row['codigo']],
+                        ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
                         ['label' => 'Empleado', 'value' => fn($row) => $row['empleado']],
                         ['label' => 'Observaciones', 'value' => fn($row) => $row['observaciones'] ?? '-'],
                     ],
                 ];
             case 'top_salidas':
                 $config = [
-                    'title' => 'Top de productos más retirados',
+                    'title' => 'Top de productos mas retirados',
                     'filename' => 'top_salidas',
                     'columns' => [
-                        ['label' => 'Código', 'value' => fn($row) => $row['codigo']],
+                        ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
                         ['label' => 'Producto', 'value' => fn($row) => $row['nombre']],
                         ['label' => 'Cantidad salida', 'value' => fn($row) => $formatNumber($row['total_salidas'])],
                     ],
@@ -652,7 +652,7 @@ class ReporteController
                 return $config;
             case 'estado_inventario':
                 $config = [
-                    'title' => 'Estado físico del inventario',
+                    'title' => 'Estado fisico del inventario',
                     'filename' => 'estado_inventario',
                     'columns' => [
                         ['label' => 'Estado', 'value' => fn($row) => $row['estado']],
@@ -666,30 +666,30 @@ class ReporteController
                 return $config;
             case 'productos_consumibles':
                 return [
-                    'title' => 'Catálogo de consumibles',
+                    'title' => 'Catalogo de consumibles',
                     'filename' => 'productos_consumibles',
                     'columns' => [
-                        ['label' => 'Código', 'value' => fn($row) => $row['codigo']],
+                        ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
                         ['label' => 'Producto', 'value' => fn($row) => $row['nombre']],
-                        ['label' => 'Categoría', 'value' => fn($row) => $row['categoria'] ?? '-'],
-                        ['label' => 'Almacén', 'value' => fn($row) => $row['almacen'] ?? '-'],
+                        ['label' => 'Categoria', 'value' => fn($row) => $row['categoria'] ?? '-'],
+                        ['label' => 'Almacen', 'value' => fn($row) => $row['almacen'] ?? '-'],
                         ['label' => 'Stock actual', 'value' => fn($row) => $formatNumber($row['stock_actual'])],
-                        ['label' => 'Stock mínimo', 'value' => fn($row) => $formatNumber($row['stock_minimo'])],
+                        ['label' => 'Stock minimo', 'value' => fn($row) => $formatNumber($row['stock_minimo'])],
                         ['label' => 'Unidad', 'value' => fn($row) => $row['unidad'] ?? '-'],
                         ['label' => 'Estado', 'value' => fn($row) => $row['estado'] ?? '-'],
                     ],
                 ];
             case 'productos_herramientas':
                 return [
-                    'title' => 'Catálogo de herramientas',
+                    'title' => 'Catalogo de herramientas',
                     'filename' => 'productos_herramientas',
                     'columns' => [
-                        ['label' => 'Código', 'value' => fn($row) => $row['codigo']],
+                        ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
                         ['label' => 'Producto', 'value' => fn($row) => $row['nombre']],
-                        ['label' => 'Categoría', 'value' => fn($row) => $row['categoria'] ?? '-'],
-                        ['label' => 'Almacén', 'value' => fn($row) => $row['almacen'] ?? '-'],
+                        ['label' => 'Categoria', 'value' => fn($row) => $row['categoria'] ?? '-'],
+                        ['label' => 'Almacen', 'value' => fn($row) => $row['almacen'] ?? '-'],
                         ['label' => 'Stock actual', 'value' => fn($row) => $formatNumber($row['stock_actual'])],
-                        ['label' => 'Stock mínimo', 'value' => fn($row) => $formatNumber($row['stock_minimo'])],
+                        ['label' => 'Stock minimo', 'value' => fn($row) => $formatNumber($row['stock_minimo'])],
                         ['label' => 'Unidad', 'value' => fn($row) => $row['unidad'] ?? '-'],
                         ['label' => 'Estado', 'value' => fn($row) => $row['estado'] ?? '-'],
                     ],
@@ -702,7 +702,7 @@ class ReporteController
     private function buildPdfDocument(array $lines): string
     {
         if (empty($lines)) {
-            $lines = ['Reporte sin información'];
+            $lines = ['Reporte sin informacion'];
         }
 
         $maxLinesPerPage = 42;
@@ -726,7 +726,7 @@ class ReporteController
         }
 
         if (empty($pageRefs)) {
-            // Garantizar al menos una página vacía
+            // Garantizar al menos una pagina vacia
             $contentStream = $this->createPdfContentStream(['(Sin contenido)']);
             $contentObjNum = count($objects) + 1;
             $objects[$contentObjNum] = $contentStream;
@@ -786,3 +786,17 @@ class ReporteController
         return mb_convert_encoding($text, 'UTF-8', 'UTF-8');
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
