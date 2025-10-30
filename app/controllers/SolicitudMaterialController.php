@@ -1,226 +1,225 @@
 <?php
-require_once __DIR__ . '/../models/SolicitudMaterial.php';
-require_once __DIR__ . '/../models/Producto.php';
-require_once __DIR__ . '/../helpers/Session.php';
-require_once __DIR__ . '/../models/Prestamo.php';
+    require_once __DIR__ . '/../models/SolicitudMaterial.php';
+    require_once __DIR__ . '/../models/Producto.php';
+    require_once __DIR__ . '/../helpers/Session.php';
+    require_once __DIR__ . '/../models/Prestamo.php';
 
-class SolicitudMaterialController
-{
-    // Formulario de solicitud para inventario (proyecto/servicio)
-    public function crear()
+    class SolicitudMaterialController
     {
-        $this->crearSolicitud(false);
-    }
+        // Formulario de solicitud para inventario (proyecto/servicio)
+        public function crear()
+        {
+            $this->crearSolicitud(false);
+        }
 
-    // Formulario de solicitud general (material no en inventario)
-    public function crearGeneral()
-    {
-        $this->crearSolicitud(true);
-    }
+        // Formulario de solicitud general (material no en inventario)
+        public function crearGeneral()
+        {
+            $this->crearSolicitud(true);
+        }
 
-    // Logica compartida
-    private function crearSolicitud($isGeneral = false)
-    {
-        Session::requireLogin('Empleado');
-        $productos_consumibles = $isGeneral ? [] : Producto::all(['tipo' => 'Consumible']);
-        $productos_herramientas = $isGeneral ? [] : Producto::all(['tipo' => 'Herramienta']);
-        $msg = '';
+        // Logica compartida
+        private function crearSolicitud($isGeneral = false)
+        {
+            Session::requireLogin('Empleado');
+            $productos_consumibles  = $isGeneral ? [] : Producto::all(['tipo' => 'Consumible']);
+            $productos_herramientas = $isGeneral ? [] : Producto::all(['tipo' => 'Herramienta']);
+            $msg                    = '';
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
-                $msg = 'Token CSRF invalido.';
-                if ($isGeneral) {
-                    include __DIR__ . '/../views/solicitudes/crear_general.php';
-                } else {
-                    include __DIR__ . '/../views/solicitudes/crear.php';
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
+                    $msg = 'Token CSRF invalido.';
+                    if ($isGeneral) {
+                        include __DIR__ . '/../views/solicitudes/crear_general.php';
+                    } else {
+                        include __DIR__ . '/../views/solicitudes/crear.php';
+                    }
+                    return;
                 }
+
+                $comentario     = trim($_POST['comentario']);
+                $observacion    = trim($_POST['observacion'] ?? '');
+                $tipo           = $isGeneral ? 'General' : 'Mixta';
+                $tipo_solicitud = $isGeneral ? 'General' : 'Servicio';
+                $detalles       = [];
+                $extras         = [];
+
+                if (empty($comentario)) {
+                    $msg = $isGeneral
+                        ? 'Debes especificar el motivo de la solicitud.'
+                        : 'Debes especificar para que proyecto/destino se va a utilizar el material.';
+                } elseif (empty($_POST['material'])) {
+                    $msg = 'Debes agregar al menos un material o herramienta a la solicitud.';
+                } else {
+                    $materiales = json_decode($_POST['material'], true);
+                    foreach ($materiales as $item) {
+                        if ($isGeneral) {
+                            if (! empty($item['producto_nombre']) && (float) $item['cantidad'] > 0) {
+                                $extras[] = [
+                                    'descripcion' => $item['producto_nombre'],
+                                    'cantidad'    => $item['cantidad'],
+                                    'observacion' => $item['observacion'] ?? '',
+                                ];
+                            }
+                        } else {
+                            if (($item['tipo'] ?? '') === 'Extra') {
+                                $extras[] = [
+                                    'descripcion' => $item['producto_nombre'],
+                                    'cantidad'    => $item['cantidad'],
+                                    'observacion' => $item['observacion'] ?? '',
+                                ];
+                            } elseif (! empty($item['producto_id']) && (float) $item['cantidad'] > 0) {
+                                $detalles[] = [
+                                    'producto_id' => $item['producto_id'],
+                                    'cantidad'    => $item['cantidad'],
+                                    'observacion' => $item['observacion'] ?? '',
+                                ];
+                                if ($tipo === 'Mixta') {
+                                    $tipo = $item['tipo'];
+                                } elseif ($tipo !== $item['tipo']) {
+                                    $tipo = 'Mixta';
+                                }
+                            }
+                        }
+                    }
+
+                    if (count($detalles) === 0 && count($extras) === 0) {
+                        $msg = 'Debes agregar al menos un material, herramienta o material extra valido.';
+                    } else {
+                        $data = [
+                            'usuario_id'     => $_SESSION['user_id'],
+                            'tipo'           => $tipo,
+                            'tipo_solicitud' => $tipo_solicitud,
+                            'comentario'     => $comentario,
+                            'observacion'    => $observacion,
+                            'extras'         => $extras,
+                        ];
+                        SolicitudMaterial::create($data, $detalles);
+                        $msg = 'Solicitud enviada correctamente.';
+                    }
+                }
+            }
+
+            if ($isGeneral) {
+                include __DIR__ . '/../views/solicitudes/crear_general.php';
+            } else {
+                include __DIR__ . '/../views/solicitudes/crear.php';
+            }
+        }
+
+        public function historial()
+        {
+            Session::requireLogin('Empleado');
+            $solicitudes = SolicitudMaterial::historialPorUsuario($_SESSION['user_id']);
+            include __DIR__ . '/../views/solicitudes/historial.php';
+        }
+
+        public function detalle($id)
+        {
+            Session::requireLogin('Empleado');
+            $solicitud = SolicitudMaterial::find($id, $_SESSION['user_id']);
+            $detalles  = $solicitud ? SolicitudMaterial::detalles($id) : [];
+            include __DIR__ . '/../views/solicitudes/detalle.php';
+        }
+
+        // Listar solicitudes pendientes para revision/entrega
+        public function revisar()
+        {
+            Session::requireLogin(['Administrador', 'Almacen']);
+            $solicitudes = SolicitudMaterial::listarPendientes(['pendiente', 'aprobada']);
+            include __DIR__ . '/../views/solicitudes/revisar.php';
+        }
+
+        // Ver y aprobar/rechazar solicitud
+        public function aprobar($id)
+        {
+            Session::requireLogin(['Administrador', 'Almacen']);
+            $solicitud = SolicitudMaterial::find($id);
+            $detalles  = $solicitud ? SolicitudMaterial::detalles($id) : [];
+            $msg       = '';
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
+                    $msg = 'Token CSRF invalido.';
+                } else {
+                    $accion      = $_POST['accion'] ?? '';
+                    $observacion = trim($_POST['observacion'] ?? '');
+                    if ($accion === 'aprobar') {
+                        SolicitudMaterial::actualizarEstado($id, 'aprobada', $_SESSION['user_id'], $observacion);
+                        $msg = 'Solicitud aprobada correctamente.';
+                    } elseif ($accion === 'rechazar') {
+                        SolicitudMaterial::actualizarEstado($id, 'rechazada', $_SESSION['user_id'], $observacion);
+                        $msg = 'Solicitud rechazada.';
+                    }
+                }
+                $solicitud = SolicitudMaterial::find($id);
+            }
+            include __DIR__ . '/../views/solicitudes/aprobar.php';
+        }
+
+        // Entregar materiales (solo si ya esta aprobada)
+        public function entregar($id)
+        {
+            Session::requireLogin(["Administrador", "Almacen"]);
+            $solicitud = SolicitudMaterial::find($id);
+            $detalles  = $solicitud ? SolicitudMaterial::detalles($id) : [];
+            $msg       = '';
+            if (! $solicitud || strtolower($solicitud['estado']) !== 'aprobada') {
+                $msg = 'La solicitud no esta aprobada o no existe.';
+                include __DIR__ . '/../views/solicitudes/entregar.php';
                 return;
             }
 
-            $comentario = trim($_POST['comentario']);
-            $observacion = trim($_POST['observacion'] ?? '');
-            $tipo = $isGeneral ? 'General' : 'Mixta';
-            $tipo_solicitud = $isGeneral ? 'General' : 'Servicio';
-            $detalles = [];
-            $extras = [];
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
+                    $msg = 'Token CSRF invalido.';
+                    include __DIR__ . '/../views/solicitudes/entregar.php';
+                    return;
+                }
 
-            if (empty($comentario)) {
-                $msg = $isGeneral
-                    ? 'Debes especificar el motivo de la solicitud.'
-                    : 'Debes especificar para que proyecto/destino se va a utilizar el material.';
-            } elseif (empty($_POST['material'])) {
-                $msg = 'Debes agregar al menos un material o herramienta a la solicitud.';
-            } else {
-                $materiales = json_decode($_POST['material'], true);
-                foreach ($materiales as $item) {
-                    if ($isGeneral) {
-                        if (!empty($item['producto_nombre']) && (float)$item['cantidad'] > 0) {
-                            $extras[] = [
-                                'descripcion' => $item['producto_nombre'],
-                                'cantidad' => $item['cantidad'],
-                                'observacion' => $item['observacion'] ?? ''
-                            ];
-                        }
-                    } else {
-                        if (($item['tipo'] ?? '') === 'Extra') {
-                            $extras[] = [
-                                'descripcion' => $item['producto_nombre'],
-                                'cantidad' => $item['cantidad'],
-                                'observacion' => $item['observacion'] ?? ''
-                            ];
-                        } elseif (!empty($item['producto_id']) && (float)$item['cantidad'] > 0) {
-                            $detalles[] = [
-                                'producto_id' => $item['producto_id'],
-                                'cantidad' => $item['cantidad'],
-                                'observacion' => $item['observacion'] ?? ''
-                            ];
-                            if ($tipo === 'Mixta') {
-                                $tipo = $item['tipo'];
-                            } elseif ($tipo !== $item['tipo']) {
-                                $tipo = 'Mixta';
+                $observacion = trim($_POST['observacion'] ?? '');
+                $fechaEstim  = trim($_POST['fecha_estimada_devolucion'] ?? '');
+
+                $tieneHerramienta = false;
+                foreach ($detalles as $d) {
+                    if ($d['producto_id']) {
+                        $productoTmp = Producto::find($d['producto_id']);
+                        if ($productoTmp && $productoTmp['tipo'] === 'Herramienta') {$tieneHerramienta = true;
+                            break;}
+                    }
+                }
+                if ($tieneHerramienta && $fechaEstim === '') {
+                    $msg = 'Debes indicar la fecha estimada de devolucion para las herramientas.';
+                    include __DIR__ . '/../views/solicitudes/entregar.php';
+                    return;
+                }
+
+                if ($solicitud['tipo_solicitud'] === 'Servicio' || $solicitud['tipo_solicitud'] === 'Mixta') {
+                    foreach ($detalles as $d) {
+                        if ($d['producto_id']) {
+                            $producto = Producto::find($d['producto_id']);
+                            if ($producto && $producto['tipo'] === 'Herramienta') {
+                                Prestamo::crear([
+                                    'producto_id'               => $d['producto_id'],
+                                    'empleado_id'               => $solicitud['usuario_id'],
+                                    'autorizado_by_user_id'     => $_SESSION['user_id'],
+                                    'fecha_prestamo'            => date('Y-m-d H:i:s'),
+                                    'fecha_estimada_devolucion' => $fechaEstim,
+                                    'estado'                    => 'Prestado',
+                                    'observaciones'             => $d['observacion'],
+                                ], $d['cantidad']);
+                                Producto::restarStock($d['producto_id'], $d['cantidad'], (int) ($producto['almacen_id'] ?? 0));
+                            } else {
+                                Producto::restarStock($d['producto_id'], $d['cantidad'], (int) ($producto['almacen_id'] ?? 0));
                             }
                         }
                     }
                 }
 
-                if (count($detalles) === 0 && count($extras) === 0) {
-                    $msg = 'Debes agregar al menos un material, herramienta o material extra valido.';
-                } else {
-                    $data = [
-                        'usuario_id' => $_SESSION['user_id'],
-                        'tipo' => $tipo,
-                        'tipo_solicitud' => $tipo_solicitud,
-                        'comentario' => $comentario,
-                        'observacion' => $observacion,
-                        'extras' => $extras
-                    ];
-                    SolicitudMaterial::create($data, $detalles);
-                    $msg = 'Solicitud enviada correctamente.';
-                }
+                SolicitudMaterial::actualizarEstado($id, 'entregada', $_SESSION['user_id'], $observacion);
+                $msg       = 'Solicitud entregada correctamente.';
+                $solicitud = SolicitudMaterial::find($id);
+                $detalles  = $solicitud ? SolicitudMaterial::detalles($id) : [];
             }
-        }
-
-        if ($isGeneral) {
-            include __DIR__ . '/../views/solicitudes/crear_general.php';
-        } else {
-            include __DIR__ . '/../views/solicitudes/crear.php';
-        }
-    }
-
-    public function historial()
-    {
-        Session::requireLogin('Empleado');
-        $solicitudes = SolicitudMaterial::historialPorUsuario($_SESSION['user_id']);
-        include __DIR__ . '/../views/solicitudes/historial.php';
-    }
-
-    public function detalle($id)
-    {
-        Session::requireLogin('Empleado');
-        $solicitud = SolicitudMaterial::find($id, $_SESSION['user_id']);
-        $detalles = $solicitud ? SolicitudMaterial::detalles($id) : [];
-        include __DIR__ . '/../views/solicitudes/detalle.php';
-    }
-
-    // Listar solicitudes pendientes para revision/entrega
-    public function revisar()
-    {
-        Session::requireLogin(['Administrador', 'Almacen']);
-        $solicitudes = SolicitudMaterial::listarPendientes(['pendiente', 'aprobada']);
-        include __DIR__ . '/../views/solicitudes/revisar.php';
-    }
-
-    // Ver y aprobar/rechazar solicitud
-    public function aprobar($id)
-    {
-        Session::requireLogin(['Administrador', 'Almacen']);
-        $solicitud = SolicitudMaterial::find($id);
-        $detalles = $solicitud ? SolicitudMaterial::detalles($id) : [];
-        $msg = '';
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
-                $msg = 'Token CSRF invalido.';
-            } else {
-                $accion = $_POST['accion'] ?? '';
-                $observacion = trim($_POST['observacion'] ?? '');
-                if ($accion === 'aprobar') {
-                    SolicitudMaterial::actualizarEstado($id, 'aprobada', $_SESSION['user_id'], $observacion);
-                    $msg = 'Solicitud aprobada correctamente.';
-            } elseif ($accion === 'rechazar') {
-                SolicitudMaterial::actualizarEstado($id, 'rechazada', $_SESSION['user_id'], $observacion);
-                    $msg = 'Solicitud rechazada.';
-                }
-            }
-            $solicitud = SolicitudMaterial::find($id);
-        }
-        include __DIR__ . '/../views/solicitudes/aprobar.php';
-    }
-
-    // Entregar materiales (solo si ya esta aprobada)
-    public function entregar($id)
-    {
-        Session::requireLogin(["Administrador", "Almacen"]);
-        $solicitud = SolicitudMaterial::find($id);
-        $detalles = $solicitud ? SolicitudMaterial::detalles($id) : [];
-        $msg = '';
-        if (!$solicitud || strtolower($solicitud['estado']) !== 'aprobada') {
-            $msg = 'La solicitud no esta aprobada o no existe.';
             include __DIR__ . '/../views/solicitudes/entregar.php';
-            return;
         }
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
-                $msg = 'Token CSRF invalido.';
-                include __DIR__ . '/../views/solicitudes/entregar.php';
-                return;
-            }
-
-            $observacion = trim($_POST['observacion'] ?? '');
-            $fechaEstim = trim($_POST['fecha_estimada_devolucion'] ?? '');
-
-            $tieneHerramienta = false;
-            foreach ($detalles as $d) {
-                if ($d['producto_id']) {
-                    $productoTmp = Producto::find($d['producto_id']);
-                    if ($productoTmp && $productoTmp['tipo'] === 'Herramienta') { $tieneHerramienta = true; break; }
-                }
-            }
-            if ($tieneHerramienta && $fechaEstim === '') {
-                $msg = 'Debes indicar la fecha estimada de devolucion para las herramientas.';
-                include __DIR__ . '/../views/solicitudes/entregar.php';
-                return;
-            }
-
-            if ($solicitud['tipo_solicitud'] === 'Servicio' || $solicitud['tipo_solicitud'] === 'Mixta') {
-                foreach ($detalles as $d) {
-                    if ($d['producto_id']) {
-                        $producto = Producto::find($d['producto_id']);
-                        if ($producto && $producto['tipo'] === 'Herramienta') {
-                            Prestamo::crear([
-                                'producto_id' => $d['producto_id'],
-                                'empleado_id' => $solicitud['usuario_id'],
-                                'autorizado_by_user_id' => $_SESSION['user_id'],
-                                'fecha_prestamo' => date('Y-m-d H:i:s'),
-                                'fecha_estimada_devolucion' => $fechaEstim,
-                                'estado' => 'Prestado',
-                                'observaciones' => $d['observacion']
-                            ], $d['cantidad']);
-                            Producto::restarStock($d['producto_id'], $d['cantidad'], (int)($producto['almacen_id'] ?? 0));
-                        } else {
-                            Producto::restarStock($d['producto_id'], $d['cantidad'], (int)($producto['almacen_id'] ?? 0));
-                        }
-                    }
-                }
-            }
-
-            SolicitudMaterial::actualizarEstado($id, 'entregada', $_SESSION['user_id'], $observacion);
-            $msg = 'Solicitud entregada correctamente.';
-            $solicitud = SolicitudMaterial::find($id);
-            $detalles = $solicitud ? SolicitudMaterial::detalles($id) : [];
-        }
-        include __DIR__ . '/../views/solicitudes/entregar.php';
-    }
 }
-?>
-

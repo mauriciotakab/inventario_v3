@@ -15,17 +15,17 @@ class ProveedorController
     {
         Session::requireLogin(['Administrador', 'Almacen']);
         $errors = [];
-        $msg = '';
-        $data = $this->emptyProveedor();
+        $msg    = '';
+        $data   = $this->emptyProveedor();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $errors[] = 'Token CSRF inválido.';
             } else {
                 $data = $this->extractProveedor($_POST, $errors);
                 if (empty($errors)) {
                     Proveedor::create($data);
-                    $msg = 'Proveedor registrado correctamente.';
+                    $msg  = 'Proveedor registrado correctamente.';
                     $data = $this->emptyProveedor();
                 }
             }
@@ -38,21 +38,21 @@ class ProveedorController
     {
         Session::requireLogin(['Administrador', 'Almacen']);
         $proveedor = Proveedor::find($id);
-        if (!$proveedor) {
+        if (! $proveedor) {
             die('Proveedor no encontrado.');
         }
 
         $errors = [];
-        $msg = '';
+        $msg    = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $errors[] = 'Token CSRF inválido.';
             } else {
                 $data = $this->extractProveedor($_POST, $errors);
                 if (empty($errors)) {
                     Proveedor::update($id, $data);
-                    $msg = 'Proveedor actualizado correctamente.';
+                    $msg       = 'Proveedor actualizado correctamente.';
                     $proveedor = Proveedor::find($id);
                 }
             }
@@ -64,7 +64,7 @@ class ProveedorController
     public function delete($id): void
     {
         Session::requireLogin(['Administrador', 'Almacen']);
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Session::checkCsrf($_POST['csrf'] ?? '')) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || ! Session::checkCsrf($_POST['csrf'] ?? '')) {
             header('Location: proveedores.php?error=csrf');
             exit();
         }
@@ -82,11 +82,11 @@ class ProveedorController
 
     private function extractProveedor(array $payload, array &$errors): array
     {
-        $nombre = trim($payload['nombre'] ?? '');
-        $contacto = trim($payload['contacto'] ?? '');
-        $telefono = trim($payload['telefono'] ?? '');
-        $email = trim($payload['email'] ?? '');
-        $direccion = trim($payload['direccion'] ?? '');
+        $nombre      = trim($payload['nombre'] ?? '');
+        $contacto    = trim($payload['contacto'] ?? '');
+        $telefono    = trim($payload['telefono'] ?? '');
+        $email       = trim($payload['email'] ?? '');
+        $direccion   = trim($payload['direccion'] ?? '');
         $condiciones = trim($payload['condiciones_pago'] ?? '');
 
         if ($nombre === '') {
@@ -95,19 +95,19 @@ class ProveedorController
         if ($contacto === '') {
             $errors[] = 'El contacto es obligatorio.';
         }
-        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if ($email !== '' && ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'El correo electrónico no es válido.';
         }
-        if ($telefono !== '' && !preg_match('/^[0-9 +()-]{5,20}$/', $telefono)) {
+        if ($telefono !== '' && ! preg_match('/^[0-9 +()-]{5,20}$/', $telefono)) {
             $errors[] = 'El teléfono contiene caracteres no permitidos.';
         }
 
         return [
-            'nombre' => $nombre,
-            'contacto' => $contacto,
-            'telefono' => $telefono,
-            'email' => $email,
-            'direccion' => $direccion,
+            'nombre'           => $nombre,
+            'contacto'         => $contacto,
+            'telefono'         => $telefono,
+            'email'            => $email,
+            'direccion'        => $direccion,
             'condiciones_pago' => $condiciones,
         ];
     }
@@ -115,11 +115,11 @@ class ProveedorController
     private function emptyProveedor(): array
     {
         return [
-            'nombre' => '',
-            'contacto' => '',
-            'telefono' => '',
-            'email' => '',
-            'direccion' => '',
+            'nombre'           => '',
+            'contacto'         => '',
+            'telefono'         => '',
+            'email'            => '',
+            'direccion'        => '',
             'condiciones_pago' => '',
         ];
     }

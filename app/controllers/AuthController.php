@@ -11,12 +11,12 @@ class AuthController
         $error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $error = 'La sesion expiro. Intenta nuevamente.';
             } else {
                 $username = trim($_POST['username'] ?? '');
                 $password = (string) ($_POST['password'] ?? '');
-                $user = $username !== '' ? Usuario::findByUsername($username) : null;
+                $user     = $username !== '' ? Usuario::findByUsername($username) : null;
 
                 if ($user && password_verify($password, $user['password'])) {
                     Session::setUser($user);
@@ -49,11 +49,11 @@ class AuthController
         $mensaje = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $mensaje = 'La sesion expiro. Intenta nuevamente.';
             } else {
                 $username = trim($_POST['username'] ?? '');
-                $user = $username !== '' ? Usuario::findByUsername($username) : null;
+                $user     = $username !== '' ? Usuario::findByUsername($username) : null;
 
                 if ($user) {
                     $mensaje = 'Por favor contacta al administrador para restablecer tu contrasena.';
@@ -67,6 +67,3 @@ class AuthController
         include __DIR__ . '/../views/auth/forgot.php';
     }
 }
-
-
-

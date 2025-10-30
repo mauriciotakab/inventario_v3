@@ -17,14 +17,14 @@ class UnidadMedidaController
         $error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $error = 'Token CSRF inválido.';
             } elseif (empty(trim($_POST['nombre'] ?? '')) || empty(trim($_POST['abreviacion'] ?? ''))) {
                 $error = 'Todos los campos son obligatorios.';
             } else {
                 UnidadMedida::create([
-                    'nombre' => trim($_POST['nombre']),
-                    'abreviacion' => trim($_POST['abreviacion'])
+                    'nombre'      => trim($_POST['nombre']),
+                    'abreviacion' => trim($_POST['abreviacion']),
                 ]);
                 header('Location: unidades.php?success=1');
                 exit();
@@ -38,21 +38,21 @@ class UnidadMedidaController
     {
         Session::requireLogin(['Administrador']);
         $unidad = UnidadMedida::find($id);
-        $error = '';
+        $error  = '';
 
-        if (!$unidad) {
+        if (! $unidad) {
             die('Unidad no encontrada.');
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $error = 'Token CSRF inválido.';
             } elseif (empty(trim($_POST['nombre'] ?? '')) || empty(trim($_POST['abreviacion'] ?? ''))) {
                 $error = 'Todos los campos son obligatorios.';
             } else {
                 UnidadMedida::update($id, [
-                    'nombre' => trim($_POST['nombre']),
-                    'abreviacion' => trim($_POST['abreviacion'])
+                    'nombre'      => trim($_POST['nombre']),
+                    'abreviacion' => trim($_POST['abreviacion']),
                 ]);
                 header('Location: unidades.php?success=2');
                 exit();
@@ -65,7 +65,7 @@ class UnidadMedidaController
     public function delete($id): void
     {
         Session::requireLogin(['Administrador']);
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Session::checkCsrf($_POST['csrf'] ?? '')) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || ! Session::checkCsrf($_POST['csrf'] ?? '')) {
             header('Location: unidades.php?error=csrf');
             exit();
         }

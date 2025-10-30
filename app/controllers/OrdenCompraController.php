@@ -14,19 +14,19 @@ class OrdenCompraController
 
         $filtros = [
             'proveedor_id' => $_GET['proveedor_id'] ?? '',
-            'estado' => $_GET['estado'] ?? '',
-            'desde' => $_GET['desde'] ?? '',
-            'hasta' => $_GET['hasta'] ?? '',
+            'estado'       => $_GET['estado'] ?? '',
+            'desde'        => $_GET['desde'] ?? '',
+            'hasta'        => $_GET['hasta'] ?? '',
         ];
 
         $historial = OrdenCompra::historial([
             'proveedor_id' => $filtros['proveedor_id'] ?: null,
-            'desde' => $filtros['desde'] ?: null,
-            'hasta' => $filtros['hasta'] ?: null,
+            'desde'        => $filtros['desde'] ?: null,
+            'hasta'        => $filtros['hasta'] ?: null,
         ]);
 
-        if (!empty($filtros['estado'])) {
-            $estadoFiltro = strtolower($filtros['estado']);
+        if (! empty($filtros['estado'])) {
+            $estadoFiltro         = strtolower($filtros['estado']);
             $historial['ordenes'] = array_values(array_filter(
                 $historial['ordenes'],
                 fn($orden) => strtolower($orden['estado'] ?? '') === $estadoFiltro
@@ -34,7 +34,7 @@ class OrdenCompraController
         }
 
         $proveedores = $db->query("SELECT id, nombre FROM proveedores ORDER BY nombre ASC")->fetchAll();
-        $estados = ['Pendiente', 'Enviada', 'Recibida', 'Cancelada'];
+        $estados     = ['Pendiente', 'Enviada', 'Recibida', 'Cancelada'];
 
         include __DIR__ . '/../views/ordenes/index.php';
     }
@@ -45,20 +45,20 @@ class OrdenCompraController
         $db = Database::getInstance()->getConnection();
 
         $proveedores = $db->query("SELECT id, nombre, rfc FROM proveedores ORDER BY nombre ASC")->fetchAll();
-        $almacenes = $db->query("SELECT id, nombre FROM almacenes ORDER BY nombre ASC")->fetchAll();
-        $productos = $db->query("SELECT id, codigo, nombre, tipo FROM productos ORDER BY nombre ASC")->fetchAll();
-        $categorias = $db->query("SELECT id, nombre FROM categorias ORDER BY nombre ASC")->fetchAll();
-        $unidades = $db->query("SELECT id, nombre, abreviacion FROM unidades_medida ORDER BY nombre ASC")->fetchAll();
+        $almacenes   = $db->query("SELECT id, nombre FROM almacenes ORDER BY nombre ASC")->fetchAll();
+        $productos   = $db->query("SELECT id, codigo, nombre, tipo FROM productos ORDER BY nombre ASC")->fetchAll();
+        $categorias  = $db->query("SELECT id, nombre FROM categorias ORDER BY nombre ASC")->fetchAll();
+        $unidades    = $db->query("SELECT id, nombre, abreviacion FROM unidades_medida ORDER BY nombre ASC")->fetchAll();
 
         $errors = [];
-        $msg = '';
+        $msg    = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $errors[] = 'Token CSRF invalido.';
             } else {
                 $cabecera = $this->buildCabeceraFromRequest($_POST, $errors);
-                $items = $this->buildDetallesFromRequest($_POST, $cabecera, $errors);
+                $items    = $this->buildDetallesFromRequest($_POST, $cabecera, $errors);
 
                 if (empty($items)) {
                     $errors[] = 'Debes agregar al menos un producto a la orden.';
@@ -67,9 +67,9 @@ class OrdenCompraController
                 if (empty($errors)) {
                     try {
                         $cabecera['usuario_id'] = $_SESSION['user_id'] ?? null;
-                        $ordenId = OrdenCompra::crear($cabecera, $items);
+                        $ordenId                = OrdenCompra::crear($cabecera, $items);
                         ActivityLogger::log('orden_compra_creada', 'Orden de compra creada', [
-                            'orden_id' => $ordenId,
+                            'orden_id'     => $ordenId,
                             'proveedor_id' => $cabecera['proveedor_id'],
                         ]);
                         header('Location: ordenes_compra_detalle.php?id=' . $ordenId . '&created=1');
@@ -88,7 +88,7 @@ class OrdenCompraController
     {
         Session::requireLogin(['Administrador', 'Compras']);
         $orden = OrdenCompra::find($id);
-        if (!$orden) {
+        if (! $orden) {
             header('Location: ordenes_compra.php?not_found=1');
             exit();
         }
@@ -98,22 +98,22 @@ class OrdenCompraController
             exit();
         }
 
-        $db = Database::getInstance()->getConnection();
+        $db          = Database::getInstance()->getConnection();
         $proveedores = $db->query("SELECT id, nombre, rfc FROM proveedores ORDER BY nombre ASC")->fetchAll();
-        $almacenes = $db->query("SELECT id, nombre FROM almacenes ORDER BY nombre ASC")->fetchAll();
-        $productos = $db->query("SELECT id, codigo, nombre, tipo FROM productos ORDER BY nombre ASC")->fetchAll();
-        $categorias = $db->query("SELECT id, nombre FROM categorias ORDER BY nombre ASC")->fetchAll();
-        $unidades = $db->query("SELECT id, nombre, abreviacion FROM unidades_medida ORDER BY nombre ASC")->fetchAll();
+        $almacenes   = $db->query("SELECT id, nombre FROM almacenes ORDER BY nombre ASC")->fetchAll();
+        $productos   = $db->query("SELECT id, codigo, nombre, tipo FROM productos ORDER BY nombre ASC")->fetchAll();
+        $categorias  = $db->query("SELECT id, nombre FROM categorias ORDER BY nombre ASC")->fetchAll();
+        $unidades    = $db->query("SELECT id, nombre, abreviacion FROM unidades_medida ORDER BY nombre ASC")->fetchAll();
 
         $errors = [];
-        $msg = '';
+        $msg    = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $errors[] = 'Token CSRF invalido.';
             } else {
                 $cabecera = $this->buildCabeceraFromRequest($_POST, $errors);
-                $items = $this->buildDetallesFromRequest($_POST, $cabecera, $errors);
+                $items    = $this->buildDetallesFromRequest($_POST, $cabecera, $errors);
 
                 if (empty($items)) {
                     $errors[] = 'Debes agregar al menos un producto a la orden.';
@@ -124,7 +124,7 @@ class OrdenCompraController
                         $cabecera['usuario_id'] = $_SESSION['user_id'] ?? ($orden['usuario_id'] ?? null);
                         OrdenCompra::actualizar($id, $cabecera, $items);
                         ActivityLogger::log('orden_compra_actualizada', 'Orden de compra actualizada', [
-                            'orden_id' => $id,
+                            'orden_id'     => $id,
                             'proveedor_id' => $cabecera['proveedor_id'],
                         ]);
                         header('Location: ordenes_compra_detalle.php?id=' . $id . '&updated=1');
@@ -134,7 +134,7 @@ class OrdenCompraController
                     }
                 }
 
-                $orden = array_merge($orden, $cabecera);
+                $orden             = array_merge($orden, $cabecera);
                 $orden['detalles'] = $items;
             }
         }
@@ -146,32 +146,32 @@ class OrdenCompraController
     {
         Session::requireLogin(['Administrador', 'Compras', 'Almacen']);
         $orden = OrdenCompra::find($id);
-        if (!$orden) {
+        if (! $orden) {
             header('Location: ordenes_compra.php?not_found=1');
             exit();
         }
 
-        $db = Database::getInstance()->getConnection();
+        $db        = Database::getInstance()->getConnection();
         $almacenes = $db->query("SELECT id, nombre FROM almacenes ORDER BY nombre ASC")->fetchAll();
 
-        $msg = '';
+        $msg   = '';
         $error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $error = 'Token CSRF invalido.';
             } else {
                 $accion = $_POST['accion'] ?? '';
                 if ($accion === 'recibir' && strtolower($orden['estado']) !== 'recibida') {
                     $extras = [
-                        'numero_factura' => trim($_POST['numero_factura'] ?? ''),
-                        'rfc' => trim($_POST['rfc'] ?? ''),
+                        'numero_factura'     => trim($_POST['numero_factura'] ?? ''),
+                        'rfc'                => trim($_POST['rfc'] ?? ''),
                         'almacen_destino_id' => isset($_POST['almacen_destino_id']) ? (int) $_POST['almacen_destino_id'] : null,
                     ];
 
-                    if (!$this->validFactura($extras['numero_factura'])) {
+                    if (! $this->validFactura($extras['numero_factura'])) {
                         $error = 'El numero de factura no es valido (max. 30 caracteres alfanumericos).';
-                    } elseif ($extras['rfc'] !== '' && !$this->validRfc($extras['rfc'])) {
+                    } elseif ($extras['rfc'] !== '' && ! $this->validRfc($extras['rfc'])) {
                         $error = 'El RFC proporcionado no es valido.';
                     } elseif (empty($extras['almacen_destino_id'])) {
                         $error = 'Debes seleccionar el almacen destino para registrar la recepcion.';
@@ -180,7 +180,7 @@ class OrdenCompraController
                             $extras['rfc'] = $extras['rfc'] ?: null;
                             OrdenCompra::actualizarEstado($id, 'Recibida', $extras);
                             ActivityLogger::log('orden_compra_recibida', 'Orden de compra recibida', [
-                                'orden_id' => $id,
+                                'orden_id'       => $id,
                                 'numero_factura' => $extras['numero_factura'] ?: null,
                             ]);
                             header('Location: ordenes_compra_detalle.php?id=' . $id . '&received=1');
@@ -211,61 +211,61 @@ class OrdenCompraController
 
     private function buildCabeceraFromRequest(array $input, array &$errors): array
     {
-        $proveedorId = isset($input['proveedor_id']) ? (int) $input['proveedor_id'] : 0;
+        $proveedorId    = isset($input['proveedor_id']) ? (int) $input['proveedor_id'] : 0;
         $almacenDestino = isset($input['almacen_destino_id']) ? (int) $input['almacen_destino_id'] : 0;
-        $estado = $input['estado'] ?? 'Pendiente';
-        $fecha = $input['fecha'] ?? date('Y-m-d');
-        $numeroFactura = trim($input['numero_factura'] ?? '');
-        $rfc = trim($input['rfc'] ?? '');
+        $estado         = $input['estado'] ?? 'Pendiente';
+        $fecha          = $input['fecha'] ?? date('Y-m-d');
+        $numeroFactura  = trim($input['numero_factura'] ?? '');
+        $rfc            = trim($input['rfc'] ?? '');
 
         if ($proveedorId <= 0) {
             $errors[] = 'Debes seleccionar un proveedor.';
         }
-        if (!in_array($estado, ['Pendiente', 'Enviada', 'Recibida', 'Cancelada'], true)) {
+        if (! in_array($estado, ['Pendiente', 'Enviada', 'Recibida', 'Cancelada'], true)) {
             $errors[] = 'El estado seleccionado no es valido.';
         }
-        if (!preg_match('/^\\d{4}-\\d{2}-\\d{2}$/', $fecha)) {
+        if (! preg_match('/^\\d{4}-\\d{2}-\\d{2}$/', $fecha)) {
             $errors[] = 'La fecha no tiene un formato valido (YYYY-MM-DD).';
         }
         if ($almacenDestino <= 0) {
             $errors[] = 'Debes seleccionar un almacen destino.';
         }
-        if ($numeroFactura !== '' && !$this->validFactura($numeroFactura)) {
+        if ($numeroFactura !== '' && ! $this->validFactura($numeroFactura)) {
             $errors[] = 'El numero de factura solo puede contener letras, numeros y -/_. (max. 30 caracteres).';
         }
-        if ($rfc !== '' && !$this->validRfc($rfc)) {
+        if ($rfc !== '' && ! $this->validRfc($rfc)) {
             $errors[] = 'El RFC proporcionado no es valido.';
         }
 
         return [
-            'proveedor_id' => $proveedorId,
-            'solicitud_id' => !empty($input['solicitud_id']) ? (int) $input['solicitud_id'] : null,
-            'rfc' => $rfc !== '' ? strtoupper($rfc) : null,
-            'numero_factura' => $numeroFactura !== '' ? strtoupper($numeroFactura) : null,
-            'fecha' => $fecha,
-            'estado' => $estado,
+            'proveedor_id'       => $proveedorId,
+            'solicitud_id'       => ! empty($input['solicitud_id']) ? (int) $input['solicitud_id'] : null,
+            'rfc'                => $rfc !== '' ? strtoupper($rfc) : null,
+            'numero_factura'     => $numeroFactura !== '' ? strtoupper($numeroFactura) : null,
+            'fecha'              => $fecha,
+            'estado'             => $estado,
             'almacen_destino_id' => $almacenDestino,
         ];
     }
 
     private function buildDetallesFromRequest(array $post, array $cabecera, array &$errors): array
     {
-        $detalles = [];
-        $tipos = $post['item_tipo'] ?? [];
-        $productoIds = $post['item_producto_id'] ?? [];
-        $cantidad = $post['item_cantidad'] ?? [];
-        $costos = $post['item_costo'] ?? [];
-        $preciosVenta = $post['item_precio_venta'] ?? [];
-        $codigos = $post['item_codigo'] ?? [];
-        $nombres = $post['item_nombre'] ?? [];
+        $detalles      = [];
+        $tipos         = $post['item_tipo'] ?? [];
+        $productoIds   = $post['item_producto_id'] ?? [];
+        $cantidad      = $post['item_cantidad'] ?? [];
+        $costos        = $post['item_costo'] ?? [];
+        $preciosVenta  = $post['item_precio_venta'] ?? [];
+        $codigos       = $post['item_codigo'] ?? [];
+        $nombres       = $post['item_nombre'] ?? [];
         $tiposProducto = $post['item_tipo_producto'] ?? [];
-        $unidades = $post['item_unidad'] ?? [];
-        $categorias = $post['item_categoria'] ?? [];
-        $stockMinimo = $post['item_stock_minimo'] ?? [];
+        $unidades      = $post['item_unidad'] ?? [];
+        $categorias    = $post['item_categoria'] ?? [];
+        $stockMinimo   = $post['item_stock_minimo'] ?? [];
 
         foreach ($tipos as $index => $tipo) {
-            $cant = isset($cantidad[$index]) ? (float) str_replace(',', '.', $cantidad[$index]) : 0.0;
-            $costo = isset($costos[$index]) ? (float) str_replace(',', '.', $costos[$index]) : 0.0;
+            $cant        = isset($cantidad[$index]) ? (float) str_replace(',', '.', $cantidad[$index]) : 0.0;
+            $costo       = isset($costos[$index]) ? (float) str_replace(',', '.', $costos[$index]) : 0.0;
             $precioVenta = isset($preciosVenta[$index]) ? (float) str_replace(',', '.', $preciosVenta[$index]) : 0.0;
 
             if ($cant <= 0) {
@@ -284,17 +284,17 @@ class OrdenCompraController
                     continue;
                 }
                 $detalles[] = [
-                    'producto_id' => $productoId,
-                    'cantidad' => $cant,
+                    'producto_id'     => $productoId,
+                    'cantidad'        => $cant,
                     'precio_unitario' => $costo,
                 ];
             } else {
-                $codigo = trim($codigos[$index] ?? '');
-                $nombre = trim($nombres[$index] ?? '');
+                $codigo       = trim($codigos[$index] ?? '');
+                $nombre       = trim($nombres[$index] ?? '');
                 $tipoProducto = trim($tiposProducto[$index] ?? '');
-                $unidadId = isset($unidades[$index]) ? (int) $unidades[$index] : null;
-                $categoriaId = isset($categorias[$index]) ? (int) $categorias[$index] : null;
-                $stockMin = isset($stockMinimo[$index]) ? (float) str_replace(',', '.', $stockMinimo[$index]) : 0.0;
+                $unidadId     = isset($unidades[$index]) ? (int) $unidades[$index] : null;
+                $categoriaId  = isset($categorias[$index]) ? (int) $categorias[$index] : null;
+                $stockMin     = isset($stockMinimo[$index]) ? (float) str_replace(',', '.', $stockMinimo[$index]) : 0.0;
 
                 if ($nombre === '') {
                     $errors[] = 'El nombre del nuevo producto es obligatorio (fila ' . ($index + 1) . ').';
@@ -312,7 +312,7 @@ class OrdenCompraController
                     $errors[] = 'El nombre del nuevo producto excede 255 caracteres (fila ' . ($index + 1) . ').';
                     continue;
                 }
-                if (!in_array($tipoProducto, Producto::tiposDisponibles(), true)) {
+                if (! in_array($tipoProducto, Producto::tiposDisponibles(), true)) {
                     $errors[] = 'El tipo de producto indicado no es valido (fila ' . ($index + 1) . ').';
                     continue;
                 }
@@ -327,16 +327,16 @@ class OrdenCompraController
 
                 try {
                     $productoId = $this->crearProductoDesdeOrden([
-                        'codigo' => $codigo,
-                        'nombre' => $nombre,
-                        'tipo' => $tipoProducto,
+                        'codigo'           => $codigo,
+                        'nombre'           => $nombre,
+                        'tipo'             => $tipoProducto,
                         'unidad_medida_id' => $unidadId,
-                        'categoria_id' => $categoriaId,
-                        'costo_compra' => $costo,
-                        'precio_venta' => $precioVenta,
-                        'stock_minimo' => $stockMin,
-                        'almacen_id' => $cabecera['almacen_destino_id'] ?? null,
-                        'proveedor_id' => $cabecera['proveedor_id'] ?? null,
+                        'categoria_id'     => $categoriaId,
+                        'costo_compra'     => $costo,
+                        'precio_venta'     => $precioVenta,
+                        'stock_minimo'     => $stockMin,
+                        'almacen_id'       => $cabecera['almacen_destino_id'] ?? null,
+                        'proveedor_id'     => $cabecera['proveedor_id'] ?? null,
                     ]);
                 } catch (\Throwable $e) {
                     $errors[] = 'No fue posible registrar el nuevo producto (fila ' . ($index + 1) . '): ' . $e->getMessage();
@@ -344,8 +344,8 @@ class OrdenCompraController
                 }
 
                 $detalles[] = [
-                    'producto_id' => $productoId,
-                    'cantidad' => $cant,
+                    'producto_id'     => $productoId,
+                    'cantidad'        => $cant,
                     'precio_unitario' => $costo,
                 ];
             }
@@ -356,29 +356,45 @@ class OrdenCompraController
 
     private function crearProductoDesdeOrden(array $data): int
     {
+        $codigo = strtoupper(trim((string) ($data['codigo'] ?? '')));
+        if ($codigo === '') {
+            throw new InvalidArgumentException('El codigo del producto es obligatorio.');
+        }
+        $data['codigo'] = $codigo;
+
+        $tiposValidos = Producto::tiposDisponibles();
+        $data['tipo'] = $data['tipo'] ?? 'Consumible';
+        if (! in_array($data['tipo'], $tiposValidos, true)) {
+            $data['tipo'] = 'Consumible';
+        }
+
+        if (empty($data['almacen_id'])) {
+            throw new InvalidArgumentException('Debes seleccionar el almacén destino para la orden.');
+        }
+
         $existente = Producto::findByCodigo($data['codigo']);
         if ($existente) {
             return (int) $existente['id'];
         }
 
         $payload = array_merge([
-            'descripcion' => '',
-            'peso' => null,
-            'ancho' => null,
-            'alto' => null,
-            'profundidad' => null,
-            'clase_categoria' => null,
-            'marca' => null,
-            'color' => null,
-            'forma' => null,
+            'descripcion'               => '',
+            'peso'                      => null,
+            'ancho'                     => null,
+            'alto'                      => null,
+            'profundidad'               => null,
+            'clase_categoria'           => null,
+            'marca'                     => null,
+            'color'                     => null,
+            'forma'                     => null,
             'especificaciones_tecnicas' => null,
-            'origen' => null,
-            'stock_actual' => 0,
-            'estado' => 'Nuevo',
-            'imagen_url' => null,
+            'origen'                    => null,
+            'stock_actual'              => 0,
+            'estado'                    => 'Nuevo',
+            'imagen_url'                => null,
             'last_requested_by_user_id' => null,
-            'last_request_date' => null,
-            'tags' => null,
+            'last_request_date'         => null,
+            'tags'                      => null,
         ], $data);
 
         Producto::create($payload);
@@ -396,5 +412,3 @@ class OrdenCompraController
         return strlen($factura) <= 30 && preg_match('/^[A-Z0-9._-]*$/i', $factura);
     }
 }
-
-

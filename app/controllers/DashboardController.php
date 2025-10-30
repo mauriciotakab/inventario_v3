@@ -8,17 +8,17 @@ class DashboardController
     {
         Session::requireLogin();
 
-        $role = $_SESSION['role'] ?? '';
+        $role   = $_SESSION['role'] ?? '';
         $nombre = $_SESSION['nombre'] ?? '';
         $userId = (int) ($_SESSION['user_id'] ?? 0);
 
         $db = Database::getInstance()->getConnection();
 
         $datos = [
-            'nombre' => $nombre,
-            'role' => $role,
+            'nombre'      => $nombre,
+            'role'        => $role,
             'last_update' => date('d/m/Y, h:i:s a'),
-            'alertas' => [],
+            'alertas'     => [],
         ];
 
         switch ($role) {
@@ -41,19 +41,19 @@ class DashboardController
 
     private function datosGenerales($db): array
     {
-        $totalProductos = (int) $db->query('SELECT COUNT(*) FROM productos')->fetchColumn();
-        $stockBajo = (int) $db->query('SELECT COUNT(*) FROM productos WHERE stock_actual < stock_minimo')->fetchColumn();
-        $valorTotal = (float) $db->query('SELECT SUM(stock_actual * costo_compra) FROM productos')->fetchColumn();
+        $totalProductos        = (int) $db->query('SELECT COUNT(*) FROM productos')->fetchColumn();
+        $stockBajo             = (int) $db->query('SELECT COUNT(*) FROM productos WHERE stock_actual < stock_minimo')->fetchColumn();
+        $valorTotal            = (float) $db->query('SELECT SUM(stock_actual * costo_compra) FROM productos')->fetchColumn();
         $herramientasPrestadas = (int) $db->query("SELECT COUNT(*) FROM prestamos WHERE estado = 'Prestado'")->fetchColumn();
-        $prestamosVencidos = (int) $db->query("SELECT COUNT(*) FROM prestamos WHERE estado = 'Prestado' AND fecha_estimada_devolucion IS NOT NULL AND fecha_estimada_devolucion < NOW()")->fetchColumn();
+        $prestamosVencidos     = (int) $db->query("SELECT COUNT(*) FROM prestamos WHERE estado = 'Prestado' AND fecha_estimada_devolucion IS NOT NULL AND fecha_estimada_devolucion < NOW()")->fetchColumn();
 
         return [
-            'totalProductos' => $totalProductos,
-            'stockBajo' => $stockBajo,
-            'valorTotalInventario' => $valorTotal,
+            'totalProductos'        => $totalProductos,
+            'stockBajo'             => $stockBajo,
+            'valorTotalInventario'  => $valorTotal,
             'herramientasPrestadas' => $herramientasPrestadas,
-            'alertas' => array_merge($this->alertasInventario($db), $this->alertasPrestamosVencidos($db)),
-            'prestamosVencidos' => $prestamosVencidos,
+            'alertas'               => array_merge($this->alertasInventario($db), $this->alertasPrestamosVencidos($db)),
+            'prestamosVencidos'     => $prestamosVencidos,
         ];
     }
 
@@ -62,11 +62,11 @@ class DashboardController
         $datos = $this->datosGenerales($db);
 
         $solicitudesPendientes = (int) $db->query("SELECT COUNT(*) FROM solicitudes_material WHERE estado = 'pendiente'")->fetchColumn();
-        $solicitudesAprobadas = (int) $db->query("SELECT COUNT(*) FROM solicitudes_material WHERE estado = 'aprobada'")->fetchColumn();
+        $solicitudesAprobadas  = (int) $db->query("SELECT COUNT(*) FROM solicitudes_material WHERE estado = 'aprobada'")->fetchColumn();
 
         $datos['solicitudesPendientes'] = $solicitudesPendientes;
-        $datos['solicitudesAprobadas'] = $solicitudesAprobadas;
-        $datos['ultimaActualizacion'] = $this->ultimasActualizaciones($db);
+        $datos['solicitudesAprobadas']  = $solicitudesAprobadas;
+        $datos['ultimaActualizacion']   = $this->ultimasActualizaciones($db);
 
         return $datos;
     }
@@ -75,10 +75,10 @@ class DashboardController
     {
         $datos = $this->datosGenerales($db);
 
-        $productosAlmacen = (int) $db->query('SELECT COUNT(*) FROM productos')->fetchColumn();
+        $productosAlmacen        = (int) $db->query('SELECT COUNT(*) FROM productos')->fetchColumn();
         $solicitudesPorGestionar = (int) $db->query("SELECT COUNT(*) FROM solicitudes_material WHERE estado IN ('pendiente','aprobada')")->fetchColumn();
 
-        $datos['productosAlmacen'] = $productosAlmacen;
+        $datos['productosAlmacen']   = $productosAlmacen;
         $datos['solicitudesAlmacen'] = $solicitudesPorGestionar;
         $datos['ultimosMovimientos'] = $this->expuestosMovimientos($db);
 
@@ -87,9 +87,9 @@ class DashboardController
 
     private function datosEmpleado($db, int $userId): array
     {
-        $solicitudesEnviadas = (int) $db->query("SELECT COUNT(*) FROM solicitudes_material WHERE usuario_id = {$userId}")->fetchColumn();
+        $solicitudesEnviadas  = (int) $db->query("SELECT COUNT(*) FROM solicitudes_material WHERE usuario_id = {$userId}")->fetchColumn();
         $pendientesAprobacion = (int) $db->query("SELECT COUNT(*) FROM solicitudes_material WHERE usuario_id = {$userId} AND estado = 'pendiente'")->fetchColumn();
-        $entregadas = (int) $db->query("SELECT COUNT(*) FROM solicitudes_material WHERE usuario_id = {$userId} AND estado = 'entregada'")->fetchColumn();
+        $entregadas           = (int) $db->query("SELECT COUNT(*) FROM solicitudes_material WHERE usuario_id = {$userId} AND estado = 'entregada'")->fetchColumn();
 
         $alertas = $db->prepare("SELECT comentario, estado, DATE_FORMAT(fecha_solicitud, '%d/%m/%Y') AS fecha
                                   FROM solicitudes_material
@@ -99,10 +99,10 @@ class DashboardController
         $alertas->execute([$userId]);
 
         return [
-            'solicitudesMias' => $solicitudesEnviadas,
+            'solicitudesMias'   => $solicitudesEnviadas,
             'pendientesAprobar' => $pendientesAprobacion,
-            'entregadas' => $entregadas,
-            'alertas' => $alertas->fetchAll() ?: [],
+            'entregadas'        => $entregadas,
+            'alertas'           => $alertas->fetchAll() ?: [],
         ];
     }
 
@@ -137,10 +137,10 @@ class DashboardController
                                AND pr.fecha_estimada_devolucion < NOW()
                              ORDER BY pr.fecha_estimada_devolucion ASC
                              LIMIT 5");
-        $rows = $stmt->fetchAll() ?: [];
+        $rows    = $stmt->fetchAll() ?: [];
         $alertas = [];
         foreach ($rows as $r) {
-            $fecha = date('d/m/Y', strtotime($r['fecha_estimada_devolucion']));
+            $fecha     = date('d/m/Y', strtotime($r['fecha_estimada_devolucion']));
             $alertas[] = [
                 'Préstamo vencido: ' . ($r['producto'] ?? 'Herramienta') . ' (' . ($r['empleado'] ?? 'Empleado') . ')',
                 $fecha,

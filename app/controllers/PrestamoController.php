@@ -18,18 +18,18 @@ class PrestamoController
     {
         Session::requireLogin(['Administrador', 'Almacen']);
         $prestamo = Prestamo::find($id);
-        $msg = '';
-        if (!$prestamo || $prestamo['estado'] !== 'Prestado') {
+        $msg      = '';
+        if (! $prestamo || $prestamo['estado'] !== 'Prestado') {
             $msg = 'Este prestamo no esta pendiente de devolucion o no existe.';
             include __DIR__ . '/../views/prestamos/devolver.php';
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $msg = 'Token CSRF invalido.';
             } else {
                 $estado_devolucion = $_POST['estado_devolucion'] ?? '';
-                $observaciones = trim($_POST['observaciones'] ?? '');
+                $observaciones     = trim($_POST['observaciones'] ?? '');
                 Prestamo::devolver($id, $estado_devolucion, $observaciones);
                 $msg = 'Devolucion registrada correctamente.';
                 // Recargar prestamo actualizado
@@ -44,24 +44,23 @@ class PrestamoController
     {
         Session::requireLogin(['Administrador', 'Almacen']);
 
-        $busqueda = trim($_GET['q'] ?? '');
-        $estado = trim($_GET['estado'] ?? '');
-        $desde = trim($_GET['desde'] ?? '');
-        $hasta = trim($_GET['hasta'] ?? '');
-        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $busqueda  = trim($_GET['q'] ?? '');
+        $estado    = trim($_GET['estado'] ?? '');
+        $desde     = trim($_GET['desde'] ?? '');
+        $hasta     = trim($_GET['hasta'] ?? '');
+        $page      = max(1, (int) ($_GET['page'] ?? 1));
         $porPagina = 9;
 
         $filtros = [
             'estado' => $estado,
-            'desde' => $desde,
-            'hasta' => $hasta,
+            'desde'  => $desde,
+            'hasta'  => $hasta,
         ];
 
-        $prestamos = Prestamo::historialPaginado($busqueda, $page, $porPagina, $filtros);
-        $total = Prestamo::totalHistorial($busqueda, $filtros);
+        $prestamos  = Prestamo::historialPaginado($busqueda, $page, $porPagina, $filtros);
+        $total      = Prestamo::totalHistorial($busqueda, $filtros);
         $totalPages = (int) ceil(($total ?: 0) / $porPagina);
 
         include __DIR__ . '/../views/prestamos/historial.php';
     }
 }
-?>

@@ -146,6 +146,10 @@ class Producto
 
     public static function create($data)
     {
+        $data['codigo'] = strtoupper(trim((string) ($data['codigo'] ?? '')));
+        $data['codigo_barras'] = isset($data['codigo_barras']) && $data['codigo_barras'] !== ''
+            ? strtoupper(trim((string) $data['codigo_barras']))
+            : null;
         $db = Database::getInstance()->getConnection();
         $sql = "INSERT INTO productos (
             codigo, codigo_barras, nombre, descripcion, proveedor_id, categoria_id,
@@ -190,6 +194,10 @@ class Producto
 
     public static function findByCodigo($codigo)
     {
+        $codigo = strtoupper(trim((string) $codigo));
+        if ($codigo === '') {
+            return false;
+        }
         $db = Database::getInstance()->getConnection();
         $stmt = $db->prepare("SELECT * FROM productos WHERE codigo = ?");
         $stmt->execute([$codigo]);
@@ -198,6 +206,10 @@ class Producto
 
     public static function findByCodigoBarras(string $codigoBarras)
     {
+        $codigoBarras = strtoupper(trim($codigoBarras));
+        if ($codigoBarras === '') {
+            return false;
+        }
         $db = Database::getInstance()->getConnection();
         $stmt = $db->prepare("SELECT * FROM productos WHERE codigo_barras = ?");
         $stmt->execute([$codigoBarras]);
@@ -206,6 +218,10 @@ class Producto
 
     public static function codigoBarrasExiste(string $codigoBarras, ?int $exceptId = null): bool
     {
+        $codigoBarras = strtoupper(trim($codigoBarras));
+        if ($codigoBarras === '') {
+            return false;
+        }
         $db = Database::getInstance()->getConnection();
         if ($exceptId) {
             $stmt = $db->prepare("SELECT COUNT(*) FROM productos WHERE codigo_barras = ? AND id <> ?");
@@ -219,6 +235,7 @@ class Producto
 
     public static function actualizarCodigoBarras(int $id, string $codigo): bool
     {
+        $codigo = strtoupper(trim($codigo));
         $db = Database::getInstance()->getConnection();
         $stmt = $db->prepare("UPDATE productos SET codigo_barras = ? WHERE id = ?");
         return $stmt->execute([$codigo, $id]);
@@ -227,6 +244,10 @@ class Producto
     public static function existsCodigoExcept($codigo, $id)
     {
         $db = Database::getInstance()->getConnection();
+        $codigo = strtoupper(trim((string) $codigo));
+        if ($codigo === '') {
+            return false;
+        }
         $stmt = $db->prepare("SELECT * FROM productos WHERE codigo = ? AND id != ?");
         $stmt->execute([$codigo, $id]);
         return $stmt->fetch();
@@ -243,6 +264,10 @@ class Producto
             estado=?, tipo=?, imagen_url=?, last_requested_by_user_id=?, last_request_date=?, tags=?
             WHERE id=?";
         $stmt = $db->prepare($sql);
+        $data['codigo'] = strtoupper(trim((string) ($data['codigo'] ?? '')));
+        $data['codigo_barras'] = isset($data['codigo_barras']) && $data['codigo_barras'] !== ''
+            ? strtoupper(trim((string) $data['codigo_barras']))
+            : null;
         return $stmt->execute([
             $data['codigo'], $data['codigo_barras'], $data['nombre'], $data['descripcion'], $data['proveedor_id'], $data['categoria_id'],
             $data['peso'], $data['ancho'], $data['alto'], $data['profundidad'], $data['unidad_medida_id'],
@@ -256,8 +281,12 @@ class Producto
     public static function delete($id)
     {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("DELETE FROM productos WHERE id=?");
-        return $stmt->execute([$id]);
+        try {
+            $stmt = $db->prepare("DELETE FROM productos WHERE id=?");
+            return $stmt->execute([$id]);
+        } catch (\PDOException $e) {
+            return false;
+        }
     }
 
     public static function setActive($id, $active)

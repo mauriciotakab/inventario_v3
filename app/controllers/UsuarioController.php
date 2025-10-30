@@ -19,18 +19,18 @@ class UsuarioController
         $error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $error = 'Token CSRF inválido.';
             } else {
                 $username = trim($_POST['username'] ?? '');
-                $nombre = trim($_POST['nombre_completo'] ?? '');
+                $nombre   = trim($_POST['nombre_completo'] ?? '');
                 $password = $_POST['password'] ?? '';
-                $role = $_POST['role'] ?? '';
-                $activo = isset($_POST['activo']);
+                $role     = $_POST['role'] ?? '';
+                $activo   = isset($_POST['activo']);
 
                 if ($username === '' || $nombre === '' || $password === '' || $role === '') {
                     $error = 'Todos los campos son obligatorios.';
-                } elseif (!in_array($role, $this->rolesPermitidos, true)) {
+                } elseif (! in_array($role, $this->rolesPermitidos, true)) {
                     $error = 'El rol seleccionado no es válido.';
                 } elseif (strlen($password) < 6) {
                     $error = 'La contraseña debe tener al menos 6 caracteres.';
@@ -38,11 +38,11 @@ class UsuarioController
                     $error = 'Ese nombre de usuario ya está registrado.';
                 } else {
                     Usuario::create([
-                        'username' => $username,
-                        'password' => $password,
+                        'username'        => $username,
+                        'password'        => $password,
                         'nombre_completo' => $nombre,
-                        'role' => $role,
-                        'activo' => $activo ? 1 : 0,
+                        'role'            => $role,
+                        'activo'          => $activo ? 1 : 0,
                     ]);
                     header('Location: usuarios.php?success=1');
                     exit();
@@ -57,33 +57,33 @@ class UsuarioController
     {
         Session::requireLogin('Administrador');
         $usuario = Usuario::findById($id);
-        $error = '';
+        $error   = '';
 
-        if (!$usuario) {
+        if (! $usuario) {
             die('Usuario no encontrado.');
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $error = 'Token CSRF inválido.';
             } else {
                 $username = trim($_POST['username'] ?? '');
-                $nombre = trim($_POST['nombre_completo'] ?? '');
+                $nombre   = trim($_POST['nombre_completo'] ?? '');
                 $password = $_POST['password'] ?? '';
-                $role = $_POST['role'] ?? '';
-                $activo = isset($_POST['activo']);
+                $role     = $_POST['role'] ?? '';
+                $activo   = isset($_POST['activo']);
 
                 if ($username === '' || $nombre === '' || $role === '') {
                     $error = 'Todos los campos son obligatorios.';
-                } elseif (!in_array($role, $this->rolesPermitidos, true)) {
+                } elseif (! in_array($role, $this->rolesPermitidos, true)) {
                     $error = 'El rol seleccionado no es válido.';
                 } else {
                     Usuario::update($id, [
-                        'username' => $username,
+                        'username'        => $username,
                         'nombre_completo' => $nombre,
-                        'password' => $password,
-                        'role' => $role,
-                        'activo' => $activo ? 1 : 0,
+                        'password'        => $password,
+                        'role'            => $role,
+                        'activo'          => $activo ? 1 : 0,
                     ]);
                     header('Location: usuarios.php?success=2');
                     exit();
@@ -97,7 +97,7 @@ class UsuarioController
     public function delete($id): void
     {
         Session::requireLogin('Administrador');
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Session::checkCsrf($_POST['csrf'] ?? '')) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || ! Session::checkCsrf($_POST['csrf'] ?? '')) {
             header('Location: usuarios.php?deleted=0&error=csrf');
             exit();
         }
@@ -120,7 +120,7 @@ class UsuarioController
     public function setActive($id, $active): void
     {
         Session::requireLogin('Administrador');
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Session::checkCsrf($_POST['csrf'] ?? '')) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || ! Session::checkCsrf($_POST['csrf'] ?? '')) {
             header('Location: usuarios.php?error=csrf');
             exit();
         }

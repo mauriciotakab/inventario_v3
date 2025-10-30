@@ -9,6 +9,13 @@ if (!empty($alerta['success'])) {
         : 'Producto registrado correctamente.';
 }
 $mensajeEliminado = !empty($alerta['deleted']) ? 'Producto eliminado correctamente.' : null;
+$mensajeError = null;
+$errorCode = $_GET['error'] ?? '';
+if ($errorCode === 'relaciones') {
+    $mensajeError = 'No se pudo eliminar el producto porque tiene movimientos, solicitudes o préstamos vinculados.';
+} elseif ($errorCode === 'csrf') {
+    $mensajeError = 'El formulario expiró, intenta nuevamente.';
+}
 $importResultado = $importAlert ?? null;
 ?>
 <!DOCTYPE html>
@@ -81,6 +88,9 @@ $importResultado = $importAlert ?? null;
         </header>
 
         <main class="dashboard-main productos-main">
+            <?php if ($mensajeError): ?>
+                <div class="alert alert-danger"><i class="fa fa-circle-exclamation"></i> <?= htmlspecialchars($mensajeError) ?></div>
+            <?php endif; ?>
             <?php if ($mensajeExito): ?>
                 <div class="alert alert-success"><i class="fa fa-check-circle"></i> <?= htmlspecialchars($mensajeExito) ?></div>
             <?php endif; ?>

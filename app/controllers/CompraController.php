@@ -12,15 +12,15 @@ class CompraController
 
         $filtros = [
             'proveedor_id' => $_GET['proveedor_id'] ?? '',
-            'desde' => $_GET['desde'] ?? date('Y-m-01'),
-            'hasta' => $_GET['hasta'] ?? date('Y-m-d'),
+            'desde'        => $_GET['desde'] ?? date('Y-m-01'),
+            'hasta'        => $_GET['hasta'] ?? date('Y-m-d'),
         ];
 
         if ($filtros['desde'] > $filtros['hasta']) {
             [$filtros['desde'], $filtros['hasta']] = [$filtros['hasta'], $filtros['desde']];
         }
 
-        $db = Database::getInstance()->getConnection();
+        $db          = Database::getInstance()->getConnection();
         $proveedores = $db->query("SELECT id, nombre FROM proveedores ORDER BY nombre ASC")->fetchAll();
 
         $historial = OrdenCompra::historial($filtros);
@@ -28,8 +28,8 @@ class CompraController
         if (isset($_GET['export']) && $_GET['export'] === 'csv') {
             ActivityLogger::log('compras_export', 'Descarga de historial de compras', [
                 'proveedor_id' => $filtros['proveedor_id'] ?: null,
-                'desde' => $filtros['desde'],
-                'hasta' => $filtros['hasta'],
+                'desde'        => $filtros['desde'],
+                'hasta'        => $filtros['hasta'],
             ]);
             $filename = 'compras_proveedor_' . date('Ymd_His') . '.csv';
             header('Content-Type: text/csv; charset=utf-8');

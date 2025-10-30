@@ -12,24 +12,24 @@ class ReporteController
     {
         Session::requireLogin(['Administrador', 'Almacen']);
 
-        $role = $_SESSION['role'] ?? 'Almacen';
+        $role          = $_SESSION['role'] ?? 'Almacen';
         $mostrarCostos = $role === 'Administrador';
 
-        $fechaFin = $this->parseDate($_GET['to'] ?? date('Y-m-d'));
+        $fechaFin    = $this->parseDate($_GET['to'] ?? date('Y-m-d'));
         $fechaInicio = $this->parseDate($_GET['from'] ?? date('Y-m-01'));
         if ($fechaInicio > $fechaFin) {
-            $tmp = $fechaInicio;
+            $tmp         = $fechaInicio;
             $fechaInicio = $fechaFin;
-            $fechaFin = $tmp;
+            $fechaFin    = $tmp;
         }
 
         $movTipo = $_GET['mov_tipo'] ?? '';
         $movTipo = in_array($movTipo, ['Entrada', 'Salida', 'Transferencia'], true) ? $movTipo : '';
 
-        $db = Database::getInstance()->getConnection();
-        $proveedores = $db->query("SELECT id, nombre, rfc FROM proveedores ORDER BY nombre ASC")->fetchAll();
-        $almacenes = $db->query("SELECT id, nombre FROM almacenes ORDER BY nombre ASC")->fetchAll();
-        $categorias = $db->query("SELECT id, nombre FROM categorias ORDER BY nombre ASC")->fetchAll();
+        $db            = Database::getInstance()->getConnection();
+        $proveedores   = $db->query("SELECT id, nombre, rfc FROM proveedores ORDER BY nombre ASC")->fetchAll();
+        $almacenes     = $db->query("SELECT id, nombre FROM almacenes ORDER BY nombre ASC")->fetchAll();
+        $categorias    = $db->query("SELECT id, nombre FROM categorias ORDER BY nombre ASC")->fetchAll();
         $tiposProducto = Producto::tiposDisponibles();
 
         $proveedorFiltro = isset($_GET['proveedor_id']) ? (int) $_GET['proveedor_id'] : 0;
@@ -53,7 +53,7 @@ class ReporteController
         }
 
         $topTipo = $_GET['top_tipo'] ?? '';
-        if (!in_array($topTipo, $tiposProducto, true)) {
+        if (! in_array($topTipo, $tiposProducto, true)) {
             $topTipo = '';
         }
 
@@ -62,15 +62,15 @@ class ReporteController
             $topAlmacenId = null;
         }
 
-        $inventarioResumen = $this->resumenInventario();
-        $inventarioBajo = $this->reporteInventarioBajo($invAlmacenId, $invCategoriaId);
-        $valorPorAlmacen = $mostrarCostos ? $this->reporteValorPorAlmacen() : [];
-        $movimientos = $this->reporteMovimientos($fechaInicio, $fechaFin, $movTipo, $movAlmacenId);
-        $prestamosAbiertos = $this->reportePrestamosActivos($fechaInicio, $fechaFin);
-        $prestamosVencidos = $this->reportePrestamosVencidos();
-        $topSalidas = $this->reporteTopSalidas($fechaInicio, $fechaFin, $topTipo, $topAlmacenId);
-        $estadoInventario = $this->reporteEstadoInventario();
-        $productosPorTipo = $this->reporteProductosPorTipo();
+        $inventarioResumen   = $this->resumenInventario();
+        $inventarioBajo      = $this->reporteInventarioBajo($invAlmacenId, $invCategoriaId);
+        $valorPorAlmacen     = $mostrarCostos ? $this->reporteValorPorAlmacen() : [];
+        $movimientos         = $this->reporteMovimientos($fechaInicio, $fechaFin, $movTipo, $movAlmacenId);
+        $prestamosAbiertos   = $this->reportePrestamosActivos($fechaInicio, $fechaFin);
+        $prestamosVencidos   = $this->reportePrestamosVencidos();
+        $topSalidas          = $this->reporteTopSalidas($fechaInicio, $fechaFin, $topTipo, $topAlmacenId);
+        $estadoInventario    = $this->reporteEstadoInventario();
+        $productosPorTipo    = $this->reporteProductosPorTipo();
         $comprasPorProveedor = $mostrarCostos
             ? $this->reporteComprasPorProveedor($fechaInicio, $fechaFin, $proveedorFiltro)
             : ['rows' => [], 'resumen' => ['total' => 0.0, 'proveedores' => []]];
@@ -78,23 +78,23 @@ class ReporteController
         $comprasResumen = $comprasPorProveedor['resumen'];
 
         $datasets = [
-            'inventario_bajo' => $inventarioBajo,
-            'movimientos' => $movimientos,
-            'prestamos_abiertos' => $prestamosAbiertos,
-            'prestamos_vencidos' => $prestamosVencidos,
-            'top_salidas' => $topSalidas,
-            'estado_inventario' => $estadoInventario,
-            'productos_consumibles' => $productosPorTipo['consumibles'],
+            'inventario_bajo'        => $inventarioBajo,
+            'movimientos'            => $movimientos,
+            'prestamos_abiertos'     => $prestamosAbiertos,
+            'prestamos_vencidos'     => $prestamosVencidos,
+            'top_salidas'            => $topSalidas,
+            'estado_inventario'      => $estadoInventario,
+            'productos_consumibles'  => $productosPorTipo['consumibles'],
             'productos_herramientas' => $productosPorTipo['herramientas'],
         ];
 
         if ($mostrarCostos) {
-            $datasets['valor_almacen'] = $valorPorAlmacen;
+            $datasets['valor_almacen']     = $valorPorAlmacen;
             $datasets['compras_proveedor'] = $comprasListado;
         }
 
         if (isset($_GET['export'])) {
-            $section = $_GET['section'] ?? '';
+            $section    = $_GET['section'] ?? '';
             $exportType = $_GET['export'];
             if ($exportType === 'csv') {
                 $this->exportCsv($section, $datasets, $mostrarCostos, $fechaInicio, $fechaFin);
@@ -108,15 +108,15 @@ class ReporteController
         }
 
         $filters = [
-            'from' => $fechaInicio,
-            'to' => $fechaFin,
-            'mov_tipo' => $movTipo,
-            'mov_almacen_id' => $movAlmacenId ? (string) $movAlmacenId : '',
-            'inv_almacen_id' => $invAlmacenId ? (string) $invAlmacenId : '',
+            'from'             => $fechaInicio,
+            'to'               => $fechaFin,
+            'mov_tipo'         => $movTipo,
+            'mov_almacen_id'   => $movAlmacenId ? (string) $movAlmacenId : '',
+            'inv_almacen_id'   => $invAlmacenId ? (string) $invAlmacenId : '',
             'inv_categoria_id' => $invCategoriaId ? (string) $invCategoriaId : '',
-            'top_tipo' => $topTipo,
-            'top_almacen_id' => $topAlmacenId ? (string) $topAlmacenId : '',
-            'proveedor_id' => $proveedorFiltro ? (string) $proveedorFiltro : '',
+            'top_tipo'         => $topTipo,
+            'top_almacen_id'   => $topAlmacenId ? (string) $topAlmacenId : '',
+            'proveedor_id'     => $proveedorFiltro ? (string) $proveedorFiltro : '',
         ];
 
         include __DIR__ . '/../views/reportes/index.php';
@@ -130,7 +130,7 @@ class ReporteController
 
     private function resumenInventario(): array
     {
-        $db = Database::getInstance()->getConnection();
+        $db  = Database::getInstance()->getConnection();
         $sql = "SELECT COUNT(*) AS total,
                        SUM(CASE WHEN stock_actual < stock_minimo THEN 1 ELSE 0 END) AS stock_bajo,
                        SUM(CASE WHEN stock_actual <= 0 THEN 1 ELSE 0 END) AS sin_stock,
@@ -143,23 +143,23 @@ class ReporteController
         $data = $db->query($sql)->fetch();
 
         $prestamosPendientes = $db->query("SELECT COUNT(*) FROM prestamos WHERE estado = 'Prestado'")->fetchColumn();
-        $prestamosVencidos = $db->query("SELECT COUNT(*)
+        $prestamosVencidos   = $db->query("SELECT COUNT(*)
                                          FROM prestamos
                                          WHERE estado = 'Prestado'
                                            AND fecha_estimada_devolucion IS NOT NULL
                                            AND fecha_estimada_devolucion < NOW()")->fetchColumn();
 
         return [
-            'total' => (int) ($data['total'] ?? 0),
-            'stock_bajo' => (int) ($data['stock_bajo'] ?? 0),
-            'sin_stock' => (int) ($data['sin_stock'] ?? 0),
-            'consumibles' => (int) ($data['consumibles'] ?? 0),
-            'herramientas' => (int) ($data['herramientas'] ?? 0),
-            'activos' => (int) ($data['activos'] ?? 0),
-            'inactivos' => (int) ($data['inactivos'] ?? 0),
-            'valor_total' => (float) ($data['valor_total'] ?? 0),
+            'total'                => (int) ($data['total'] ?? 0),
+            'stock_bajo'           => (int) ($data['stock_bajo'] ?? 0),
+            'sin_stock'            => (int) ($data['sin_stock'] ?? 0),
+            'consumibles'          => (int) ($data['consumibles'] ?? 0),
+            'herramientas'         => (int) ($data['herramientas'] ?? 0),
+            'activos'              => (int) ($data['activos'] ?? 0),
+            'inactivos'            => (int) ($data['inactivos'] ?? 0),
+            'valor_total'          => (float) ($data['valor_total'] ?? 0),
             'prestamos_pendientes' => (int) $prestamosPendientes,
-            'prestamos_vencidos' => (int) $prestamosVencidos,
+            'prestamos_vencidos'   => (int) $prestamosVencidos,
         ];
     }
 
@@ -192,10 +192,10 @@ class ReporteController
                   LEFT JOIN unidades_medida um ON p.unidad_medida_id = um.id
                   LEFT JOIN stock_almacen sa ON sa.producto_id = p.id";
 
-        $where = [];
+        $where       = [];
         $whereParams = [];
         if ($categoriaId !== null) {
-            $where[] = 'p.categoria_id = ?';
+            $where[]       = 'p.categoria_id = ?';
             $whereParams[] = $categoriaId;
         }
 
@@ -219,9 +219,9 @@ class ReporteController
 
         $resultado = [];
         foreach ($rows as $row) {
-            $stockTotal = $row['stock_total'] !== null ? (float) $row['stock_total'] : null;
-            $stockFiltrado = $almacenId !== null ? (float) ($row['stock_filtrado'] ?? 0) : null;
-            $stockProducto = (float) ($row['stock_producto'] ?? 0);
+            $stockTotal     = $row['stock_total'] !== null ? (float) $row['stock_total'] : null;
+            $stockFiltrado  = $almacenId !== null ? (float) ($row['stock_filtrado'] ?? 0) : null;
+            $stockProducto  = (float) ($row['stock_producto'] ?? 0);
             $stockCalculado = $almacenId !== null
                 ? $stockFiltrado
                 : ($stockTotal !== null ? (float) $stockTotal : $stockProducto);
@@ -229,19 +229,19 @@ class ReporteController
             $stockMinimo = (float) ($row['stock_minimo'] ?? 0);
             if ($stockCalculado < $stockMinimo) {
                 $almacenesDistintos = (int) ($row['almacenes_distintos'] ?? 0);
-                $almacenEtiqueta = $almacenId !== null
+                $almacenEtiqueta    = $almacenId !== null
                     ? ($almacenNombre ?? 'Almacén seleccionado')
                     : ($row['almacen_producto'] ?: ($almacenesDistintos > 1 ? 'Múltiples almacenes' : 'Sin asignar'));
 
                 $resultado[] = [
-                    'codigo' => $row['codigo'],
-                    'nombre' => $row['nombre'],
-                    'tipo' => $row['tipo'],
-                    'categoria' => $row['categoria'],
-                    'almacen' => $almacenEtiqueta,
+                    'codigo'       => $row['codigo'],
+                    'nombre'       => $row['nombre'],
+                    'tipo'         => $row['tipo'],
+                    'categoria'    => $row['categoria'],
+                    'almacen'      => $almacenEtiqueta,
                     'stock_actual' => $stockCalculado,
                     'stock_minimo' => $stockMinimo,
-                    'unidad' => $row['unidad'] ?? '',
+                    'unidad'       => $row['unidad'] ?? '',
                 ];
             }
         }
@@ -271,7 +271,7 @@ class ReporteController
 
     private function reporteMovimientos(string $desde, string $hasta, string $tipo = '', ?int $almacenId = null): array
     {
-        $db = Database::getInstance()->getConnection();
+        $db  = Database::getInstance()->getConnection();
         $sql = "SELECT m.fecha,
                        m.tipo,
                        m.cantidad,
@@ -305,7 +305,7 @@ class ReporteController
 
     private function reportePrestamosActivos(string $desde, string $hasta): array
     {
-        $db = Database::getInstance()->getConnection();
+        $db  = Database::getInstance()->getConnection();
         $sql = "SELECT pr.id,
                        pr.fecha_prestamo,
                        pr.fecha_estimada_devolucion,
@@ -327,7 +327,7 @@ class ReporteController
 
     private function reportePrestamosVencidos(): array
     {
-        $db = Database::getInstance()->getConnection();
+        $db  = Database::getInstance()->getConnection();
         $sql = "SELECT pr.id,
                        pr.fecha_prestamo,
                        pr.fecha_estimada_devolucion,
@@ -348,7 +348,7 @@ class ReporteController
 
     private function reporteTopSalidas(string $desde, string $hasta, string $tipo = '', ?int $almacenId = null): array
     {
-        $db = Database::getInstance()->getConnection();
+        $db  = Database::getInstance()->getConnection();
         $sql = "SELECT p.codigo,
                        p.nombre,
                        p.tipo,
@@ -393,19 +393,19 @@ class ReporteController
                     : ($row['almacen_referencia'] ?? '-'));
 
             return [
-                'codigo' => $row['codigo'],
-                'nombre' => $row['nombre'],
-                'tipo' => $row['tipo'],
-                'total_salidas' => (float) ($row['total_salidas'] ?? 0),
+                'codigo'         => $row['codigo'],
+                'nombre'         => $row['nombre'],
+                'tipo'           => $row['tipo'],
+                'total_salidas'  => (float) ($row['total_salidas'] ?? 0),
                 'costo_estimado' => (float) ($row['costo_estimado'] ?? 0),
-                'almacen' => $almacenLabel,
+                'almacen'        => $almacenLabel,
             ];
         }, $rows);
     }
 
     private function reporteComprasPorProveedor(string $desde, string $hasta, ?int $proveedorId = null): array
     {
-        $db = Database::getInstance()->getConnection();
+        $db  = Database::getInstance()->getConnection();
         $sql = "SELECT oc.id,
                        oc.fecha,
                        oc.estado,
@@ -435,39 +435,39 @@ class ReporteController
         $stmt->execute($params);
         $rowsRaw = $stmt->fetchAll() ?: [];
 
-        $rows = [];
+        $rows               = [];
         $resumenProveedores = [];
-        $totalPeriodo = 0.0;
+        $totalPeriodo       = 0.0;
 
         foreach ($rowsRaw as $row) {
             $subtotal = (float) ($row['subtotal'] ?? 0);
-            $importe = $row['total'] !== null ? (float) $row['total'] : $subtotal;
+            $importe  = $row['total'] !== null ? (float) $row['total'] : $subtotal;
             if ($importe <= 0 && $subtotal > 0) {
                 $importe = $subtotal;
             }
 
             $rows[] = [
-                'orden_id' => (int) ($row['id'] ?? 0),
-                'fecha' => $row['fecha'],
-                'proveedor' => $row['proveedor'] ?? 'Sin proveedor',
-                'proveedor_rfc' => $row['proveedor_rfc'] ?? '',
-                'orden_rfc' => $row['orden_rfc'] ?? '',
-                'numero_factura' => $row['numero_factura'] ?? '',
-                'estado' => $row['estado'] ?? '-',
-                'almacen' => $row['almacen_destino'] ?? '-',
-                'total_items' => (float) ($row['total_items'] ?? 0),
+                'orden_id'        => (int) ($row['id'] ?? 0),
+                'fecha'           => $row['fecha'],
+                'proveedor'       => $row['proveedor'] ?? 'Sin proveedor',
+                'proveedor_rfc'   => $row['proveedor_rfc'] ?? '',
+                'orden_rfc'       => $row['orden_rfc'] ?? '',
+                'numero_factura'  => $row['numero_factura'] ?? '',
+                'estado'          => $row['estado'] ?? '-',
+                'almacen'         => $row['almacen_destino'] ?? '-',
+                'total_items'     => (float) ($row['total_items'] ?? 0),
                 'importe_detalle' => round($subtotal, 2),
-                'importe_total' => round($importe, 2),
-                'creado_por' => $row['creado_por'] ?? '-',
+                'importe_total'   => round($importe, 2),
+                'creado_por'      => $row['creado_por'] ?? '-',
             ];
 
             $claveProveedor = $row['proveedor'] ?? 'Sin proveedor';
-            if (!isset($resumenProveedores[$claveProveedor])) {
+            if (! isset($resumenProveedores[$claveProveedor])) {
                 $resumenProveedores[$claveProveedor] = [
                     'proveedor' => $claveProveedor,
-                    'rfc' => $row['proveedor_rfc'] ?? '',
-                    'ordenes' => 0,
-                    'importe' => 0.0,
+                    'rfc'       => $row['proveedor_rfc'] ?? '',
+                    'ordenes'   => 0,
+                    'importe'   => 0.0,
                 ];
             }
             $resumenProveedores[$claveProveedor]['ordenes']++;
@@ -485,9 +485,9 @@ class ReporteController
         });
 
         return [
-            'rows' => $rows,
+            'rows'    => $rows,
             'resumen' => [
-                'total' => round($totalPeriodo, 2),
+                'total'       => round($totalPeriodo, 2),
                 'proveedores' => array_map(static function ($item) {
                     $item['importe'] = round($item['importe'], 2);
                     return $item;
@@ -498,7 +498,7 @@ class ReporteController
 
     private function reporteEstadoInventario(): array
     {
-        $db = Database::getInstance()->getConnection();
+        $db  = Database::getInstance()->getConnection();
         $sql = "SELECT estado,
                        COUNT(*) AS cantidad,
                        SUM(stock_actual) AS unidades,
@@ -511,7 +511,7 @@ class ReporteController
 
     private function reporteProductosPorTipo(): array
     {
-        $db = Database::getInstance()->getConnection();
+        $db  = Database::getInstance()->getConnection();
         $sql = "SELECT p.codigo,
                        p.nombre,
                        p.tipo,
@@ -529,7 +529,7 @@ class ReporteController
         $filas = $db->query($sql)->fetchAll();
 
         $resultado = [
-            'consumibles' => [],
+            'consumibles'  => [],
             'herramientas' => [],
         ];
 
@@ -547,7 +547,7 @@ class ReporteController
 
     private function exportCsv(string $section, array $datasets, bool $mostrarCostos, string $desde, string $hasta): void
     {
-        if (!isset($datasets[$section])) {
+        if (! isset($datasets[$section])) {
             header('HTTP/1.1 400 Bad Request');
             echo 'Reporte no disponible.';
             return;
@@ -560,15 +560,15 @@ class ReporteController
             return;
         }
 
-        if (($config['requiresCost'] ?? false) && !$mostrarCostos) {
+        if (($config['requiresCost'] ?? false) && ! $mostrarCostos) {
             header('HTTP/1.1 403 Forbidden');
             echo 'No tienes permisos para exportar este reporte.';
             return;
         }
 
-        $rows = $datasets[$section];
+        $rows         = $datasets[$section];
         $filenameBase = $config['filename'] ?? ('reporte_' . $section);
-        $filename = $filenameBase . '_' . date('Ymd_His') . '.csv';
+        $filename     = $filenameBase . '_' . date('Ymd_His') . '.csv';
 
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename=' . $filename);
@@ -588,7 +588,7 @@ class ReporteController
         foreach ($rows as $row) {
             $line = [];
             foreach ($columns as $col) {
-                $value = $col['value'];
+                $value  = $col['value'];
                 $line[] = (string) $value($row);
             }
             fputcsv($output, $line);
@@ -597,14 +597,14 @@ class ReporteController
         fclose($output);
         ActivityLogger::log('reporte_export', 'Exportacion CSV de ' . $section, [
             'section' => $section,
-            'desde' => $desde,
-            'hasta' => $hasta,
+            'desde'   => $desde,
+            'hasta'   => $hasta,
         ]);
     }
 
     private function exportPdf(string $section, array $datasets, bool $mostrarCostos, string $desde, string $hasta): void
     {
-        if (!isset($datasets[$section])) {
+        if (! isset($datasets[$section])) {
             header('HTTP/1.1 400 Bad Request');
             echo 'Reporte no disponible.';
             return;
@@ -617,31 +617,31 @@ class ReporteController
             return;
         }
 
-        if (($config['requiresCost'] ?? false) && !$mostrarCostos) {
+        if (($config['requiresCost'] ?? false) && ! $mostrarCostos) {
             header('HTTP/1.1 403 Forbidden');
             echo 'No tienes permisos para exportar este reporte.';
             return;
         }
 
-        $rows = $datasets[$section];
-        $columns = $config['columns'];
-        $title = $config['title'] ?? 'Reporte';
+        $rows     = $datasets[$section];
+        $columns  = $config['columns'];
+        $title    = $config['title'] ?? 'Reporte';
         $subtitle = $config['subtitle'] ?? null;
         if ($subtitle instanceof \Closure) {
             $subtitle = $subtitle($desde, $hasta);
         }
 
-        $lines = [];
+        $lines   = [];
         $lines[] = $title;
         if ($subtitle) {
             $lines[] = $subtitle;
         } elseif (in_array($section, ['movimientos', 'prestamos_abiertos', 'prestamos_vencidos', 'top_salidas'], true)) {
             $lines[] = 'Periodo: ' . $desde . ' al ' . $hasta;
         }
-        $lines[] = '';
+        $lines[]      = '';
         $headerLabels = array_column($columns, 'label');
-        $lines[] = implode(' | ', $headerLabels);
-        $lines[] = str_repeat('-', min(110, strlen($lines[count($lines) - 1])));
+        $lines[]      = implode(' | ', $headerLabels);
+        $lines[]      = str_repeat('-', min(110, strlen($lines[count($lines) - 1])));
 
         if (empty($rows)) {
             $lines[] = 'Sin registros para este reporte.';
@@ -649,24 +649,24 @@ class ReporteController
             foreach ($rows as $row) {
                 $lineParts = [];
                 foreach ($columns as $col) {
-                    $value = $col['value'];
+                    $value       = $col['value'];
                     $lineParts[] = (string) $value($row);
                 }
                 $lines[] = implode(' | ', $lineParts);
             }
         }
 
-        $pdf = $this->buildPdfDocument($lines);
+        $pdf          = $this->buildPdfDocument($lines);
         $filenameBase = $config['filename'] ?? ('reporte_' . $section);
-        $filename = $filenameBase . '_' . date('Ymd_His') . '.pdf';
+        $filename     = $filenameBase . '_' . date('Ymd_His') . '.pdf';
 
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename=' . $filename);
         echo $pdf;
         ActivityLogger::log('reporte_export', 'Exportacion PDF de ' . $section, [
             'section' => $section,
-            'desde' => $desde,
-            'hasta' => $hasta,
+            'desde'   => $desde,
+            'hasta'   => $hasta,
         ]);
     }
 
@@ -674,14 +674,14 @@ class ReporteController
     {
         Session::requireLogin(['Administrador', 'Almacen']);
 
-        $db = Database::getInstance()->getConnection();
+        $db    = Database::getInstance()->getConnection();
         $desde = $this->parseDate($_GET['from'] ?? date('Y-m-01'));
         $hasta = $this->parseDate($_GET['to'] ?? date('Y-m-d'));
         if ($desde > $hasta) {
             [$desde, $hasta] = [$hasta, $desde];
         }
         $tipoFiltro = $_GET['tipo'] ?? '';
-        $almacenId = $_GET['almacen_id'] ?? '';
+        $almacenId  = $_GET['almacen_id'] ?? '';
 
         $sql = "SELECT p.id,
                        p.codigo,
@@ -702,11 +702,11 @@ class ReporteController
 
         $where = [];
         if ($tipoFiltro !== '' && in_array($tipoFiltro, Producto::tiposDisponibles(), true)) {
-            $where[] = 'p.tipo = ?';
+            $where[]  = 'p.tipo = ?';
             $params[] = $tipoFiltro;
         }
         if ($almacenId !== '') {
-            $where[] = 'p.almacen_id = ?';
+            $where[]  = 'p.almacen_id = ?';
             $params[] = (int) $almacenId;
         }
         if ($where) {
@@ -720,30 +720,30 @@ class ReporteController
 
         $rotacion = [];
         foreach ($filas as $fila) {
-            $salidas = (float) ($fila['total_salidas'] ?? 0);
-            $entradas = (float) ($fila['total_entradas'] ?? 0);
-            $stockActual = (float) ($fila['stock_actual'] ?? 0);
+            $salidas       = (float) ($fila['total_salidas'] ?? 0);
+            $entradas      = (float) ($fila['total_entradas'] ?? 0);
+            $stockActual   = (float) ($fila['stock_actual'] ?? 0);
             $stockPromedio = max(1.0, ($stockActual + max($entradas, 0)) / 2);
-            $indice = $salidas > 0 ? $salidas / $stockPromedio : 0.0;
+            $indice        = $salidas > 0 ? $salidas / $stockPromedio : 0.0;
             $clasificacion = match (true) {
                 $salidas <= 0 => 'Sin movimiento',
-                $indice >= 2 => 'Alta',
-                $indice >= 1 => 'Media',
-                default => 'Baja',
+                $indice >= 2  => 'Alta',
+                $indice >= 1  => 'Media',
+                default       => 'Baja',
             };
             $diasSinMovimiento = null;
-            if (!empty($fila['ultimo_movimiento'])) {
-                $ultimo = new DateTime($fila['ultimo_movimiento']);
-                $fin = new DateTime($hasta);
+            if (! empty($fila['ultimo_movimiento'])) {
+                $ultimo            = new DateTime($fila['ultimo_movimiento']);
+                $fin               = new DateTime($hasta);
                 $diasSinMovimiento = $ultimo->diff($fin)->days;
             }
 
             $rotacion[] = array_merge($fila, [
-                'indice' => $indice,
-                'clasificacion' => $clasificacion,
+                'indice'              => $indice,
+                'clasificacion'       => $clasificacion,
                 'dias_sin_movimiento' => $diasSinMovimiento,
-                'salidas' => $salidas,
-                'entradas' => $entradas,
+                'salidas'             => $salidas,
+                'entradas'            => $entradas,
             ]);
         }
 
@@ -771,13 +771,13 @@ class ReporteController
                 }
                 fclose($out);
                 ActivityLogger::log('rotacion_export', 'Exportacion CSV de rotacion de inventario', [
-                    'tipo' => $tipoFiltro ?: null,
+                    'tipo'       => $tipoFiltro ?: null,
                     'almacen_id' => $almacenId ?: null,
-                    'desde' => $desde,
-                    'hasta' => $hasta,
+                    'desde'      => $desde,
+                    'hasta'      => $hasta,
                 ]);
             } elseif ($_GET['export'] === 'pdf') {
-                $lines = ['Rotacion de inventario', "Periodo: {$desde} al {$hasta}", ''];
+                $lines   = ['Rotacion de inventario', "Periodo: {$desde} al {$hasta}", ''];
                 $lines[] = 'Codigo | Producto | Salidas | Indice | Clasificacion';
                 $lines[] = str_repeat('-', 80);
                 foreach ($rotacion as $row) {
@@ -795,16 +795,16 @@ class ReporteController
                 header('Content-Disposition: attachment; filename=' . $filename . '.pdf');
                 echo $pdf;
                 ActivityLogger::log('rotacion_export', 'Exportacion PDF de rotacion de inventario', [
-                    'tipo' => $tipoFiltro ?: null,
+                    'tipo'       => $tipoFiltro ?: null,
                     'almacen_id' => $almacenId ?: null,
-                    'desde' => $desde,
-                    'hasta' => $hasta,
+                    'desde'      => $desde,
+                    'hasta'      => $hasta,
                 ]);
             }
             return;
         }
 
-        $almacenes = $db->query('SELECT id, nombre FROM almacenes ORDER BY nombre ASC')->fetchAll();
+        $almacenes        = $db->query('SELECT id, nombre FROM almacenes ORDER BY nombre ASC')->fetchAll();
         $tiposDisponibles = Producto::tiposDisponibles();
         include __DIR__ . '/../views/reportes/rotacion.php';
     }
@@ -819,9 +819,9 @@ class ReporteController
         switch ($section) {
             case 'inventario_bajo':
                 return [
-                    'title' => 'Inventario por debajo del stock minimo',
+                    'title'    => 'Inventario por debajo del stock minimo',
                     'filename' => 'inventario_bajo',
-                    'columns' => [
+                    'columns'  => [
                         ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
                         ['label' => 'Producto', 'value' => fn($row) => $row['nombre']],
                         ['label' => 'Tipo', 'value' => fn($row) => $row['tipo']],
@@ -834,10 +834,10 @@ class ReporteController
                 ];
             case 'valor_almacen':
                 return [
-                    'title' => 'Valor del inventario por almacen',
-                    'filename' => 'valor_inventario_almacen',
+                    'title'        => 'Valor del inventario por almacen',
+                    'filename'     => 'valor_inventario_almacen',
                     'requiresCost' => true,
-                    'columns' => [
+                    'columns'      => [
                         ['label' => 'Almacen', 'value' => fn($row) => $row['almacen']],
                         ['label' => 'Productos', 'value' => fn($row) => $row['productos']],
                         ['label' => 'Unidades', 'value' => fn($row) => $formatNumber($row['unidades'])],
@@ -846,9 +846,9 @@ class ReporteController
                 ];
             case 'movimientos':
                 return [
-                    'title' => 'Movimientos de inventario',
+                    'title'    => 'Movimientos de inventario',
                     'filename' => 'movimientos_inventario',
-                    'columns' => [
+                    'columns'  => [
                         ['label' => 'Fecha', 'value' => fn($row) => $row['fecha']],
                         ['label' => 'Tipo', 'value' => fn($row) => $row['tipo']],
                         ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
@@ -862,9 +862,9 @@ class ReporteController
                 ];
             case 'prestamos_abiertos':
                 return [
-                    'title' => 'Herramientas prestadas',
+                    'title'    => 'Herramientas prestadas',
                     'filename' => 'prestamos_herramientas',
-                    'columns' => [
+                    'columns'  => [
                         ['label' => 'ID', 'value' => fn($row) => $row['id']],
                         ['label' => 'Fecha prestamo', 'value' => fn($row) => $row['fecha_prestamo']],
                         ['label' => 'Fecha estimada', 'value' => fn($row) => $row['fecha_estimada_devolucion'] ?? '-'],
@@ -877,9 +877,9 @@ class ReporteController
                 ];
             case 'prestamos_vencidos':
                 return [
-                    'title' => 'Prestamos vencidos',
+                    'title'    => 'Prestamos vencidos',
                     'filename' => 'prestamos_vencidos',
-                    'columns' => [
+                    'columns'  => [
                         ['label' => 'ID', 'value' => fn($row) => $row['id']],
                         ['label' => 'Fecha prestamo', 'value' => fn($row) => $row['fecha_prestamo']],
                         ['label' => 'Fecha estimada', 'value' => fn($row) => $row['fecha_estimada_devolucion'] ?? '-'],
@@ -892,9 +892,9 @@ class ReporteController
                 ];
             case 'top_salidas':
                 $config = [
-                    'title' => 'Top de productos mas retirados',
+                    'title'    => 'Top de productos mas retirados',
                     'filename' => 'top_salidas',
-                    'columns' => [
+                    'columns'  => [
                         ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
                         ['label' => 'Producto', 'value' => fn($row) => $row['nombre']],
                         ['label' => 'Tipo', 'value' => fn($row) => $row['tipo'] ?? '-'],
@@ -908,10 +908,10 @@ class ReporteController
                 return $config;
             case 'compras_proveedor':
                 return [
-                    'title' => 'Compras por proveedor',
-                    'filename' => 'compras_proveedor',
+                    'title'        => 'Compras por proveedor',
+                    'filename'     => 'compras_proveedor',
                     'requiresCost' => true,
-                    'columns' => [
+                    'columns'      => [
                         ['label' => 'Orden', 'value' => fn($row) => $row['orden_id']],
                         ['label' => 'Fecha', 'value' => fn($row) => $row['fecha']],
                         ['label' => 'Proveedor', 'value' => fn($row) => $row['proveedor']],
@@ -928,9 +928,9 @@ class ReporteController
                 ];
             case 'estado_inventario':
                 $config = [
-                    'title' => 'Estado fisico del inventario',
+                    'title'    => 'Estado fisico del inventario',
                     'filename' => 'estado_inventario',
-                    'columns' => [
+                    'columns'  => [
                         ['label' => 'Estado', 'value' => fn($row) => $row['estado']],
                         ['label' => 'Productos', 'value' => fn($row) => $row['cantidad']],
                         ['label' => 'Unidades', 'value' => fn($row) => $formatNumber($row['unidades'])],
@@ -942,9 +942,9 @@ class ReporteController
                 return $config;
             case 'productos_consumibles':
                 return [
-                    'title' => 'Catalogo de consumibles',
+                    'title'    => 'Catalogo de consumibles',
                     'filename' => 'productos_consumibles',
-                    'columns' => [
+                    'columns'  => [
                         ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
                         ['label' => 'Producto', 'value' => fn($row) => $row['nombre']],
                         ['label' => 'Categoria', 'value' => fn($row) => $row['categoria'] ?? '-'],
@@ -957,9 +957,9 @@ class ReporteController
                 ];
             case 'productos_herramientas':
                 return [
-                    'title' => 'Catalogo de herramientas',
+                    'title'    => 'Catalogo de herramientas',
                     'filename' => 'productos_herramientas',
-                    'columns' => [
+                    'columns'  => [
                         ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
                         ['label' => 'Producto', 'value' => fn($row) => $row['nombre']],
                         ['label' => 'Categoria', 'value' => fn($row) => $row['categoria'] ?? '-'],
@@ -982,39 +982,39 @@ class ReporteController
         }
 
         $maxLinesPerPage = 42;
-        $pagesContent = array_chunk($lines, $maxLinesPerPage);
+        $pagesContent    = array_chunk($lines, $maxLinesPerPage);
 
-        $objects = [];
-        $objects[1] = '<< /Type /Catalog /Pages 2 0 R >>';
-        $objects[2] = ''; // placeholder for /Pages
-        $fontObjNum = 3;
+        $objects              = [];
+        $objects[1]           = '<< /Type /Catalog /Pages 2 0 R >>';
+        $objects[2]           = ''; // placeholder for /Pages
+        $fontObjNum           = 3;
         $objects[$fontObjNum] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
 
         $pageRefs = [];
         foreach ($pagesContent as $chunk) {
-            $contentStream = $this->createPdfContentStream($chunk);
-            $contentObjNum = count($objects) + 1;
+            $contentStream           = $this->createPdfContentStream($chunk);
+            $contentObjNum           = count($objects) + 1;
             $objects[$contentObjNum] = $contentStream;
 
-            $pageObjNum = $contentObjNum + 1;
+            $pageObjNum           = $contentObjNum + 1;
             $objects[$pageObjNum] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ' . $fontObjNum . ' 0 R >> >> /Contents ' . $contentObjNum . ' 0 R >>';
-            $pageRefs[] = $pageObjNum . ' 0 R';
+            $pageRefs[]           = $pageObjNum . ' 0 R';
         }
 
         if (empty($pageRefs)) {
             // Garantizar al menos una pagina vacia
-            $contentStream = $this->createPdfContentStream(['(Sin contenido)']);
-            $contentObjNum = count($objects) + 1;
+            $contentStream           = $this->createPdfContentStream(['(Sin contenido)']);
+            $contentObjNum           = count($objects) + 1;
             $objects[$contentObjNum] = $contentStream;
-            $pageObjNum = $contentObjNum + 1;
-            $objects[$pageObjNum] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ' . $fontObjNum . ' 0 R >> >> /Contents ' . $contentObjNum . ' 0 R >>';
-            $pageRefs[] = $pageObjNum . ' 0 R';
+            $pageObjNum              = $contentObjNum + 1;
+            $objects[$pageObjNum]    = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ' . $fontObjNum . ' 0 R >> >> /Contents ' . $contentObjNum . ' 0 R >>';
+            $pageRefs[]              = $pageObjNum . ' 0 R';
         }
 
         $objects[2] = '<< /Type /Pages /Kids [' . implode(' ', $pageRefs) . '] /Count ' . count($pageRefs) . ' >>';
 
-        $pdf = "%PDF-1.4\n";
-        $offsets = [];
+        $pdf         = "%PDF-1.4\n";
+        $offsets     = [];
         $objectCount = count($objects);
 
         for ($i = 1; $i <= $objectCount; $i++) {
@@ -1037,7 +1037,7 @@ class ReporteController
     private function createPdfContentStream(array $lines): string
     {
         $leading = 14;
-        $startY = 792 - 72;
+        $startY  = 792 - 72;
         $content = "BT\n/F1 11 Tf\n{$leading} TL\n72 {$startY} Td\n";
 
         $total = count($lines);
@@ -1062,17 +1062,3 @@ class ReporteController
         return mb_convert_encoding($text, 'UTF-8', 'UTF-8');
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

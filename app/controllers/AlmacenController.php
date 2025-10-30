@@ -16,10 +16,10 @@ class AlmacenController
     {
         Session::requireLogin(['Administrador']);
         $usuarios = Usuario::all();
-        $error = '';
+        $error    = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $error = 'Token CSRF inválido.';
             } else {
                 Almacen::create($_POST);
@@ -34,16 +34,16 @@ class AlmacenController
     public function edit($id): void
     {
         Session::requireLogin(['Administrador']);
-        $almacen = Almacen::find($id);
+        $almacen  = Almacen::find($id);
         $usuarios = Usuario::all();
-        $error = '';
+        $error    = '';
 
-        if (!$almacen) {
+        if (! $almacen) {
             die('Almacén no encontrado.');
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $error = 'Token CSRF inválido.';
             } else {
                 Almacen::update($id, $_POST);
@@ -58,7 +58,7 @@ class AlmacenController
     public function delete($id): void
     {
         Session::requireLogin(['Administrador']);
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Session::checkCsrf($_POST['csrf'] ?? '')) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || ! Session::checkCsrf($_POST['csrf'] ?? '')) {
             header('Location: almacenes.php?error=csrf');
             exit();
         }

@@ -15,29 +15,29 @@ class ClienteController
     {
         Session::requireLogin(['Administrador', 'Almacen']);
         $errors = [];
-        $msg = '';
-        $data = [
-            'nombre' => '',
-            'contacto' => '',
-            'telefono' => '',
-            'email' => '',
+        $msg    = '';
+        $data   = [
+            'nombre'    => '',
+            'contacto'  => '',
+            'telefono'  => '',
+            'email'     => '',
             'direccion' => '',
         ];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $errors[] = 'Token CSRF inválido.';
             } else {
                 $data = $this->extractClienteData($_POST, $errors);
 
                 if (empty($errors)) {
                     Cliente::create($data);
-                    $msg = 'Cliente registrado correctamente.';
+                    $msg  = 'Cliente registrado correctamente.';
                     $data = [
-                        'nombre' => '',
-                        'contacto' => '',
-                        'telefono' => '',
-                        'email' => '',
+                        'nombre'    => '',
+                        'contacto'  => '',
+                        'telefono'  => '',
+                        'email'     => '',
                         'direccion' => '',
                     ];
                 }
@@ -51,22 +51,22 @@ class ClienteController
     {
         Session::requireLogin(['Administrador', 'Almacen']);
         $cliente = Cliente::find($id);
-        if (!$cliente) {
+        if (! $cliente) {
             die('Cliente no encontrado.');
         }
 
         $errors = [];
-        $msg = '';
+        $msg    = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $errors[] = 'Token CSRF inválido.';
             } else {
                 $data = $this->extractClienteData($_POST, $errors);
 
                 if (empty($errors)) {
                     Cliente::update($id, $data);
-                    $msg = 'Cliente actualizado correctamente.';
+                    $msg     = 'Cliente actualizado correctamente.';
                     $cliente = Cliente::find($id);
                 }
             }
@@ -78,7 +78,7 @@ class ClienteController
     public function delete($id): void
     {
         Session::requireLogin(['Administrador', 'Almacen']);
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Session::checkCsrf($_POST['csrf'] ?? '')) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || ! Session::checkCsrf($_POST['csrf'] ?? '')) {
             header('Location: clientes.php?error=csrf');
             exit();
         }
@@ -96,29 +96,29 @@ class ClienteController
 
     private function extractClienteData(array $payload, array &$errors): array
     {
-        $nombre = trim($payload['nombre'] ?? '');
-        $contacto = trim($payload['contacto'] ?? '');
-        $telefono = trim($payload['telefono'] ?? '');
-        $email = trim($payload['email'] ?? '');
+        $nombre    = trim($payload['nombre'] ?? '');
+        $contacto  = trim($payload['contacto'] ?? '');
+        $telefono  = trim($payload['telefono'] ?? '');
+        $email     = trim($payload['email'] ?? '');
         $direccion = trim($payload['direccion'] ?? '');
 
         if ($nombre === '') {
             $errors[] = 'El nombre es obligatorio.';
         }
 
-        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if ($email !== '' && ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'El correo electrónico no es válido.';
         }
 
-        if ($telefono !== '' && !preg_match('/^[0-9 +()-]{5,20}$/', $telefono)) {
+        if ($telefono !== '' && ! preg_match('/^[0-9 +()-]{5,20}$/', $telefono)) {
             $errors[] = 'El teléfono contiene caracteres no permitidos.';
         }
 
         return [
-            'nombre' => $nombre,
-            'contacto' => $contacto,
-            'telefono' => $telefono,
-            'email' => $email,
+            'nombre'    => $nombre,
+            'contacto'  => $contacto,
+            'telefono'  => $telefono,
+            'email'     => $email,
             'direccion' => $direccion,
         ];
     }

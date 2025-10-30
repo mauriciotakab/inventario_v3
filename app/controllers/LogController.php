@@ -13,18 +13,18 @@ class LogController
 
         $filtros = [
             'usuario_id' => $_GET['usuario_id'] ?? '',
-            'accion' => trim($_GET['accion'] ?? ''),
-            'desde' => $_GET['desde'] ?? '',
-            'hasta' => $_GET['hasta'] ?? '',
+            'accion'     => trim($_GET['accion'] ?? ''),
+            'desde'      => $_GET['desde'] ?? '',
+            'hasta'      => $_GET['hasta'] ?? '',
         ];
 
-        $pagina = max(1, (int) ($_GET['page'] ?? 1));
+        $pagina    = max(1, (int) ($_GET['page'] ?? 1));
         $porPagina = 50;
-        $offset = ($pagina - 1) * $porPagina;
+        $offset    = ($pagina - 1) * $porPagina;
 
-        $resultado = Log::listar($filtros, $porPagina, $offset);
-        $logs = $resultado['items'];
-        $total = $resultado['total'];
+        $resultado    = Log::listar($filtros, $porPagina, $offset);
+        $logs         = $resultado['items'];
+        $total        = $resultado['total'];
         $totalPaginas = max(1, (int) ceil($total / $porPagina));
 
         $usuarios = $db->query('SELECT id, nombre_completo FROM usuarios ORDER BY nombre_completo ASC')->fetchAll();

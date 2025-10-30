@@ -17,7 +17,7 @@ class CategoriaController
         $error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $error = 'Token CSRF inválido.';
             } elseif (empty(trim($_POST['nombre'] ?? ''))) {
                 $error = 'El nombre es obligatorio.';
@@ -35,14 +35,14 @@ class CategoriaController
     {
         Session::requireLogin(['Administrador']);
         $categoria = Categoria::find($id);
-        $error = '';
+        $error     = '';
 
-        if (!$categoria) {
+        if (! $categoria) {
             die('Categoría no encontrada.');
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!Session::checkCsrf($_POST['csrf'] ?? '')) {
+            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                 $error = 'Token CSRF inválido.';
             } elseif (empty(trim($_POST['nombre'] ?? ''))) {
                 $error = 'El nombre es obligatorio.';
@@ -59,7 +59,7 @@ class CategoriaController
     public function delete($id): void
     {
         Session::requireLogin(['Administrador']);
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Session::checkCsrf($_POST['csrf'] ?? '')) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || ! Session::checkCsrf($_POST['csrf'] ?? '')) {
             header('Location: categorias.php?error=csrf');
             exit();
         }
