@@ -15,36 +15,7 @@ $role = $_SESSION['role'] ?? '';
 </head>
 <body>
 <div class="main-layout">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
-            <div>
-                <div class="sidebar-title">TAKAB</div>
-                <div class="sidebar-desc">Dashboard</div>
-            </div>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <?php if ($role === 'Administrador'): ?>
-                <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestión de Usuarios</a>
-                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
-                <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-                <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
-                <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-                <a href="configuracion.php" class="active"><i class="fa-solid fa-gear"></i> Configuración</a>
-            <?php elseif ($role === 'Almacen'): ?>
-                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
-                <a href="solicitudes.php"><i class="fa-solid fa-inbox"></i> Gestionar Solicitudes</a>
-                <a href="revisar_solicitudes.php"><i class="fa-solid fa-comments"></i> Solicitudes de Material</a>
-                <a href="configuracion_almacen.php"><i class="fa-solid fa-gear"></i> Configuración</a>
-            <?php elseif ($role === 'Empleado'): ?>
-                <a href="solicitudes_crear.php"><i class="fa-solid fa-plus-square"></i> Solicitar Material</a>
-                <a href="mis_solicitudes.php"><i class="fa-solid fa-clipboard-list"></i> Mis Solicitudes</a>
-                <a href="solicitar_material_general.php"><i class="fa-solid fa-toolbox"></i> Solicitud general</a>
-            <?php endif; ?>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-        </nav>
-    </aside>
+    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
     <div class="main-content">
         <div class="prov-header">
             <div>
@@ -85,7 +56,7 @@ $role = $_SESSION['role'] ?? '';
                                 <a href="proveedores_edit.php?id=<?= (int) $prov['id'] ?>" class="btn-secundario" title="Editar">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <form method="post" action="proveedores_delete.php" style="display:inline-block" onsubmit="return confirm('¿Eliminar este proveedor?');">
+                                <form method="post" action="proveedores_delete.php" style="display:inline-block" data-confirm="¿Eliminar este proveedor?">
                                     <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
                                     <input type="hidden" name="id" value="<?= (int) $prov['id'] ?>">
                                     <button type="submit" class="btn-eliminar" title="Eliminar"><i class="fa fa-trash"></i></button>
@@ -103,5 +74,6 @@ $role = $_SESSION['role'] ?? '';
         </div>
     </div>
 </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

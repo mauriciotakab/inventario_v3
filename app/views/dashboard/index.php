@@ -14,61 +14,10 @@ $alertas = $datos['alertas'] ?? [];
 </head>
 <body>
 <div class="main-layout">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="login-logo"><img src="assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
-            <div>
-                <div class="sidebar-title">TAKAB</div>
-                <div class="sidebar-desc">Dashboard</div>
-            </div>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="dashboard.php" class="active"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <?php if ($role === 'Administrador'): ?>
-                <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestion de Usuarios</a>
-                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestion de Productos</a>
-                <a href="ordenes_compra.php"><i class="fa-solid fa-file-invoice-dollar"></i> Ordenes de compra</a>
-                <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-                <a href="compras_proveedor.php"><i class="fa-solid fa-file-invoice"></i> Compras por proveedor</a>
-                <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotacion de inventario</a>
-                <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
-                <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-                <a href="logs.php"><i class="fa-solid fa-clipboard-list"></i> Bitacora</a>
-                <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
-            <?php elseif ($role === 'Almacen'): ?>
-                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestion de Productos</a>
-                <a href="ordenes_compra.php"><i class="fa-solid fa-file-invoice-dollar"></i> Ordenes de compra</a>
-                <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-                <a href="compras_proveedor.php"><i class="fa-solid fa-file-invoice"></i> Compras por proveedor</a>
-                <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotacion de inventario</a>
-                <a href="revisar_solicitudes.php"><i class="fa-solid fa-inbox"></i> Solicitudes de Material</a>
-                <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-                <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
-            <?php elseif ($role === 'Compras'): ?>
-                <a href="ordenes_compra.php"><i class="fa-solid fa-file-invoice-dollar"></i> Ordenes de compra</a>
-                <a href="ordenes_compra_crear.php"><i class="fa-solid fa-plus"></i> Registrar orden</a>
-                <a href="compras_proveedor.php"><i class="fa-solid fa-chart-pie"></i> Historial de compras</a>
-                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestion de Productos</a>
-                <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-                <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-            <?php elseif ($role === 'Empleado'): ?>
-                <a href="solicitudes_crear.php"><i class="fa-solid fa-plus-square"></i> Solicitar Material para Servicio</a>
-                <a href="solicitar_material_general.php"><i class="fa-solid fa-box-open"></i> Solicitar Herramienta General</a>
-                <a href="mis_solicitudes.php"><i class="fa-solid fa-clipboard-list"></i> Mis Solicitudes</a>
-            <?php endif; ?>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-        </nav>
-    </aside>
+    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
 
     <div class="content-area">
-        <header class="top-header">
-            <div></div>
-            <div class="top-header-user">
-                <span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
-                <i class="fa-solid fa-user-circle"></i>
-                <a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
-            </div>
-        </header>
+        <?php include __DIR__ . '/../partials/topbar.php'; ?>
 
         <main class="dashboard-main">
             <div class="dashboard-header-row">
@@ -230,6 +179,7 @@ $alertas = $datos['alertas'] ?? [];
         </main>
     </div>
 </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>
 

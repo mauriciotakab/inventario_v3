@@ -10,13 +10,7 @@
 <body>
 <div class="main-layout">
     <div class="content-area">
-        <header class="top-header">
-            <div></div>
-            <div class="top-header-user">
-                <span>Administrador</span>
-                <i class="fa-solid fa-user-circle"></i>
-            </div>
-        </header>
+        <?php include __DIR__ . '/../partials/topbar.php'; ?>
         <main class="dashboard-main">
             <div class="usuarios-header-row">
                 <h1>Agregar Usuario</h1>
@@ -49,5 +43,6 @@
         </main>
     </div>
 </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

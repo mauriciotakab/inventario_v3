@@ -36,34 +36,9 @@ $csrfToken = Session::csrfToken();
 </head>
 <body>
 <div class="main-layout">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
-            <div>
-                <div class="sidebar-title">TAKAB</div>
-                <div class="sidebar-desc">Dashboard</div>
-            </div>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <a href="usuarios.php" class="active"><i class="fa-solid fa-users-cog"></i> Gestión de Usuarios</a>
-            <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Productos</a>
-            <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-            <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
-            <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-            <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-        </nav>
-    </aside>
+    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
     <div class="content-area">
-        <header class="top-header">
-            <div></div>
-            <div class="top-header-user">
-                <span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
-                <i class="fa-solid fa-user-circle"></i>
-                <a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
-            </div>
-        </header>
+        <?php include __DIR__ . '/../partials/topbar.php'; ?>
         <main class="dashboard-main">
             <?php if ($deleteStatus !== null): ?>
                 <div class="alert-banner <?= $deleteStatus === '1' ? 'success' : 'error' ?>">
@@ -157,7 +132,7 @@ $csrfToken = Session::csrfToken();
                                             <input type="hidden" name="active" value="1">
                                             <button type="submit" title="Activar"><i class="fa fa-user-check"></i></button>
                                         </form>
-                                        <form class="inline-action" method="post" action="usuarios_delete.php" onsubmit="return confirm('¿Eliminar usuario?');">
+                                        <form class="inline-action" method="post" action="usuarios_delete.php" data-confirm="¿Eliminar usuario?">
                                             <input type="hidden" name="csrf" value="<?= $csrfToken ?>">
                                             <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
                                             <button type="submit" class="btn-danger" title="Eliminar"><i class="fa fa-trash"></i></button>
@@ -175,5 +150,6 @@ $csrfToken = Session::csrfToken();
         </main>
     </div>
 </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

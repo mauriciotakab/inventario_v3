@@ -13,29 +13,7 @@ $role = $_SESSION['role'] ?? '';
 </head>
 <body>
 <div class="main-layout">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
-            <div>
-                <div class="sidebar-title">TAKAB</div>
-                <div class="sidebar-desc">Dashboard</div>
-            </div>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <?php if ($role === 'Administrador'): ?>
-                <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestión de Usuarios</a>
-            <?php endif; ?>
-            <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
-            <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-            <a href="proveedores.php"><i class="fa fa-truck"></i> Proveedores</a>
-            <a href="clientes.php" class="active"><i class="fa fa-building"></i> Clientes</a>
-            <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
-            <a href="prestamos_pendientes.php"><i class="fa-solid fa-screwdriver-wrench"></i> Préstamos Pendientes</a>
-            <a href="prestamos_historial.php"><i class="fa-solid fa-history"></i> Historial de Préstamos</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-        </nav>
-    </aside>
+    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
 
     <div class="main-content">
         <div class="page-title">
@@ -71,7 +49,7 @@ $role = $_SESSION['role'] ?? '';
                         <td><?= htmlspecialchars($c['direccion']) ?></td>
                         <td>
                             <a class="btn-secundario" href="clientes_edit.php?id=<?= (int) $c['id'] ?>"><i class="fa fa-edit"></i> Editar</a>
-                            <form method="post" action="clientes_delete.php" style="display:inline-block" onsubmit="return confirm('¿Eliminar este cliente?');">
+                            <form method="post" action="clientes_delete.php" style="display:inline-block" data-confirm="¿Eliminar este cliente?">
                                 <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
                                 <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
                                 <button type="submit" class="btn-eliminar"><i class="fa fa-trash"></i></button>
@@ -86,5 +64,6 @@ $role = $_SESSION['role'] ?? '';
         </table>
     </div>
 </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

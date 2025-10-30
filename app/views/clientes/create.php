@@ -13,20 +13,7 @@ $nombre = $_SESSION['nombre'] ?? '';
 </head>
 <body>
 <div class="main-layout">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
-            <div>
-                <div class="sidebar-title">TAKAB</div>
-                <div class="sidebar-desc">Dashboard</div>
-            </div>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <a href="clientes.php" class="active"><i class="fa fa-building"></i> Clientes</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-        </nav>
-    </aside>
+    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
 
     <div class="main-content">
         <h2><i class="fa fa-plus"></i> Registrar cliente</h2>
@@ -66,5 +53,6 @@ $nombre = $_SESSION['nombre'] ?? '';
         </form>
     </div>
 </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

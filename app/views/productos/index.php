@@ -41,51 +41,10 @@ $importResultado = $importAlert ?? null;
 </head>
 <body>
 <div class="main-layout">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
-            <div>
-                <div class="sidebar-title">TAKAB</div>
-                <div class="sidebar-desc">Dashboard</div>
-            </div>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <?php if ($role === 'Administrador'): ?>
-                <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestion de Usuarios</a>
-            <?php endif; ?>
-            <a href="productos.php" class="active"><i class="fa-solid fa-boxes-stacked"></i> Productos</a>
-            <?php if (in_array($role, ['Administrador','Compras','Almacen'], true)): ?>
-                <a href="ordenes_compra.php"><i class="fa-solid fa-file-invoice-dollar"></i> Ordenes de compra</a>
-            <?php endif; ?>
-            <?php if (in_array($role, ['Administrador','Compras'], true)): ?>
-                <a href="ordenes_compra_crear.php"><i class="fa-solid fa-plus"></i> Registrar orden</a>
-            <?php endif; ?>
-            <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-            <a href="compras_proveedor.php"><i class="fa-solid fa-file-invoice"></i> Compras por proveedor</a>
-            <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotacion de inventario</a>
-            <?php if ($role === 'Administrador' || $role === 'Almacen'): ?>
-                <a href="revisar_solicitudes.php"><i class="fa-solid fa-inbox"></i> Solicitudes de Material</a>
-            <?php endif; ?>
-            <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-            <?php if ($role === 'Administrador'): ?>
-                <a href="logs.php"><i class="fa-solid fa-clipboard-list"></i> Bitacora</a>
-            <?php endif; ?>
-            <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
-            <a href="documentacion.php"><i class="fa-solid fa-book"></i> Documentacion</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-        </nav>
-    </aside>
+    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
 
     <div class="content-area">
-        <header class="top-header">
-            <div></div>
-            <div class="top-header-user">
-                <span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
-                <i class="fa-solid fa-user-circle"></i>
-                <a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
-            </div>
-        </header>
+        <?php include __DIR__ . '/../partials/topbar.php'; ?>
 
         <main class="dashboard-main productos-main">
             <?php if ($mensajeError): ?>
@@ -373,11 +332,14 @@ $importResultado = $importAlert ?? null;
                                             <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
                                             <input type="hidden" name="id" value="<?= (int) $producto['id'] ?>">
                                             <input type="hidden" name="active" value="<?= (int)($producto['activo_id'] ?? 1) === 1 ? 0 : 1 ?>">
-                                            <button type="submit" class="btn-table" title="<?= (int)($producto['activo_id'] ?? 1) === 1 ? 'Desactivar' : 'Activar' ?>" onclick="return confirm('<?= (int)($producto['activo_id'] ?? 1) === 1 ? '¿Desactivar este producto?' : '¿Activar este producto?' ?>');">
+                                            <button type="submit"
+                                                    class="btn-table"
+                                                    title="<?= (int)($producto['activo_id'] ?? 1) === 1 ? 'Desactivar' : 'Activar' ?>"
+                                                    data-confirm-click="<?= (int)($producto['activo_id'] ?? 1) === 1 ? '¿Desactivar este producto?' : '¿Activar este producto?' ?>">
                                                 <i class="fa <?= (int)($producto['activo_id'] ?? 1) === 1 ? 'fa-toggle-off' : 'fa-toggle-on' ?>"></i>
                                             </button>
                                         </form>
-                                        <form method="post" action="productos_delete.php" class="inline-form" style="display:inline-block" onsubmit="return confirm('¿Eliminar el producto seleccionado? Esta acción no se puede deshacer.');">
+                                        <form method="post" action="productos_delete.php" class="inline-form" style="display:inline-block" data-confirm="¿Eliminar el producto seleccionado? Esta acción no se puede deshacer.">
                                             <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
                                             <input type="hidden" name="id" value="<?= (int) $producto['id'] ?>">
                                             <button type="submit" class="btn-table btn-danger" title="Eliminar">
@@ -395,8 +357,8 @@ $importResultado = $importAlert ?? null;
         </main>
     </div>
 </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>
-
 
 

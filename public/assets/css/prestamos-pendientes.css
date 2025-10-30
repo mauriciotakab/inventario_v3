@@ -107,3 +107,33 @@
     .takab-pagination{gap:2px;}
     .pagination-btn, .pagination-current {font-size:.95rem; padding:5px 9px;}
 }
+
+.prestamos-tabs {
+    display: flex;
+    gap: 12px;
+    margin: 16px 0 24px;
+    flex-wrap: wrap;
+}
+
+.prestamos-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: #edf2ff;
+    color: #1a2c51;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.prestamos-tab:hover {
+    background: #dbe4ff;
+    color: #102a56;
+}
+
+.prestamos-tab.active {
+    background: #123278;
+    color: #fff;
+}

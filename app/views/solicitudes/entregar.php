@@ -1,6 +1,7 @@
 ﻿<?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin(['Administrador', 'Almacen']);
+$breadcrumbs = [['label' => 'Entrega de solicitud']];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -104,7 +105,7 @@ Session::requireLogin(['Administrador', 'Almacen']);
                 <input type="date" name="fecha_estimada_devolucion" class="entregar-input">
             </label>
             <div class="entregar-actions">
-                <button type="submit" class="btn-entregar" onclick="return confirmarEntrega(event);">
+                <button type="submit" class="btn-entregar" data-confirm-click="¿Confirmas que la solicitud ha sido entregada? Esta acción actualizará el estado a 'Entregada'.">
                     <i class="fa fa-box"></i> Marcar como Entregada
                 </button>
                 <a href="revisar_solicitudes.php" class="btn-volver">
@@ -112,18 +113,10 @@ Session::requireLogin(['Administrador', 'Almacen']);
                 </a>
             </div>
         </form>
-        <script>
-        function confirmarEntrega(e) {
-            if(!confirm("¿Confirmas que la solicitud ha sido entregada?\nEsta acción actualizará el estado a 'Entregada'.")) {
-                e.preventDefault();
-                return false;
-            }
-            return true;
-        }
-        </script>
     <?php else: ?>
         <p>Solicitud no encontrada o no aprobada.</p>
     <?php endif; ?>
 </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

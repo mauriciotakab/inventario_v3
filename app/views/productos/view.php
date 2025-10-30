@@ -17,6 +17,10 @@ $estadoActivo = $producto['estado_activo'] ?? 'Activo';
 $unidad = $producto['unidad_abreviacion'] ?? $producto['unidad_medida_nombre'] ?? '';
 $tags = array_filter(array_map('trim', explode(',', $producto['tags'] ?? '')));
 
+$breadcrumbs = [
+    ['label' => 'Detalle del producto'],
+];
+
 // Helper para clases CSS seguras a partir del tipo
 function safe_css_class($s) {
 	$s = strtolower((string) $s);
@@ -35,35 +39,9 @@ function safe_css_class($s) {
 </head>
 <body>
 <div class="main-layout">
-	<aside class="sidebar">
-		<div class="sidebar-header">
-			<div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
-			<div>
-				<div class="sidebar-title">TAKAB</div>
-				<div class="sidebar-desc">Panel de control</div>
-			</div>
-		</div>
-		<nav class="sidebar-nav">
-			<a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-			<?php if ($role === 'Administrador'): ?>
-				<a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestión de Usuarios</a>
-			<?php endif; ?>
-			<a href="productos.php" class="active"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
-			<a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-			<a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
-			<a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
-			<a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-		</nav>
-	</aside>
+	<?php include __DIR__ . '/../partials/sidebar.php'; ?>
 	<div class="content-area">
-		<header class="top-header">
-			<div></div>
-			<div class="top-header-user">
-				<span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
-				<i class="fa-solid fa-user-circle"></i>
-				<a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
-			</div>
-		</header>
+		<?php include __DIR__ . '/../partials/topbar.php'; ?>
 		<main class="dashboard-main productos-main">
 			<div class="productos-header">
 				<div>
@@ -222,5 +200,6 @@ function safe_css_class($s) {
 		</main>
 	</div>
 </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

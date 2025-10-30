@@ -16,33 +16,10 @@ $nombre = $_SESSION['nombre'] ?? '';
 </head>
 <body>
 <div class="main-layout">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
-            <div>
-                <div class="sidebar-title">TAKAB</div>
-                <div class="sidebar-desc">Dashboard</div>
-            </div>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <a href="solicitudes_crear.php"><i class="fa-solid fa-comments"></i> Solicitar Material para Servicio</a>
-            <a href="solicitar_material_general.php" class="active"><i class="fa-solid fa-cart-plus"></i> Solicitud general</a>
-            <a href="mis_solicitudes.php"><i class="fa-solid fa-clipboard-list"></i> Mis Solicitudes</a>
-            <a href="documentacion.php"><i class="fa-solid fa-book"></i> Documentación</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-        </nav>
-    </aside>
+    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
 
     <div class="content-area">
-        <header class="top-header">
-            <div></div>
-            <div class="top-header-user">
-                <span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
-                <i class="fa-solid fa-user-circle"></i>
-                <a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
-            </div>
-        </header>
+        <?php include __DIR__ . '/../partials/topbar.php'; ?>
 
         <main class="dashboard-main solicitud-main">
             <div class="solicitud-header">
@@ -169,5 +146,6 @@ document.getElementById('solicitudForm').addEventListener('submit', function (ev
     }
 });
 </script>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

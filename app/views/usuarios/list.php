@@ -20,7 +20,7 @@
         <td>
             <a href="/usuario/ver/<?= $u['id'] ?>">Ver</a> | 
             <a href="/usuario/editar/<?= $u['id'] ?>">Editar</a> | 
-            <a href="/usuario/eliminar/<?= $u['id'] ?>" onclick="return confirm('¿Seguro de eliminar?');">Eliminar</a>
+            <a href="/usuario/eliminar/<?= $u['id'] ?>" data-confirm-click="¿Seguro de eliminar?">Eliminar</a>
         </td>
     </tr>
     <?php endforeach; ?>

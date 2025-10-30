@@ -5,6 +5,9 @@ $nombre = $_SESSION['nombre'] ?? '';
 $values = isset($data) && is_array($data) ? $data : ($producto ?? []);
 $errors = $errors ?? [];
 $error = $error ?? '';
+$breadcrumbs = [
+    ['label' => 'Editar producto'],
+];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -18,36 +21,10 @@ $error = $error ?? '';
 </head>
 <body>
 <div class="main-layout">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo TAKAB" width="90" height="55"></div>
-            <div>
-                <div class="sidebar-title">TAKAB</div>
-                <div class="sidebar-desc">Panel de control</div>
-            </div>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <?php if ($role === 'Administrador'): ?>
-                <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gesti&oacute;n de Usuarios</a>
-            <?php endif; ?>
-            <a href="productos.php" class="active"><i class="fa-solid fa-boxes-stacked"></i> Gesti&oacute;n de Productos</a>
-            <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-            <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
-            <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuraci&oacute;n</a>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesi&oacute;n</a>
-        </nav>
-    </aside>
+    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
 
     <div class="content-area">
-        <header class="top-header">
-            <div></div>
-            <div class="top-header-user">
-                <span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
-                <i class="fa-solid fa-user-circle"></i>
-                <a href="logout.php" class="logout-btn" title="Cerrar sesi&oacute;n"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
-            </div>
-        </header>
+        <?php include __DIR__ . '/../partials/topbar.php'; ?>
 
         <main class="dashboard-main productos-main">
             <?php if (!empty($errors)): ?>
@@ -250,5 +227,6 @@ $error = $error ?? '';
         </main>
     </div>
 </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

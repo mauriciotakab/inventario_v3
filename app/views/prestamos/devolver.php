@@ -64,5 +64,6 @@ Session::requireLogin(['Administrador', 'Almacen']);
         </a>
     <?php endif; ?>
 </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

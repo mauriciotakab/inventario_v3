@@ -1,6 +1,7 @@
 ﻿<?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin(['Administrador', 'Almacen']);
+$breadcrumbs = [["label" => 'Aprobación de solicitud']];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -100,10 +101,10 @@ Session::requireLogin(['Administrador', 'Almacen']);
                 <input type="text" name="observacion" class="aprobar-input">
             </label>
             <div class="aprobar-actions">
-                <button type="submit" name="accion" value="aprobar" class="btn-aprobar" onclick="return confirmarAprobar(event);">
+                <button type="submit" name="accion" value="aprobar" class="btn-aprobar" data-confirm-click="¿Estás seguro de aprobar esta solicitud?">
                     <i class="fa fa-check"></i> Aprobar
                 </button>
-                <button type="submit" name="accion" value="rechazar" class="btn-rechazar" onclick="return confirmarRechazar(event);">
+                <button type="submit" name="accion" value="rechazar" class="btn-rechazar" data-confirm-click="¿Estás seguro de RECHAZAR esta solicitud? Esta acción no se puede deshacer.">
                     <i class="fa fa-times"></i> Rechazar
                 </button>
                 <a href="revisar_solicitudes.php" class="btn-volver">
@@ -111,25 +112,10 @@ Session::requireLogin(['Administrador', 'Almacen']);
                 </a>
             </div>
         </form>
-        <script>
-        function confirmarAprobar(e) {
-            if(!confirm("¿Estás seguro de aprobar esta solicitud?")) {
-                e.preventDefault();
-                return false;
-            }
-            return true;
-        }
-        function confirmarRechazar(e) {
-            if(!confirm("¿Estás seguro de RECHAZAR esta solicitud?\nEsta acción no se puede deshacer.")) {
-                e.preventDefault();
-                return false;
-            }
-            return true;
-        }
-        </script>
     <?php else: ?>
         <p>Solicitud no encontrada.</p>
     <?php endif; ?>
 </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

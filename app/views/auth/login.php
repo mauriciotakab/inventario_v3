@@ -49,5 +49,6 @@ $error = $error ?? '';
         </div>
     </div>
     <script src="https://kit.fontawesome.com/8b82fe7e0b.js" crossorigin="anonymous"></script>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

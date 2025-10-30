@@ -378,6 +378,10 @@
     background: #fff2da;
     color: #9b640d;
 }
+.badge-tipo.equipo {
+    background: #f1e9ff;
+    color: #5b2fb1;
+}
 
 .badge-stock.ok {
     background: #e6f4ea;
@@ -556,6 +560,24 @@
     border-radius: 10px;
     border: 1px solid #d6dbea;
     max-width: 160px;
+}
+
+@media (max-width: 920px) {
+    .productos-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 720px) {
+    .productos-form-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
 @media (max-width: 768px) {

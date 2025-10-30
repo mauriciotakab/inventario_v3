@@ -158,6 +158,27 @@
     margin-bottom: 12px;
 }
 
+@media (max-width: 980px) {
+    .inventario-form-grid {
+        grid-template-columns: 1fr;
+    }
+    .inventario-form-main {
+        padding: 28px 22px 40px;
+    }
+}
+
+@media (max-width: 640px) {
+    .inventario-form-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+}
+
 .recents-header h2 {
     margin: 0;
     font-size: 1.25rem;

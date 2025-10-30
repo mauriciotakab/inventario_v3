@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin('Empleado');
+$breadcrumbs = [['label' => 'Detalle de la solicitud']];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -131,5 +132,6 @@ Session::requireLogin('Empleado');
         <?php endif; ?>
         <a href="mis_solicitudes.php#" class="detalle-btn-back"><i class="fa fa-arrow-left"></i> Regresar</a>
     </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

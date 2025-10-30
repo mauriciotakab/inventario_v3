@@ -8,6 +8,7 @@ $hasta = $hasta ?? '';
 $page = $page ?? 1;
 $porPagina = $porPagina ?? 9;
 $totalPages = max(1, $totalPages ?? 1);
+$breadcrumbs = [['label' => 'Historial de préstamos']];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -20,47 +21,19 @@ $totalPages = max(1, $totalPages ?? 1);
 </head>
 <body>
 <div class="main-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
-            <div>
-                <div class="sidebar-title">TAKAB</div>
-                <div class="sidebar-desc">Dashboard</div>
-            </div>
-        </div>
+    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
 
-        <nav class="sidebar-nav">
-            <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <?php if ($role === 'Administrador'): ?>
-                <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestion de Usuarios</a>
-                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestion de Productos</a>
-                <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-                <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
-                <a href="prestamos_pendientes.php">- Prestamos Pendientes</a>
-                <a href="prestamos_historial.php" class="active">- Historial de Prestamos</a>
-                <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-                <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
-            <?php elseif ($role === 'Almacen'): ?>
-                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestion de Productos</a>
-                <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
-                <a href="revisar_solicitudes.php"><i class="fa-solid fa-inbox"></i> Solicitudes de Material</a>
-                <a href="prestamos_pendientes.php">- Prestamos Pendientes</a>
-                <a href="prestamos_historial.php" class="active">- Historial de Prestamos</a>
-                <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-                <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuracion</a>
-            <?php elseif ($role === 'Empleado'): ?>
-                <a href="solicitudes_crear.php"><i class="fa-solid fa-plus-square"></i> Solicitar Material</a>
-                <a href="mis_solicitudes.php"><i class="fa-solid fa-clipboard-list"></i> Mis Solicitudes</a>
-            <?php endif; ?>
-            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-        </nav>
-    </aside>
+    <div class="content-area">
+        <?php include __DIR__ . '/../partials/topbar.php'; ?>
 
-    <div class="historial-main">
+        <main class="historial-main">
         <div class="historial-title">
             <i class="fa-solid fa-history"></i>
             Historial de Prestamos de Herramientas
+        </div>
+        <div class="prestamos-tabs">
+            <a href="prestamos_pendientes.php" class="prestamos-tab">Pendientes</a>
+            <a href="prestamos_historial.php" class="prestamos-tab active">Historial</a>
         </div>
 
         <div class="search-bar">
@@ -141,8 +114,10 @@ $totalPages = max(1, $totalPages ?? 1);
             <?php endfor; ?>
         </div>
         <?php endif; ?>
+        </main>
     </div>
 </div>
+<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>
 
