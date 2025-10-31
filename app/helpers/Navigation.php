@@ -72,7 +72,7 @@ class Navigation
         'configuracion' => [
             'label' => 'Configuración',
             'icon'  => 'fa-solid fa-gear',
-            'href'  => 'configuracion.php',
+            'href'  => 'ajustes.php',
             'roles' => ['Administrador', 'Almacen'],
         ],
         'documentacion' => [
@@ -189,7 +189,7 @@ class Navigation
         'reportes.php'                 => 'reportes',
         'reportes_rotacion.php'        => 'reportes_rotacion',
         'reportes_valor.php'           => 'reportes',
-        'configuracion.php'            => 'configuracion',
+        'ajustes.php'                  => 'configuracion',
         'config_backup.php'            => 'configuracion',
         'almacenes.php'                => 'configuracion',
         'almacenes_create.php'         => 'configuracion',
@@ -401,4 +401,3 @@ class Navigation
         return in_array($role, $valid, true) ? $role : 'Empleado';
     }
 }
-

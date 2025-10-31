@@ -464,7 +464,7 @@ body, html {
 .role-administrador { background: #2563eb22; color: #1741a6; }
 .role-almacen { background: #ffe25f55; color: #917a14; }
 .role-empleado { background: #e8eefb; color: #2563eb; }
-.role-compras { background: #e5f9f5; color: #0f7669; }
+.role-compras { background: #f8e5f5; color: #b83280; }
 .status-badge {
     padding: 4px 12px;
     border-radius: 12px;
@@ -646,7 +646,7 @@ body, html {
 .role-administrador { background: #ffdddd; color: #d42e2e; }
 .role-almacén, .role-almacen { background: #e7edfa; color: #4576c9; }
 .role-empleado { background: #e3faea; color: #20a05a; }
-.role-compras { background: #ddf4f2; color: #1a7f78; }
+.role-compras { background: #f4d3ea; color: #a02468; }
 
 .status-badge {
     display: inline-block;

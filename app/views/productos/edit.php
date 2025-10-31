@@ -108,7 +108,7 @@ $breadcrumbs = [
                             <textarea id="descripcion" name="descripcion" rows="3"><?= htmlspecialchars($values['descripcion'] ?? '') ?></textarea>
                         </div>
                         <div class="productos-form-field">
-                            <label for="clase_categoria">Clase / Categor&iacute;a interna</label>
+                            <label for="clase_categoria">SKU</label>
                             <input type="text" id="clase_categoria" name="clase_categoria" value="<?= htmlspecialchars($values['clase_categoria'] ?? '') ?>">
                         </div>
                         <div class="productos-form-field">

@@ -35,7 +35,7 @@ $nombre = $_SESSION['nombre'] ?? '';
                 <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
                 <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
                 <a href="logs.php"><i class="fa-solid fa-clipboard-list"></i> Bitácora</a>
-                <a href="configuracion.php" class="active"><i class="fa-solid fa-gear"></i> Configuración</a>
+                <a href="ajustes.php" class="active"><i class="fa-solid fa-gear"></i> Configuración</a>
             <?php elseif ($role === 'Almacen'): ?>
                 <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
                 <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
@@ -43,7 +43,7 @@ $nombre = $_SESSION['nombre'] ?? '';
                 <a href="reportes_rotacion.php"><i class="fa-solid fa-arrows-rotate"></i> Rotación de inventario</a>
                 <a href="revisar_solicitudes.php"><i class="fa-solid fa-inbox"></i> Solicitudes de Material</a>
                 <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-                <a href="configuracion.php" class="active"><i class="fa-solid fa-gear"></i> Configuración</a>
+                <a href="ajustes.php" class="active"><i class="fa-solid fa-gear"></i> Configuración</a>
             <?php else: ?>
                 <a href="solicitudes_crear.php"><i class="fa-solid fa-plus-square"></i> Solicitar Material</a>
                 <a href="solicitar_material_general.php"><i class="fa-solid fa-cart-plus"></i> Solicitar Material General</a>
