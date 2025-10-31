@@ -224,7 +224,6 @@ class Navigation
             ['label' => 'Usuarios'],
         ],
         'productos'           => [
-            ['label' => 'Inventario', 'url' => 'inventario_actual.php'],
             ['label' => 'Productos'],
         ],
         'ordenes'             => [
