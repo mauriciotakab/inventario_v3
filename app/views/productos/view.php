@@ -100,7 +100,7 @@ function safe_css_class($s) {
 				</div>
 				<div class="hero-image">
 					<?php if (!empty($producto['imagen_url'])): ?>
-						<img src="../public/<?= htmlspecialchars($producto['imagen_url']) ?>" alt="Imagen del producto">
+						<img src="/<?= htmlspecialchars($producto['imagen_url']) ?>" alt="Imagen del producto">
 					<?php else: ?>
 						<div style="text-align:center;color:#7d8bb0;">
 							<i class="fa fa-camera" style="font-size:2rem;"></i>

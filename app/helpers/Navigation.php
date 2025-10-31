@@ -3,55 +3,55 @@
 class Navigation
 {
     private const ITEMS = [
-        'dashboard' => [
+        'dashboard'           => [
             'label' => 'Dashboard',
             'icon'  => 'fa-solid fa-house',
             'href'  => 'dashboard.php',
             'roles' => ['Administrador', 'Almacen', 'Compras', 'Empleado'],
         ],
-        'usuarios' => [
+        'usuarios'            => [
             'label' => 'Gestión de Usuarios',
             'icon'  => 'fa-solid fa-users-cog',
             'href'  => 'usuarios.php',
             'roles' => ['Administrador'],
         ],
-        'productos' => [
+        'productos'           => [
             'label' => 'Productos',
             'icon'  => 'fa-solid fa-boxes-stacked',
             'href'  => 'productos.php',
             'roles' => ['Administrador', 'Almacen', 'Compras'],
         ],
-        'ordenes' => [
+        'ordenes'             => [
             'label' => 'Órdenes de compra',
             'icon'  => 'fa-solid fa-file-invoice-dollar',
             'href'  => 'ordenes_compra.php',
             'roles' => ['Administrador', 'Almacen', 'Compras'],
         ],
-        'ordenes_crear' => [
+        'ordenes_crear'       => [
             'label' => 'Registrar orden',
             'icon'  => 'fa-solid fa-plus',
             'href'  => 'ordenes_compra_crear.php',
             'roles' => ['Administrador', 'Compras'],
         ],
-        'inventario' => [
+        'inventario'          => [
             'label' => 'Inventario',
             'icon'  => 'fa-solid fa-list-check',
             'href'  => 'inventario_actual.php',
             'roles' => ['Administrador', 'Almacen', 'Compras'],
         ],
-        'prestamos' => [
+        'prestamos'           => [
             'label' => 'Préstamos de herramientas',
             'icon'  => 'fa-solid fa-screwdriver-wrench',
             'href'  => 'prestamos_pendientes.php',
             'roles' => ['Administrador', 'Almacen'],
         ],
-        'compras_proveedor' => [
+        'compras_proveedor'   => [
             'label' => 'Compras por proveedor',
             'icon'  => 'fa-solid fa-file-invoice',
             'href'  => 'compras_proveedor.php',
             'roles' => ['Administrador', 'Almacen', 'Compras'],
         ],
-        'reportes_rotacion' => [
+        'reportes_rotacion'   => [
             'label' => 'Rotación de inventario',
             'icon'  => 'fa-solid fa-arrows-rotate',
             'href'  => 'reportes_rotacion.php',
@@ -63,43 +63,43 @@ class Navigation
             'href'  => 'revisar_solicitudes.php',
             'roles' => ['Administrador', 'Almacen'],
         ],
-        'reportes' => [
+        'reportes'            => [
             'label' => 'Reportes',
             'icon'  => 'fa-solid fa-chart-line',
             'href'  => 'reportes.php',
             'roles' => ['Administrador', 'Almacen', 'Compras'],
         ],
-        'configuracion' => [
+        'configuracion'       => [
             'label' => 'Configuración',
             'icon'  => 'fa-solid fa-gear',
             'href'  => 'ajustes.php',
             'roles' => ['Administrador', 'Almacen'],
         ],
-        'documentacion' => [
+        'documentacion'       => [
             'label' => 'Documentación',
             'icon'  => 'fa-solid fa-book',
             'href'  => 'documentacion.php',
-            'roles' => ['Administrador', 'Almacen', 'Compras', 'Empleado'],
+            'roles' => ['Administrador'],
         ],
-        'logs' => [
+        'logs'                => [
             'label' => 'Bitácora',
             'icon'  => 'fa-solid fa-clipboard-list',
             'href'  => 'logs.php',
             'roles' => ['Administrador'],
         ],
-        'solicitudes_crear' => [
+        'solicitudes_crear'   => [
             'label' => 'Solicitar material (servicio)',
             'icon'  => 'fa-solid fa-plus-square',
             'href'  => 'solicitudes_crear.php',
             'roles' => ['Empleado'],
         ],
-        'solicitar_general' => [
+        'solicitar_general'   => [
             'label' => 'Solicitud general',
             'icon'  => 'fa-solid fa-box-open',
             'href'  => 'solicitar_material_general.php',
             'roles' => ['Empleado'],
         ],
-        'mis_solicitudes' => [
+        'mis_solicitudes'     => [
             'label' => 'Mis solicitudes',
             'icon'  => 'fa-solid fa-clipboard-list',
             'href'  => 'mis_solicitudes.php',
@@ -124,7 +124,7 @@ class Navigation
             'logs',
             'documentacion',
         ],
-        'Almacen' => [
+        'Almacen'       => [
             'dashboard',
             'productos',
             'ordenes',
@@ -137,7 +137,7 @@ class Navigation
             'configuracion',
             'documentacion',
         ],
-        'Compras' => [
+        'Compras'       => [
             'dashboard',
             'ordenes',
             'ordenes_crear',
@@ -147,7 +147,7 @@ class Navigation
             'reportes',
             'documentacion',
         ],
-        'Empleado' => [
+        'Empleado'      => [
             'dashboard',
             'solicitudes_crear',
             'solicitar_general',
@@ -157,124 +157,124 @@ class Navigation
     ];
 
     private const ACTIVE_MAP = [
-        'dashboard.php'                => 'dashboard',
-        'usuarios.php'                 => 'usuarios',
-        'usuarios_create.php'          => 'usuarios',
-        'usuarios_edit.php'            => 'usuarios',
-        'usuarios_delete.php'          => 'usuarios',
-        'usuarios_setactive.php'       => 'usuarios',
-        'productos.php'                => 'productos',
-        'productos_create.php'         => 'productos',
-        'productos_edit.php'           => 'productos',
-        'productos_view.php'           => 'productos',
-        'productos_import.php'         => 'productos',
-        'productos_template.php'       => 'productos',
-        'ordenes_compra.php'           => 'ordenes',
-        'ordenes_compra_crear.php'     => 'ordenes_crear',
-        'ordenes_compra_detalle.php'   => 'ordenes',
-        'ordenes_compra_editar.php'    => 'ordenes',
-        'inventario_actual.php'        => 'inventario',
-        'inventario_entradas.php'      => 'inventario',
-        'inventario_salidas.php'       => 'inventario',
-        'inventario_transferencias.php'=> 'inventario',
-        'prestamos_pendientes.php'     => 'prestamos',
-        'prestamos_historial.php'      => 'prestamos',
-        'compras_proveedor.php'        => 'compras_proveedor',
-        'reportes_rotacion.php'        => 'reportes_rotacion',
-        'revisar_solicitudes.php'      => 'solicitudes_revisar',
-        'solicitud_aprobar.php'        => 'solicitudes_revisar',
-        'solicitud_detalle.php'        => 'solicitudes_revisar',
-        'solicitud_entregar.php'       => 'solicitudes_revisar',
-        'solicitudes.php'              => 'solicitudes_revisar',
-        'reportes.php'                 => 'reportes',
-        'reportes_rotacion.php'        => 'reportes_rotacion',
-        'reportes_valor.php'           => 'reportes',
-        'ajustes.php'                  => 'configuracion',
-        'config_backup.php'            => 'configuracion',
-        'almacenes.php'                => 'configuracion',
-        'almacenes_create.php'         => 'configuracion',
-        'almacenes_edit.php'           => 'configuracion',
-        'almacenes_delete.php'         => 'configuracion',
-        'categorias.php'               => 'configuracion',
-        'categorias_create.php'        => 'configuracion',
-        'categorias_edit.php'          => 'configuracion',
-        'categorias_delete.php'        => 'configuracion',
-        'clientes.php'                 => 'configuracion',
-        'clientes_create.php'          => 'configuracion',
-        'clientes_edit.php'            => 'configuracion',
-        'clientes_delete.php'          => 'configuracion',
-        'proveedores.php'              => 'configuracion',
-        'proveedores_create.php'       => 'configuracion',
-        'proveedores_edit.php'         => 'configuracion',
-        'proveedores_delete.php'       => 'configuracion',
-        'unidades.php'                 => 'configuracion',
-        'unidades_create.php'          => 'configuracion',
-        'unidades_edit.php'            => 'configuracion',
-        'unidades_delete.php'          => 'configuracion',
-        'logs.php'                     => 'logs',
-        'documentacion.php'            => 'documentacion',
-        'solicitudes_crear.php'        => 'solicitudes_crear',
-        'solicitar_material_general.php'=> 'solicitar_general',
-        'mis_solicitudes.php'          => 'mis_solicitudes',
+        'dashboard.php'                  => 'dashboard',
+        'usuarios.php'                   => 'usuarios',
+        'usuarios_create.php'            => 'usuarios',
+        'usuarios_edit.php'              => 'usuarios',
+        'usuarios_delete.php'            => 'usuarios',
+        'usuarios_setactive.php'         => 'usuarios',
+        'productos.php'                  => 'productos',
+        'productos_create.php'           => 'productos',
+        'productos_edit.php'             => 'productos',
+        'productos_view.php'             => 'productos',
+        'productos_import.php'           => 'productos',
+        'productos_template.php'         => 'productos',
+        'ordenes_compra.php'             => 'ordenes',
+        'ordenes_compra_crear.php'       => 'ordenes_crear',
+        'ordenes_compra_detalle.php'     => 'ordenes',
+        'ordenes_compra_editar.php'      => 'ordenes',
+        'inventario_actual.php'          => 'inventario',
+        'inventario_entradas.php'        => 'inventario',
+        'inventario_salidas.php'         => 'inventario',
+        'inventario_transferencias.php'  => 'inventario',
+        'prestamos_pendientes.php'       => 'prestamos',
+        'prestamos_historial.php'        => 'prestamos',
+        'compras_proveedor.php'          => 'compras_proveedor',
+        'reportes_rotacion.php'          => 'reportes_rotacion',
+        'revisar_solicitudes.php'        => 'solicitudes_revisar',
+        'solicitud_aprobar.php'          => 'solicitudes_revisar',
+        'solicitud_detalle.php'          => 'solicitudes_revisar',
+        'solicitud_entregar.php'         => 'solicitudes_revisar',
+        'solicitudes.php'                => 'solicitudes_revisar',
+        'reportes.php'                   => 'reportes',
+        'reportes_rotacion.php'          => 'reportes_rotacion',
+        'reportes_valor.php'             => 'reportes',
+        'ajustes.php'                    => 'configuracion',
+        'config_backup.php'              => 'configuracion',
+        'almacenes.php'                  => 'configuracion',
+        'almacenes_create.php'           => 'configuracion',
+        'almacenes_edit.php'             => 'configuracion',
+        'almacenes_delete.php'           => 'configuracion',
+        'categorias.php'                 => 'configuracion',
+        'categorias_create.php'          => 'configuracion',
+        'categorias_edit.php'            => 'configuracion',
+        'categorias_delete.php'          => 'configuracion',
+        'clientes.php'                   => 'configuracion',
+        'clientes_create.php'            => 'configuracion',
+        'clientes_edit.php'              => 'configuracion',
+        'clientes_delete.php'            => 'configuracion',
+        'proveedores.php'                => 'configuracion',
+        'proveedores_create.php'         => 'configuracion',
+        'proveedores_edit.php'           => 'configuracion',
+        'proveedores_delete.php'         => 'configuracion',
+        'unidades.php'                   => 'configuracion',
+        'unidades_create.php'            => 'configuracion',
+        'unidades_edit.php'              => 'configuracion',
+        'unidades_delete.php'            => 'configuracion',
+        'logs.php'                       => 'logs',
+        'documentacion.php'              => 'documentacion',
+        'solicitudes_crear.php'          => 'solicitudes_crear',
+        'solicitar_material_general.php' => 'solicitar_general',
+        'mis_solicitudes.php'            => 'mis_solicitudes',
     ];
 
     private const DEFAULT_BREADCRUMBS = [
-        'dashboard'          => [],
-        'usuarios'           => [
+        'dashboard'           => [],
+        'usuarios'            => [
             ['label' => 'Usuarios'],
         ],
-        'productos'          => [
+        'productos'           => [
             ['label' => 'Inventario', 'url' => 'inventario_actual.php'],
             ['label' => 'Productos'],
         ],
-        'ordenes'            => [
+        'ordenes'             => [
             ['label' => 'Compras'],
             ['label' => 'Órdenes de compra'],
         ],
-        'ordenes_crear'      => [
+        'ordenes_crear'       => [
             ['label' => 'Compras', 'url' => 'ordenes_compra.php'],
             ['label' => 'Registrar orden'],
         ],
-        'inventario'         => [
+        'inventario'          => [
             ['label' => 'Inventario'],
         ],
-        'prestamos'          => [
+        'prestamos'           => [
             ['label' => 'Inventario', 'url' => 'inventario_actual.php'],
             ['label' => 'Préstamos de herramientas'],
         ],
-        'compras_proveedor'  => [
+        'compras_proveedor'   => [
             ['label' => 'Compras'],
             ['label' => 'Compras por proveedor'],
         ],
-        'reportes_rotacion'  => [
+        'reportes_rotacion'   => [
             ['label' => 'Reportes'],
             ['label' => 'Rotación de inventario'],
         ],
-        'solicitudes_revisar'=> [
+        'solicitudes_revisar' => [
             ['label' => 'Solicitudes'],
             ['label' => 'Revisión de solicitudes'],
         ],
-        'reportes'           => [
+        'reportes'            => [
             ['label' => 'Reportes'],
         ],
-        'configuracion'      => [
+        'configuracion'       => [
             ['label' => 'Configuración'],
         ],
-        'documentacion'      => [
+        'documentacion'       => [
             ['label' => 'Documentación'],
         ],
-        'logs'               => [
+        'logs'                => [
             ['label' => 'Bitácora del sistema'],
         ],
-        'solicitudes_crear'  => [
+        'solicitudes_crear'   => [
             ['label' => 'Solicitudes'],
             ['label' => 'Nueva solicitud'],
         ],
-        'solicitar_general'  => [
+        'solicitar_general'   => [
             ['label' => 'Solicitudes'],
             ['label' => 'Solicitud general'],
         ],
-        'mis_solicitudes'    => [
+        'mis_solicitudes'     => [
             ['label' => 'Solicitudes'],
             ['label' => 'Mis solicitudes'],
         ],
@@ -282,7 +282,7 @@ class Navigation
 
     public static function sidebarItems(string $role): array
     {
-        $role = self::normalizeRole($role);
+        $role  = self::normalizeRole($role);
         $order = self::ROLE_ORDER[$role] ?? self::ROLE_ORDER['Empleado'];
         $items = [];
 
@@ -291,7 +291,7 @@ class Navigation
             if ($config === null) {
                 continue;
             }
-            if (!in_array($role, $config['roles'], true)) {
+            if (! in_array($role, $config['roles'], true)) {
                 continue;
             }
             $items[$key] = $config;
@@ -315,10 +315,10 @@ class Navigation
 
     public static function renderSidebar(string $role, string $nombre): string
     {
-        $items = self::sidebarItems($role);
+        $items  = self::sidebarItems($role);
         $active = self::activeKey();
 
-        $html = [];
+        $html   = [];
         $html[] = '<aside class="sidebar">';
         $html[] = '    <div class="sidebar-header">';
         $html[] = '        <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo TAKAB" width="90" height="55"></div>';
@@ -331,7 +331,7 @@ class Navigation
 
         foreach ($items as $key => $item) {
             $isActive = $key === $active ? ' class="active"' : '';
-            $html[] = sprintf(
+            $html[]   = sprintf(
                 '        <a href="%s"%s><i class="%s"></i> %s</a>',
                 htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8'),
                 $isActive,
@@ -350,9 +350,9 @@ class Navigation
     public static function renderBreadcrumbs(?array $extra = null): string
     {
         $active = self::activeKey();
-        $base = self::DEFAULT_BREADCRUMBS[$active] ?? [];
+        $base   = self::DEFAULT_BREADCRUMBS[$active] ?? [];
 
-        if (!empty($extra)) {
+        if (! empty($extra)) {
             foreach ($extra as $crumb) {
                 if (is_string($crumb)) {
                     $base[] = ['label' => $crumb];
@@ -366,17 +366,17 @@ class Navigation
             return '';
         }
 
-        $parts = [];
+        $parts   = [];
         $parts[] = '<nav class="breadcrumbs" aria-label="Breadcrumb">';
         $parts[] = '    <ol>';
 
         $lastIndex = count($base) - 1;
         foreach ($base as $index => $crumb) {
-            $label = htmlspecialchars($crumb['label'], ENT_QUOTES, 'UTF-8');
+            $label  = htmlspecialchars($crumb['label'], ENT_QUOTES, 'UTF-8');
             $isLast = $index === $lastIndex;
 
-            if (!$isLast && !empty($crumb['url'])) {
-                $url = htmlspecialchars($crumb['url'], ENT_QUOTES, 'UTF-8');
+            if (! $isLast && ! empty($crumb['url'])) {
+                $url     = htmlspecialchars($crumb['url'], ENT_QUOTES, 'UTF-8');
                 $parts[] = sprintf('        <li><a href="%s">%s</a></li>', $url, $label);
             } else {
                 $parts[] = sprintf('        <li%s>%s</li>', $isLast ? ' class="current"' : '', $label);
