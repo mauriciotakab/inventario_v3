@@ -33,6 +33,12 @@ class Navigation
             'href'  => 'ordenes_compra_crear.php',
             'roles' => ['Compras'],
         ],
+        'compras_proveedor'   => [
+            'label' => 'Compras por proveedor',
+            'icon'  => 'fa-solid fa-file-invoice',
+            'href'  => 'compras_proveedor.php',
+            'roles' => ['Administrador', 'Almacen', 'Compras'],
+        ],
         'inventario'          => [
             'label' => 'Inventario',
             'icon'  => 'fa-solid fa-list-check',
@@ -51,12 +57,7 @@ class Navigation
             'href'  => 'revisar_solicitudes.php',
             'roles' => ['Administrador', 'Almacen'],
         ],
-        'compras_proveedor'   => [
-            'label' => 'Compras por proveedor',
-            'icon'  => 'fa-solid fa-file-invoice',
-            'href'  => 'compras_proveedor.php',
-            'roles' => ['Administrador', 'Almacen', 'Compras'],
-        ],
+
         'reportes_rotacion'   => [
             'label' => 'Rotación de inventario',
             'icon'  => 'fa-solid fa-arrows-rotate',
