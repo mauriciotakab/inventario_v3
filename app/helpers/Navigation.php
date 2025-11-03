@@ -16,7 +16,7 @@ class Navigation
             'roles' => ['Administrador'],
         ],
         'productos'           => [
-            'label' => 'Productos',
+            'label' => 'Gestión de Productos',
             'icon'  => 'fa-solid fa-boxes-stacked',
             'href'  => 'productos.php',
             'roles' => ['Administrador', 'Almacen', 'Compras'],
@@ -31,7 +31,7 @@ class Navigation
             'label' => 'Registrar orden',
             'icon'  => 'fa-solid fa-plus',
             'href'  => 'ordenes_compra_crear.php',
-            'roles' => ['Administrador', 'Compras'],
+            'roles' => ['Compras'],
         ],
         'inventario'          => [
             'label' => 'Inventario',
@@ -43,6 +43,12 @@ class Navigation
             'label' => 'Préstamos de herramientas',
             'icon'  => 'fa-solid fa-screwdriver-wrench',
             'href'  => 'prestamos_pendientes.php',
+            'roles' => ['Administrador', 'Almacen'],
+        ],
+        'solicitudes_revisar' => [
+            'label' => 'Solicitudes de material',
+            'icon'  => 'fa-solid fa-inbox',
+            'href'  => 'revisar_solicitudes.php',
             'roles' => ['Administrador', 'Almacen'],
         ],
         'compras_proveedor'   => [
@@ -57,17 +63,18 @@ class Navigation
             'href'  => 'reportes_rotacion.php',
             'roles' => ['Administrador', 'Almacen', 'Compras'],
         ],
-        'solicitudes_revisar' => [
-            'label' => 'Solicitudes de material',
-            'icon'  => 'fa-solid fa-inbox',
-            'href'  => 'revisar_solicitudes.php',
-            'roles' => ['Administrador', 'Almacen'],
-        ],
+
         'reportes'            => [
             'label' => 'Reportes',
             'icon'  => 'fa-solid fa-chart-line',
             'href'  => 'reportes.php',
             'roles' => ['Administrador', 'Almacen', 'Compras'],
+        ],
+        'logs'                => [
+            'label' => 'Bitácora',
+            'icon'  => 'fa-solid fa-clipboard-list',
+            'href'  => 'logs.php',
+            'roles' => ['Administrador'],
         ],
         'configuracion'       => [
             'label' => 'Configuración',
@@ -81,12 +88,7 @@ class Navigation
             'href'  => 'documentacion.php',
             'roles' => ['Administrador'],
         ],
-        'logs'                => [
-            'label' => 'Bitácora',
-            'icon'  => 'fa-solid fa-clipboard-list',
-            'href'  => 'logs.php',
-            'roles' => ['Administrador'],
-        ],
+
         'solicitudes_crear'   => [
             'label' => 'Solicitar material (servicio)',
             'icon'  => 'fa-solid fa-plus-square',
@@ -323,7 +325,7 @@ class Navigation
         $html[] = '        <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo TAKAB" width="90" height="55"></div>';
         $html[] = '        <div>';
         $html[] = '            <div class="sidebar-title">TAKAB</div>';
-        $html[] = '            <div class="sidebar-desc">Panel principal</div>';
+        $html[] = '            <div class="sidebar-desc">Dashboard</div>';
         $html[] = '        </div>';
         $html[] = '    </div>';
         $html[] = '    <nav class="sidebar-nav">';
