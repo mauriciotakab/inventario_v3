@@ -61,13 +61,15 @@ $nombre = $_SESSION['nombre'] ?? '';
                                 <td><?= htmlspecialchars($prov['email']) ?></td>
                                 <td><?= htmlspecialchars($prov['direccion']) ?></td>
                                 <td><?= htmlspecialchars($prov['condiciones_pago']) ?></td>
-                                <td class="table-actions">
-                                    <a href="proveedores_edit.php?id=<?= (int) $prov['id'] ?>"><i class="fa fa-pen"></i> Editar</a>
-                                    <form method="post" action="proveedores_delete.php" style="display:inline-block" data-confirm="¿Eliminar este proveedor?">
-                                        <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
-                                        <input type="hidden" name="id" value="<?= (int) $prov['id'] ?>">
-                                        <button type="submit" class="btn-danger"><i class="fa fa-trash"></i> Eliminar</button>
-                                    </form>
+                                <td>
+                                    <div class="table-actions">
+                                        <a href="proveedores_edit.php?id=<?= (int) $prov['id'] ?>" class="btn-inline btn-edit"><i class="fa fa-pen"></i> Editar</a>
+                                        <form method="post" action="proveedores_delete.php" class="inline-form" data-confirm="¿Eliminar este proveedor?">
+                                            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
+                                            <input type="hidden" name="id" value="<?= (int) $prov['id'] ?>">
+                                            <button type="submit" class="btn-inline btn-delete"><i class="fa fa-trash"></i> Eliminar</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

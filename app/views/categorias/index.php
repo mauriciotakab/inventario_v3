@@ -51,13 +51,15 @@ $nombre = $_SESSION['nombre'];
                             <tr>
                                 <td><?= htmlspecialchars($c['nombre']) ?></td>
                                 <td><?= htmlspecialchars($c['descripcion']) ?></td>
-                                <td class="table-actions">
-                                    <a href="categorias_edit.php?id=<?= (int) $c['id'] ?>"><i class="fa fa-pen"></i> Editar</a>
-                                    <form method="post" action="categorias_delete.php" style="display:inline-block" data-confirm="¿Eliminar categoría?">
-                                        <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
-                                        <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
-                                        <button type="submit" class="btn-danger"><i class="fa fa-trash"></i> Eliminar</button>
-                                    </form>
+                                <td>
+                                    <div class="table-actions">
+                                        <a href="categorias_edit.php?id=<?= (int) $c['id'] ?>" class="btn-inline btn-edit"><i class="fa fa-pen"></i> Editar</a>
+                                        <form method="post" action="categorias_delete.php" class="inline-form" data-confirm="¿Eliminar categoría?">
+                                            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
+                                            <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
+                                            <button type="submit" class="btn-inline btn-delete"><i class="fa fa-trash"></i> Eliminar</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

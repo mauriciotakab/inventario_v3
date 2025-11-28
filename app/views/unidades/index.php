@@ -52,15 +52,17 @@ $nombre = $_SESSION['nombre'];
                         <tr>
                             <td><?= htmlspecialchars($u['nombre']) ?></td>
                             <td><?= htmlspecialchars($u['abreviacion']) ?></td>
-                            <td class="table-actions">
-                                <a href="unidades_edit.php?id=<?= (int) $u['id'] ?>"><i class="fa fa-pen"></i> Editar</a>
-                                <form method="post" action="unidades_delete.php" style="display:inline-block" data-confirm="¿Eliminar unidad?">
-                                    <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
-                                    <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
-                                    <button type="submit" class="btn-danger"><i class="fa fa-trash"></i> Eliminar</button>
-                                </form>
-                            </td>
-                        </tr>
+                                <td>
+                                    <div class="table-actions">
+                                        <a href="unidades_edit.php?id=<?= (int) $u['id'] ?>" class="btn-inline btn-edit"><i class="fa fa-pen"></i> Editar</a>
+                                        <form method="post" action="unidades_delete.php" class="inline-form" data-confirm="¿Eliminar unidad?">
+                                            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
+                                            <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
+                                            <button type="submit" class="btn-inline btn-delete"><i class="fa fa-trash"></i> Eliminar</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                         <?php if (empty($unidades)): ?>
                         <tr>

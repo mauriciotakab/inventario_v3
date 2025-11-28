@@ -59,13 +59,15 @@ $nombre = $_SESSION['nombre'] ?? '';
                                 <td><?= htmlspecialchars($c['telefono']) ?></td>
                                 <td><?= htmlspecialchars($c['email']) ?></td>
                                 <td><?= htmlspecialchars($c['direccion']) ?></td>
-                                <td class="table-actions">
-                                    <a href="clientes_edit.php?id=<?= (int) $c['id'] ?>"><i class="fa fa-pen"></i> Editar</a>
-                                    <form method="post" action="clientes_delete.php" style="display:inline-block" data-confirm="¿Eliminar este cliente?">
-                                        <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
-                                        <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
-                                        <button type="submit" class="btn-danger"><i class="fa fa-trash"></i> Eliminar</button>
-                                    </form>
+                                <td>
+                                    <div class="table-actions">
+                                        <a href="clientes_edit.php?id=<?= (int) $c['id'] ?>" class="btn-inline btn-edit"><i class="fa fa-pen"></i> Editar</a>
+                                        <form method="post" action="clientes_delete.php" class="inline-form" data-confirm="¿Eliminar este cliente?">
+                                            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
+                                            <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
+                                            <button type="submit" class="btn-inline btn-delete"><i class="fa fa-trash"></i> Eliminar</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

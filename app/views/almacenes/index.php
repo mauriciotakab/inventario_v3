@@ -77,17 +77,11 @@ $nombre = $_SESSION['nombre'];
                     <thead>
 
                         <tr>
-
                             <th>Nombre</th>
-
                             <th>Ubicación</th>
-
                             <th>Responsable</th>
-
                             <th>Principal</th>
-
                             <th>Acciones</th>
-
                         </tr>
 
                     </thead>
@@ -104,21 +98,29 @@ $nombre = $_SESSION['nombre'];
 
                                 <td><?= htmlspecialchars($a['responsable'] ?? '-') ?></td>
 
-                                <td><?= !empty($a['es_principal']) ? 'Sí' : 'No' ?></td>
+                                <td>
+                                    <?php if (!empty($a['es_principal'])): ?>
+                                        <span class="status-badge primary"><i class="fa fa-check"></i> Principal</span>
+                                    <?php else: ?>
+                                        <span class="status-badge muted"><i class="fa fa-circle"></i> Secundario</span>
+                                    <?php endif; ?>
+                                </td>
 
-                                <td class="table-actions">
+                                <td>
+                                    <div class="table-actions">
 
-                                    <a href="almacenes_edit.php?id=<?= (int) $a['id'] ?>"><i class="fa fa-pen"></i> Editar</a>
+                                        <a href="almacenes_edit.php?id=<?= (int) $a['id'] ?>" class="btn-inline btn-edit"><i class="fa fa-pen"></i> Editar</a>
 
-                                    <form method="post" action="almacenes_delete.php" class="inline-form" style="display:inline-block" data-confirm="¿Eliminar almacén?">
+                                        <form method="post" action="almacenes_delete.php" class="inline-form" data-confirm="¿Eliminar almacén?">
 
-                                        <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
+                                            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
 
-                                        <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
+                                            <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
 
-                                        <button type="submit" class="btn-danger"><i class="fa fa-trash"></i> Eliminar</button>
+                                            <button type="submit" class="btn-inline btn-delete"><i class="fa fa-trash"></i> Eliminar</button>
 
-                                    </form>
+                                        </form>
+                                    </div>
 
                                 </td>
 
