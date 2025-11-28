@@ -30,9 +30,10 @@ $nombre = $_SESSION['nombre'];
                         </div>
                         <p class="config-section-desc">Define las unidades que se utilizan para registrar existencias.</p>
                     </div>
-                    <div class="config-section-actions">
-                        <a class="btn-main" href="unidades_create.php"><i class="fa fa-plus"></i> Agregar unidad</a>
-                    </div>
+                </div>
+                <div class="config-section-actions" style="margin-bottom:18px;">
+                    <a class="btn-secondary-ghost" href="ajustes.php"><i class="fa fa-arrow-left"></i> Ajustes</a>
+                    <a class="btn-main" href="unidades_create.php"><i class="fa fa-plus"></i> Agregar unidad</a>
                 </div>
                 <?php if (isset($_GET['success'])): ?>
                     <div class="alert alert-success"><i class="fa fa-check-circle"></i> Operación realizada correctamente.</div>

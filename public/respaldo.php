@@ -62,6 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p class="config-section-desc">Descarga un archivo JSON con catálogos clave (categorías, almacenes, unidades, proveedores y usuarios activos).</p>
                     </div>
                 </div>
+                <div class="config-section-actions" style="margin-bottom:18px;">
+                    <a class="btn-secondary-ghost" href="ajustes.php"><i class="fa fa-arrow-left"></i> Ajustes</a>
+                </div>
 
                 <?php if ($error !== ''): ?>
                     <div class="alert alert-danger"><i class="fa fa-triangle-exclamation"></i> <?= htmlspecialchars($error) ?></div>

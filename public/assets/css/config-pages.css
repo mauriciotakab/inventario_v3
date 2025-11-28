@@ -54,6 +54,28 @@
     flex-wrap: wrap;
 }
 
+.config-page .btn-main {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #2563eb;
+    box-shadow: none;
+}
+.config-page .btn-secondary-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #cbd2e6;
+    color: #1e293b;
+    border-radius: 8px;
+    padding: 8px 16px;
+    text-decoration: none;
+    font-weight: 600;
+}
+.config-page .btn-secondary-ghost:hover {
+    background: #e7ecf8;
+}
+
 .config-page .takab-table th,
 .config-page .takab-table td {
     vertical-align: middle;
@@ -85,33 +107,30 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    border-radius: 10px;
+    padding: 7px 16px;
+    border-radius: 8px;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     border: none;
     cursor: pointer;
     text-decoration: none;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: background 0.15s ease;
     color: #fff;
-    box-shadow: 0 8px 18px rgba(15,23,42,0.1);
-}
-
-.config-page .btn-inline i {
-    font-size: 1rem;
-}
-
-.config-page .btn-inline:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 12px 22px rgba(15,23,42,0.18);
+    box-shadow: none;
 }
 
 .config-page .btn-inline.btn-edit {
-    background: linear-gradient(135deg,#3b82f6,#1d4ed8);
+    background: #2563eb;
+}
+.config-page .btn-inline.btn-edit:hover {
+    background: #1741a6;
 }
 
 .config-page .btn-inline.btn-delete {
-    background: linear-gradient(135deg,#fb7185,#dc2626);
+    background: #ef4444;
+}
+.config-page .btn-inline.btn-delete:hover {
+    background: #c53030;
 }
 
 .config-page .status-badge {

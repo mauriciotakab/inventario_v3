@@ -53,9 +53,10 @@ $nombre = $_SESSION['nombre'];
                         </div>
                         <p class="config-section-desc">Administra los almacenes disponibles y define su responsable.</p>
                     </div>
-                    <div class="config-section-actions">
-                        <a class="btn-main" href="almacenes_create.php"><i class="fa fa-plus"></i> Agregar almacén</a>
-                    </div>
+                </div>
+                <div class="config-section-actions" style="margin-bottom:18px;">
+                    <a class="btn-secondary-ghost" href="ajustes.php"><i class="fa fa-arrow-left"></i> Ajustes</a>
+                    <a class="btn-main" href="almacenes_create.php"><i class="fa fa-plus"></i> Agregar almacén</a>
                 </div>
 
                 <?php if (isset($_GET['success'])): ?>

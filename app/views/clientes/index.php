@@ -32,9 +32,10 @@ $nombre = $_SESSION['nombre'] ?? '';
                         </div>
                         <p class="config-section-desc">Administra las razones sociales y contactos frecuentes para tus operaciones.</p>
                     </div>
-                    <div class="config-section-actions">
-                        <a href="clientes_create.php" class="btn-main"><i class="fa fa-plus"></i> Nuevo cliente</a>
-                    </div>
+                </div>
+                <div class="config-section-actions" style="margin-bottom:18px;">
+                    <a class="btn-secondary-ghost" href="ajustes.php"><i class="fa fa-arrow-left"></i> Ajustes</a>
+                    <a href="clientes_create.php" class="btn-main"><i class="fa fa-plus"></i> Nuevo cliente</a>
                 </div>
 
                 <?php if (isset($_GET['error']) && $_GET['error'] === 'csrf'): ?>
