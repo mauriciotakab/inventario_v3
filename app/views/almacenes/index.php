@@ -46,7 +46,10 @@ $nombre = $_SESSION['nombre'];
 
                 <div class="config-section-header">
                     <div>
-                        <div class="config-section-title"><i class="fa-solid fa-warehouse"></i> Gestión de Almacenes</div>
+                        <div class="config-section-title">
+                            <span class="config-icon gradient-teal"><i class="fa-solid fa-warehouse"></i></span>
+                            Gestión de Almacenes
+                        </div>
                         <p class="config-section-desc">Administra los almacenes disponibles y define su responsable.</p>
                     </div>
                     <div class="config-section-actions">

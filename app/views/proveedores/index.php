@@ -25,7 +25,10 @@ $nombre = $_SESSION['nombre'] ?? '';
             <div class="main-table-card">
                 <div class="config-section-header">
                     <div>
-                        <div class="config-section-title"><i class="fa-solid fa-truck"></i> Proveedores</div>
+                        <div class="config-section-title">
+                            <span class="config-icon gradient-blue"><i class="fa-solid fa-truck"></i></span>
+                            Proveedores
+                        </div>
                         <p class="config-section-desc">Registra a tus proveedores y mantén sus datos de contacto actualizados.</p>
                     </div>
                     <div class="config-section-actions">

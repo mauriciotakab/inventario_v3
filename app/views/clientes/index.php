@@ -25,7 +25,10 @@ $nombre = $_SESSION['nombre'] ?? '';
             <div class="main-table-card">
                 <div class="config-section-header">
                     <div>
-                        <div class="config-section-title"><i class="fa fa-building"></i> Clientes</div>
+                        <div class="config-section-title">
+                            <span class="config-icon gradient-amber"><i class="fa fa-building"></i></span>
+                            Clientes
+                        </div>
                         <p class="config-section-desc">Administra las razones sociales y contactos frecuentes para tus operaciones.</p>
                     </div>
                     <div class="config-section-actions">

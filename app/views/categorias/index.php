@@ -22,7 +22,10 @@ $nombre = $_SESSION['nombre'];
             <div class="main-table-card">
                 <div class="config-section-header">
                     <div>
-                        <div class="config-section-title"><i class="fa fa-tags"></i> Categorías</div>
+                        <div class="config-section-title">
+                            <span class="config-icon gradient-orange"><i class="fa fa-tags"></i></span>
+                            Categorías
+                        </div>
                         <p class="config-section-desc">Organiza los productos por grupo para facilitar su búsqueda.</p>
                     </div>
                     <div class="config-section-actions">

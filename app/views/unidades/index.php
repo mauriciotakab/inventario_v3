@@ -23,7 +23,10 @@ $nombre = $_SESSION['nombre'];
             <div class="main-table-card">
                 <div class="config-section-header">
                     <div>
-                        <div class="config-section-title"><i class="fa-solid fa-ruler-combined"></i> Unidades de Medida</div>
+                        <div class="config-section-title">
+                            <span class="config-icon gradient-purple"><i class="fa-solid fa-ruler-combined"></i></span>
+                            Unidades de Medida
+                        </div>
                         <p class="config-section-desc">Define las unidades que se utilizan para registrar existencias.</p>
                     </div>
                     <div class="config-section-actions">

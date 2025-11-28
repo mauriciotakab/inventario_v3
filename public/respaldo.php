@@ -54,7 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="main-table-card">
                 <div class="config-section-header">
                     <div>
-                        <div class="config-section-title"><i class="fa-solid fa-database"></i> Respaldos de configuración</div>
+                        <div class="config-section-title">
+                            <span class="config-icon gradient-gray"><i class="fa-solid fa-database"></i></span>
+                            Respaldos de configuración
+                        </div>
                         <p class="config-section-desc">Descarga un archivo JSON con catálogos clave (categorías, almacenes, unidades, proveedores y usuarios activos).</p>
                     </div>
                 </div>
