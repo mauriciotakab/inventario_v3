@@ -137,17 +137,6 @@
     font-weight: 700;
 }
 .takab-table tr:last-child td { border-bottom: none; }
-.table-actions a {
-    margin-right: 9px;
-    color: #2563eb;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1.05rem;
-    transition: background 0.13s, color 0.13s;
-}
-.table-actions a:last-child { margin-right: 0; }
-.table-actions a.btn-danger { color: #e12d39; }
-.table-actions a.btn-danger:hover { color: #fff; background: #e12d39; border-radius: 5px; padding: 6px 0px; }
 @media (max-width: 900px) {
     .main-table-card, .form-card { padding: 6vw 2vw; }
 }
@@ -194,7 +183,8 @@
 .table-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
+    align-items: center;
 }
 .btn-inline {
     display: inline-flex;
@@ -208,9 +198,10 @@
     cursor: pointer;
     text-decoration: none;
     transition: all 0.15s ease;
+    color: #1e293b;
 }
 .btn-inline i {
-    font-size: 0.95rem;
+    font-size: 1rem;
 }
 .btn-inline.btn-edit {
     background: #e7efff;
