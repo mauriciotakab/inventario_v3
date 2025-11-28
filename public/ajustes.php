@@ -139,15 +139,6 @@ $nombre = $_SESSION['nombre'] ?? '';
                     <a class="config-btn" href="respaldo.php"><i class="fa-solid fa-download"></i> Descargar respaldo</a>
                 </div>
                 <?php endif; ?>
-                <div class="config-card">
-                    <div class="config-card-header">
-                        <span class="config-card-icon config-doc"><i class="fa-solid fa-book"></i></span>
-                        <div>
-                            <div class="config-card-title">Documentación</div>
-                            <div class="config-card-desc">Guías rápidas de uso e instalación</div>
-                        </div>
-                    </div>
-                    <a class="config-btn" href="documentacion.php"><i class="fa-solid fa-book-open"></i> Ver documentación</a>
                 </div>
             </div>
         </main>

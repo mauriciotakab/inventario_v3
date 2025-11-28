@@ -22,12 +22,6 @@ $nombre = $_SESSION['nombre'];
         <main class="dashboard-main config-page">
             <div class="main-table-card">
                 <div class="config-section-header">
-                    <div class="config-section-actions">
-                        <a class="btn-secondary-ghost" href="ajustes.php"><i class="fa fa-arrow-left"></i> Ajustes</a>
-                        <a class="btn-main" href="categorias_create.php"><i class="fa fa-plus"></i> Agregar categoría</a>
-                    </div>
-                </div>
-                <div class="config-section-header">
                     <div>
                         <div class="config-section-title">
                             <span class="config-icon gradient-orange"><i class="fa fa-tags"></i></span>
