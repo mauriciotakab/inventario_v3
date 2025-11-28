@@ -1,0 +1,158 @@
+.config-page .config-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #edf1f7;
+    padding-bottom: 16px;
+    margin-bottom: 22px;
+}
+
+.config-page .config-section-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0f1d3b;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.config-page .config-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.2rem;
+    box-shadow: 0 10px 25px rgba(15,23,42,0.18);
+}
+
+.config-page .config-icon i {
+    font-size: 1.3rem;
+}
+
+.config-page .config-icon.gradient-blue { background: linear-gradient(135deg,#2563eb,#172554); }
+.config-page .config-icon.gradient-purple { background: linear-gradient(135deg,#a855f7,#7c3aed); }
+.config-page .config-icon.gradient-orange { background: linear-gradient(135deg,#fb923c,#f97316); }
+.config-page .config-icon.gradient-amber { background: linear-gradient(135deg,#facc15,#f97316); }
+.config-page .config-icon.gradient-teal { background: linear-gradient(135deg,#14b8a6,#0f766e); }
+.config-page .config-icon.gradient-gray { background: linear-gradient(135deg,#94a3b8,#475569); }
+
+.config-page .config-section-desc {
+    margin: 6px 0 0 66px;
+    color: #5f6b8a;
+    font-size: 0.98rem;
+}
+
+.config-page .config-section-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.config-page .takab-table th,
+.config-page .takab-table td {
+    vertical-align: middle;
+}
+
+.config-page .takab-table th {
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+}
+
+.config-page .takab-table tbody tr:hover td {
+    background: #f8fbff;
+}
+
+.config-page .table-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.config-page .table-actions .inline-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+.config-page .btn-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(15,23,42,0.1);
+}
+
+.config-page .btn-inline i {
+    font-size: 1rem;
+}
+
+.config-page .btn-inline:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(15,23,42,0.18);
+}
+
+.config-page .btn-inline.btn-edit {
+    background: linear-gradient(135deg,#3b82f6,#1d4ed8);
+}
+
+.config-page .btn-inline.btn-delete {
+    background: linear-gradient(135deg,#fb7185,#dc2626);
+}
+
+.config-page .status-badge {
+    padding: 5px 12px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.config-page .status-badge i {
+    font-size: 0.8rem;
+}
+
+.config-page .status-badge.primary {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.config-page .status-badge.muted {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+.config-page .inline-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+@media (max-width: 600px) {
+    .config-page .config-section-desc {
+        margin-left: 0;
+    }
+    .config-page .table-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .config-page .table-actions .btn-inline {
+        width: 100%;
+        justify-content: center;
+    }
+}

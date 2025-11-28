@@ -11,6 +11,7 @@ $nombre = $_SESSION['nombre'] ?? '';
     <title>Proveedores | TAKAB</title>
     <link rel="stylesheet" href="/assets/css/dashboard.css">
     <link rel="stylesheet" href="/assets/css/config.css">
+    <link rel="stylesheet" href="/assets/css/config-pages.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -21,7 +22,7 @@ $nombre = $_SESSION['nombre'] ?? '';
 
         <?php include __DIR__ . '/../partials/topbar.php'; ?>
 
-        <main class="dashboard-main">
+        <main class="dashboard-main config-page">
             <div class="main-table-card">
                 <div class="config-section-header">
                     <div>
