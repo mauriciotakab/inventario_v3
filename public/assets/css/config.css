@@ -151,3 +151,35 @@
 @media (max-width: 900px) {
     .main-table-card, .form-card { padding: 6vw 2vw; }
 }
+
+.config-section-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+.config-section-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #122a55;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.config-section-title i {
+    font-size: 1.2rem;
+    color: #2563eb;
+}
+.config-section-desc {
+    margin-top: 4px;
+    color: #5f6b8a;
+    font-size: 0.98rem;
+}
+.config-section-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}

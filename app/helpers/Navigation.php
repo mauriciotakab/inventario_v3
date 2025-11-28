@@ -193,7 +193,7 @@ class Navigation
         'reportes_rotacion.php'          => 'reportes_rotacion',
         'reportes_valor.php'             => 'reportes',
         'ajustes.php'                    => 'configuracion',
-        'config_backup.php'              => 'configuracion',
+        'respaldo.php'                   => 'configuracion',
         'almacenes.php'                  => 'configuracion',
         'almacenes_create.php'           => 'configuracion',
         'almacenes_edit.php'             => 'configuracion',
@@ -237,16 +237,16 @@ class Navigation
             ['label' => 'Compras', 'url' => 'ordenes_compra.php'],
             ['label' => 'Registrar orden'],
         ],
+        'compras_proveedor'   => [
+            ['label' => 'Compras'],
+            ['label' => 'Compras por proveedor'],
+        ],
         'inventario'          => [
             ['label' => 'Inventario'],
         ],
         'prestamos'           => [
             ['label' => 'Inventario', 'url' => 'inventario_actual.php'],
             ['label' => 'Préstamos de herramientas'],
-        ],
-        'compras_proveedor'   => [
-            ['label' => 'Compras'],
-            ['label' => 'Compras por proveedor'],
         ],
         'reportes_rotacion'   => [
             ['label' => 'Reportes'],

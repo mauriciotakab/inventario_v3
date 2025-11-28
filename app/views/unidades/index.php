@@ -21,9 +21,14 @@ $nombre = $_SESSION['nombre'];
         <?php include __DIR__ . '/../partials/topbar.php'; ?>
         <main class="dashboard-main">
             <div class="main-table-card">
-                <div class="main-table-header-row">
-                    <div class="main-table-title">Unidades de Medida</div>
-                    <a class="btn-main" href="unidades_create.php"><i class="fa fa-plus"></i> Agregar unidad</a>
+                <div class="config-section-header">
+                    <div>
+                        <div class="config-section-title"><i class="fa-solid fa-ruler-combined"></i> Unidades de Medida</div>
+                        <p class="config-section-desc">Define las unidades que se utilizan para registrar existencias.</p>
+                    </div>
+                    <div class="config-section-actions">
+                        <a class="btn-main" href="unidades_create.php"><i class="fa fa-plus"></i> Agregar unidad</a>
+                    </div>
                 </div>
                 <?php if (isset($_GET['success'])): ?>
                     <div class="alert alert-success"><i class="fa fa-check-circle"></i> Operación realizada correctamente.</div>

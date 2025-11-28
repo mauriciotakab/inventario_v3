@@ -44,12 +44,14 @@ $nombre = $_SESSION['nombre'];
 
             <div class="main-table-card">
 
-                <div class="main-table-header-row">
-
-                    <div class="main-table-title">Gestión de Almacenes</div>
-
-                    <a class="btn-main" href="almacenes_create.php"><i class="fa fa-plus"></i> Agregar almacén</a>
-
+                <div class="config-section-header">
+                    <div>
+                        <div class="config-section-title"><i class="fa-solid fa-warehouse"></i> Gestión de Almacenes</div>
+                        <p class="config-section-desc">Administra los almacenes disponibles y define su responsable.</p>
+                    </div>
+                    <div class="config-section-actions">
+                        <a class="btn-main" href="almacenes_create.php"><i class="fa fa-plus"></i> Agregar almacén</a>
+                    </div>
                 </div>
 
                 <?php if (isset($_GET['success'])): ?>
@@ -140,4 +142,3 @@ $nombre = $_SESSION['nombre'];
 </body>
 
 </html>
-

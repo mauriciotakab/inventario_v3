@@ -136,7 +136,7 @@ $nombre = $_SESSION['nombre'] ?? '';
                             <div class="config-card-desc">Descarga la configuración en un archivo JSON</div>
                         </div>
                     </div>
-                    <a class="config-btn" href="config_backup.php"><i class="fa-solid fa-download"></i> Descargar respaldo</a>
+                    <a class="config-btn" href="respaldo.php"><i class="fa-solid fa-download"></i> Descargar respaldo</a>
                 </div>
                 <?php endif; ?>
                 <div class="config-card">

@@ -20,9 +20,14 @@ $nombre = $_SESSION['nombre'];
         <?php include __DIR__ . '/../partials/topbar.php'; ?>
         <main class="dashboard-main">
             <div class="main-table-card">
-                <div class="main-table-header-row">
-                    <div class="main-table-title">Categorías</div>
-                    <a class="btn-main" href="categorias_create.php"><i class="fa fa-plus"></i> Agregar categoría</a>
+                <div class="config-section-header">
+                    <div>
+                        <div class="config-section-title"><i class="fa fa-tags"></i> Categorías</div>
+                        <p class="config-section-desc">Organiza los productos por grupo para facilitar su búsqueda.</p>
+                    </div>
+                    <div class="config-section-actions">
+                        <a class="btn-main" href="categorias_create.php"><i class="fa fa-plus"></i> Agregar categoría</a>
+                    </div>
                 </div>
                 <?php if (isset($_GET['success'])): ?>
                     <div class="alert alert-success"><i class="fa fa-check-circle"></i> Operación realizada correctamente.</div>
