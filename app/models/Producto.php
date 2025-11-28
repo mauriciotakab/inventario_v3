@@ -282,10 +282,37 @@ class Producto
     {
         $db = Database::getInstance()->getConnection();
         try {
+            $db->beginTransaction();
+
+            self::deleteRelatedRecords($db, (int) $id);
+
             $stmt = $db->prepare("DELETE FROM productos WHERE id=?");
-            return $stmt->execute([$id]);
+            $stmt->execute([$id]);
+
+            $db->commit();
+            return true;
         } catch (\PDOException $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
             return false;
+        }
+    }
+
+    private static function deleteRelatedRecords(\PDO $db, int $productoId): void
+    {
+        $relations = [
+            'detalle_ordenes'        => 'producto_id',
+            'detalle_solicitud'      => 'producto_id',
+            'movimientos_inventario' => 'producto_id',
+            'prestamos'              => 'producto_id',
+            'solicitudes'            => 'producto_id',
+            'stock_almacen'          => 'producto_id',
+        ];
+
+        foreach ($relations as $table => $column) {
+            $stmt = $db->prepare("DELETE FROM {$table} WHERE {$column} = ?");
+            $stmt->execute([$productoId]);
         }
     }
 
