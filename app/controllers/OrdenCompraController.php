@@ -4,6 +4,7 @@ require_once __DIR__ . '/../helpers/Database.php';
 require_once __DIR__ . '/../helpers/ActivityLogger.php';
 require_once __DIR__ . '/../models/OrdenCompra.php';
 require_once __DIR__ . '/../models/Producto.php';
+require_once __DIR__ . '/../models/Factura.php';
 
 class OrdenCompraController
 {
@@ -151,9 +152,6 @@ class OrdenCompraController
             exit();
         }
 
-        $db        = Database::getInstance()->getConnection();
-        $almacenes = $db->query("SELECT id, nombre FROM almacenes ORDER BY nombre ASC")->fetchAll();
-
         $msg   = '';
         $error = '';
 
@@ -162,34 +160,7 @@ class OrdenCompraController
                 $error = 'Token CSRF invalido.';
             } else {
                 $accion = $_POST['accion'] ?? '';
-                if ($accion === 'recibir' && strtolower($orden['estado']) !== 'recibida') {
-                    $extras = [
-                        'numero_factura'     => trim($_POST['numero_factura'] ?? ''),
-                        'rfc'                => trim($_POST['rfc'] ?? ''),
-                        'almacen_destino_id' => isset($_POST['almacen_destino_id']) ? (int) $_POST['almacen_destino_id'] : null,
-                    ];
-
-                    if (! $this->validFactura($extras['numero_factura'])) {
-                        $error = 'El numero de factura no es valido (max. 30 caracteres alfanumericos).';
-                    } elseif ($extras['rfc'] !== '' && ! $this->validRfc($extras['rfc'])) {
-                        $error = 'El RFC proporcionado no es valido.';
-                    } elseif (empty($extras['almacen_destino_id'])) {
-                        $error = 'Debes seleccionar el almacen destino para registrar la recepcion.';
-                    } else {
-                        try {
-                            $extras['rfc'] = $extras['rfc'] ?: null;
-                            OrdenCompra::actualizarEstado($id, 'Recibida', $extras);
-                            ActivityLogger::log('orden_compra_recibida', 'Orden de compra recibida', [
-                                'orden_id'       => $id,
-                                'numero_factura' => $extras['numero_factura'] ?: null,
-                            ]);
-                            header('Location: ordenes_compra_detalle.php?id=' . $id . '&received=1');
-                            exit();
-                        } catch (\Throwable $e) {
-                            $error = 'No fue posible registrar la recepcion: ' . $e->getMessage();
-                        }
-                    }
-                } elseif ($accion === 'cancelar' && strtolower($orden['estado']) !== 'cancelada') {
+                if ($accion === 'cancelar' && strtolower($orden['estado']) !== 'cancelada') {
                     try {
                         OrdenCompra::actualizarEstado($id, 'Cancelada');
                         ActivityLogger::log('orden_compra_cancelada', 'Orden de compra cancelada', [
@@ -205,6 +176,8 @@ class OrdenCompraController
                 $orden = OrdenCompra::find($id) ?: $orden;
             }
         }
+
+        $facturasRelacionadas = Factura::porOrden($id);
 
         include __DIR__ . '/../views/ordenes/detalle.php';
     }

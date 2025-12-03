@@ -150,10 +150,6 @@ class OrdenCompra
             $ordenId = (int) $db->lastInsertId();
             self::guardarDetalles($db, $ordenId, $detalles);
 
-            if ($estado === 'Recibida') {
-                self::registrarRecepcionInventario($db, $ordenId, $detalles, $cabecera);
-            }
-
             $db->commit();
             return $ordenId;
         } catch (\Throwable $e) {
@@ -190,10 +186,6 @@ class OrdenCompra
             self::eliminarDetalles($db, $id);
             self::guardarDetalles($db, $id, $detalles);
 
-            if (($cabecera['estado'] ?? 'Pendiente') === 'Recibida') {
-                self::registrarRecepcionInventario($db, $id, $detalles, $cabecera);
-            }
-
             $db->commit();
             return true;
         } catch (\Throwable $e) {
@@ -219,12 +211,6 @@ class OrdenCompra
                 $extras['almacen_destino_id'] ?? null,
                 $id,
             ]);
-
-            if ($estado === 'Recibida') {
-                $detalles = self::detalles($id);
-                $cabecera = self::find($id) ?: [];
-                self::registrarRecepcionInventario($db, $id, $detalles, $cabecera);
-            }
 
             $db->commit();
             return true;
@@ -281,37 +267,8 @@ class OrdenCompra
 
     private static function registrarRecepcionInventario(\PDO $db, int $ordenId, array $detalles, array $cabecera): void
     {
-        if (empty($detalles)) {
-            return;
-        }
-
-        require_once __DIR__ . '/Producto.php';
-        require_once __DIR__ . '/MovimientoInventario.php';
-        require_once __DIR__ . '/Usuario.php';
-
-        $usuarioId = $cabecera['usuario_id'] ?? null;
-        $almacenId = $cabecera['almacen_destino_id'] ?? null;
-
-        foreach ($detalles as $detalle) {
-            $productoId = (int) ($detalle['producto_id'] ?? 0);
-            $cantidad = (float) ($detalle['cantidad'] ?? 0);
-            if ($productoId <= 0 || $cantidad <= 0) {
-                continue;
-            }
-
-            Producto::sumarStock($productoId, $cantidad);
-            if ($almacenId) {
-                Producto::actualizarAlmacen($productoId, (int) $almacenId);
-            }
-
-            MovimientoInventario::registrar([
-                'producto_id' => $productoId,
-                'tipo' => 'Entrada',
-                'cantidad' => $cantidad,
-                'usuario_id' => $usuarioId,
-                'almacen_destino_id' => $almacenId,
-                'observaciones' => 'Recepción OC #' . $ordenId,
-            ]);
-        }
+        // Manteniendo este método por compatibilidad. La recepción de inventario
+        // ahora se realiza exclusivamente a través del módulo de facturas.
+        return;
     }
 }

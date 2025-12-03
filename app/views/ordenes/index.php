@@ -21,7 +21,7 @@ $queryWith = function(array $overrides = []) {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Órdenes de compra | TAKAB</title>
+    <title>Ordenes de compra | TAKAB</title>
     <link rel="stylesheet" href="/assets/css/dashboard.css">
     <link rel="stylesheet" href="/assets/css/reportes.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -68,8 +68,8 @@ $queryWith = function(array $overrides = []) {
         <main class="ordenes-main">
             <div class="ordenes-header">
                 <div>
-                    <h1>Órdenes de compra</h1>
-                    <p style="margin:6px 0 0; color:#61729f;">Gestiona la creación, seguimiento y recepción de compras.</p>
+                    <h1>Ordenes de compra</h1>
+                    <p style="margin:6px 0 0; color:#61729f;">Gestiona la creacion y seguimiento de compras. El inventario se incrementa cuando registras la factura.</p>
                 </div>
                 <?php if (in_array($role, ['Administrador', 'Compras'], true)): ?>
                 <div class="acciones">
@@ -174,8 +174,8 @@ $queryWith = function(array $overrides = []) {
                                         <?php if (in_array($role, ['Administrador', 'Compras'], true) && !in_array($estado, ['recibida', 'cancelada'], true)): ?>
                                             <a class="btn-link" href="ordenes_compra_editar.php?id=<?= (int) $orden['id'] ?>"><i class="fa-solid fa-pen-to-square"></i> Editar</a>
                                         <?php endif; ?>
-                                        <?php if (in_array($role, ['Administrador', 'Compras', 'Almacen'], true) && $estado !== 'recibida' && $estado !== 'cancelada'): ?>
-                                            <a class="btn-link" href="ordenes_compra_detalle.php?id=<?= (int) $orden['id'] ?>#recepcion"><i class="fa-solid fa-box-open"></i> Recibir</a>
+                                        <?php if (in_array($role, ['Administrador', 'Compras', 'Almacen'], true) && $estado !== 'cancelada'): ?>
+                                            <a class="btn-link" href="facturas_create.php?orden_id=<?= (int) $orden['id'] ?>&proveedor_id=<?= (int) $orden['proveedor_id'] ?>"><i class="fa-solid fa-file-invoice-dollar"></i> Registrar factura</a>
                                         <?php endif; ?>
                                     </td>
                                 </tr>

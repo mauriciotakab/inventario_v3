@@ -27,6 +27,12 @@ class Navigation
             'href'  => 'ordenes_compra.php',
             'roles' => ['Administrador', 'Almacen', 'Compras'],
         ],
+        'facturas'           => [
+            'label' => 'Facturas de compra',
+            'icon'  => 'fa-solid fa-file-circle-check',
+            'href'  => 'facturas.php',
+            'roles' => ['Administrador', 'Almacen', 'Compras'],
+        ],
         'ordenes_crear'       => [
             'label' => 'Registrar orden',
             'icon'  => 'fa-solid fa-plus',
@@ -116,6 +122,7 @@ class Navigation
             'usuarios',
             'productos',
             'ordenes',
+            'facturas',
             'ordenes_crear',
             'inventario',
             'prestamos',
@@ -131,6 +138,7 @@ class Navigation
             'dashboard',
             'productos',
             'ordenes',
+            'facturas',
             'inventario',
             'prestamos',
             'compras_proveedor',
@@ -144,6 +152,7 @@ class Navigation
             'dashboard',
             'ordenes',
             'ordenes_crear',
+            'facturas',
             'productos',
             'inventario',
             'compras_proveedor',
@@ -172,6 +181,9 @@ class Navigation
         'productos_view.php'             => 'productos',
         'productos_import.php'           => 'productos',
         'productos_template.php'         => 'productos',
+        'facturas.php'                 => 'facturas',
+        'facturas_create.php'          => 'facturas',
+        'facturas_detalle.php'         => 'facturas',
         'ordenes_compra.php'             => 'ordenes',
         'ordenes_compra_crear.php'       => 'ordenes_crear',
         'ordenes_compra_detalle.php'     => 'ordenes',
@@ -228,6 +240,10 @@ class Navigation
         ],
         'productos'           => [
             ['label' => 'Productos'],
+        ],
+        'facturas'           => [
+            ['label' => 'Compras'],
+            ['label' => 'Facturas'],
         ],
         'ordenes'             => [
             ['label' => 'Compras'],
