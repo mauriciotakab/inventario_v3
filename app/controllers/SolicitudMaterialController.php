@@ -39,10 +39,10 @@
 
                 $comentario     = trim($_POST['comentario']);
                 $observacion    = trim($_POST['observacion'] ?? '');
-                $tipo           = $isGeneral ? 'General' : 'Mixta';
                 $tipo_solicitud = $isGeneral ? 'General' : 'Servicio';
                 $detalles       = [];
                 $extras         = [];
+                $tiposProducto  = [];
 
                 if (empty($comentario)) {
                     $msg = $isGeneral
@@ -74,10 +74,9 @@
                                     'cantidad'    => $item['cantidad'],
                                     'observacion' => $item['observacion'] ?? '',
                                 ];
-                                if ($tipo === 'Mixta') {
-                                    $tipo = $item['tipo'];
-                                } elseif ($tipo !== $item['tipo']) {
-                                    $tipo = 'Mixta';
+                                $tipoItem = $item['tipo'] ?? null;
+                                if ($tipoItem && !in_array($tipoItem, $tiposProducto, true)) {
+                                    $tiposProducto[] = $tipoItem;
                                 }
                             }
                         }
@@ -86,6 +85,14 @@
                     if (count($detalles) === 0 && count($extras) === 0) {
                         $msg = 'Debes agregar al menos un material, herramienta o material extra valido.';
                     } else {
+                        if (count($tiposProducto) === 0) {
+                            $tipo = 'Consumible';
+                        } elseif (count($tiposProducto) === 1) {
+                            $tipo = $tiposProducto[0];
+                        } else {
+                            $tipo = 'Equipo';
+                        }
+
                         $data = [
                             'usuario_id'     => $_SESSION['user_id'],
                             'tipo'           => $tipo,

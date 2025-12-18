@@ -13,7 +13,7 @@ $nombre = $_SESSION['nombre'] ?? '';
     <link rel="stylesheet" href="/assets/css/dashboard.css">
     <link rel="stylesheet" href="/assets/css/solicitudes_form.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>\n        .preview-card {margin-top:12px; display:flex; gap:12px; border:1px solid #e4e8f3; border-radius:12px; padding:12px; background:#f9fbff;}\n        .preview-card img {width:64px; height:64px; object-fit:cover; border-radius:10px; border:1px solid #dfe6f7; background:#fff;}\n        .preview-meta {display:grid; gap:4px;}\n        .preview-label {font-size:0.85rem; color:#5a6a94; text-transform:uppercase; letter-spacing:.5px;}\n        .preview-value {font-weight:700; color:#122c57;}\n    </style>\n</head>
+    <style>\n        .preview-wrapper {margin-top:8px;}\n        .preview-card {display:flex; gap:14px; border:1px solid #e4e8f3; border-radius:12px; padding:12px; background:#f9fbff; box-shadow:0 2px 8px rgba(20,41,89,0.05);}\n        .preview-card img {width:76px; height:76px; object-fit:cover; border-radius:12px; border:1px solid #dfe6f7; background:#fff;}\n        .preview-meta {display:grid; gap:6px;}\n        .preview-label {font-size:0.85rem; color:#5a6a94; text-transform:uppercase; letter-spacing:.5px;}\n        .preview-value {font-weight:700; color:#122c57;}\n    </style></head>
 <body>
 <div class="main-layout">
     <?php include __DIR__ . '/../partials/sidebar.php'; ?>
@@ -55,7 +55,7 @@ $nombre = $_SESSION['nombre'] ?? '';
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div id="preview_consumible" class="preview-card" style="display:none;"></div>
+                    <div class="preview-wrapper"><div id="preview_consumible" class="preview-card" style="display:none;"></div></div>
                     <div class="solicitud-buttons">
                         <input type="number" step="0.01" id="cantidad_consumible" placeholder="Cantidad" min="0.01">
                         <input type="text" id="obs_consumible" placeholder="Observación (opcional)">
@@ -85,7 +85,7 @@ $nombre = $_SESSION['nombre'] ?? '';
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div id="preview_herramienta" class="preview-card" style="display:none;"></div>
+                    <div class="preview-wrapper"><div id="preview_herramienta" class="preview-card" style="display:none;"></div></div>
                     <div class="solicitud-buttons">
                         <input type="number" step="0.01" id="cantidad_herramienta" placeholder="Cantidad" min="0.01">
                         <input type="text" id="obs_herramienta" placeholder="Observación (opcional)">
@@ -175,7 +175,7 @@ window.mostrarPreview = function(tipo){
     if (!data) { target.style.display = 'none'; target.innerHTML=''; return; }
     const img = data.img ? data.img : '/assets/images/placeholder.png';
     target.style.display = 'flex';
-    target.innerHTML = `<img src="${img}" alt="${data.nombre}">
+    target.innerHTML = `<img src="${img}" alt="${data.nombre}" onerror="this.onerror=null;this.src='/assets/images/placeholder.png';">
         <div class="preview-meta">
             <span class="preview-label">Producto</span>
             <span class="preview-value">${data.nombre}</span>
