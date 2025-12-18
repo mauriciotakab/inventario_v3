@@ -100,13 +100,10 @@ function safe_css_class($s) {
 				</div>
 				<div class="hero-image">
 					<?php
-                        $imgPath   = $producto['imagen_url'] ?? '';
-                        $publicDir = dirname(__DIR__, 2) . '/public/';
-                        $fullPath  = $imgPath ? $publicDir . ltrim($imgPath, '/\\') : '';
-                        $exists    = $imgPath && file_exists($fullPath);
-                        $src       = $exists ? '/' . ltrim($imgPath, '/\\') : '/assets/images/placeholder.png';
+                        $imgPath = $producto['imagen_url'] ?? '';
+                        $src     = $imgPath ? '/' . ltrim(str_replace('\\', '/', $imgPath), '/') : '/assets/images/placeholder.png';
                     ?>
-					<img src="<?= htmlspecialchars($src) ?>" alt="Imagen del producto">
+					<img src="<?= htmlspecialchars($src) ?>" alt="Imagen del producto" onerror="this.onerror=null;this.src='/assets/images/placeholder.png';">
 				</div>
 			</section>
 			<section class="productos-detail-card">

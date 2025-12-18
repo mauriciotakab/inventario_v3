@@ -206,13 +206,10 @@ $breadcrumbs = [
                         <div class="productos-form-field current-image">
                             <label>Imagen actual</label>
                             <?php
-                                $imgPath   = $values['imagen_url'] ?? '';
-                                $publicDir = dirname(__DIR__, 2) . '/public/';
-                                $fullPath  = $imgPath ? $publicDir . ltrim($imgPath, '/\\') : '';
-                                $exists    = $imgPath && file_exists($fullPath);
-                                $src       = $exists ? '/' . ltrim($imgPath, '/\\') : '/assets/images/placeholder.png';
+                                $imgPath = $values['imagen_url'] ?? '';
+                                $src     = $imgPath ? '/' . ltrim(str_replace('\\', '/', $imgPath), '/') : '/assets/images/placeholder.png';
                             ?>
-                            <img src="<?= htmlspecialchars($src) ?>" alt="Imagen actual del producto" class="producto-preview">
+                            <img src="<?= htmlspecialchars($src) ?>" alt="Imagen actual del producto" class="producto-preview" onerror="this.onerror=null;this.src='/assets/images/placeholder.png';">
                         </div>
                         <div class="productos-form-field">
                             <label for="imagen_url">Actualizar imagen</label>

@@ -206,7 +206,7 @@ $breadcrumbs = [
                         <div class="productos-form-field">
                             <label for="imagen_url">Fotograf&iacute;a del producto</label>
                             <input type="file" id="imagen_url" name="imagen_url" accept="image/*">
-                            <span class="productos-form-note">Formatos permitidos: JPG, PNG, WEBP. Tama&ntilde;o m&aacute;ximo 2&nbsp;MB.</span>
+                            <span class="productos-form-note">Formatos permitidos: JPG, PNG, WEBP. Tama&ntilde;o m&aacute;ximo 5&nbsp;MB.</span>
                         </div>
                     </div>
                 </section>

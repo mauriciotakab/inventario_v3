@@ -44,12 +44,16 @@ $nombre = $_SESSION['nombre'] ?? '';
                         <select id="select_consumible" onchange="mostrarPreview('consumible')">
                             <option value="">Seleccionar...</option>
                             <?php foreach ($productos_consumibles as $p): ?>
+                                <?php
+                                    $imgPath = $p['imagen_url'] ?? '';
+                                    $imgUrl  = $imgPath ? '/' . ltrim(str_replace('\\', '/', $imgPath), '/') : '/assets/images/placeholder.png';
+                                ?>
                                 <option value="<?= $p['id'] ?>"
                                         data-tipo="Consumible"
                                         data-stock="<?= htmlspecialchars($p['stock_actual'] ?? 0) ?>"
                                         data-marca="<?= htmlspecialchars($p['marca'] ?? '-') ?>"
                                         data-nombre="<?= htmlspecialchars($p['nombre'] ?? '') ?>"
-                                        data-img="<?= htmlspecialchars($p['imagen_url'] ?? '') ?>">
+                                        data-img="<?= htmlspecialchars($imgUrl) ?>">
                                     <?= htmlspecialchars($p['nombre']) ?>
                                 </option>
                             <?php endforeach; ?>
@@ -74,12 +78,16 @@ $nombre = $_SESSION['nombre'] ?? '';
                         <select id="select_herramienta" onchange="mostrarPreview('herramienta')">
                             <option value="">Seleccionar...</option>
                             <?php foreach ($productos_herramientas as $p): ?>
+                                <?php
+                                    $imgPath = $p['imagen_url'] ?? '';
+                                    $imgUrl  = $imgPath ? '/' . ltrim(str_replace('\\', '/', $imgPath), '/') : '/assets/images/placeholder.png';
+                                ?>
                                 <option value="<?= $p['id'] ?>"
                                         data-tipo="Herramienta"
                                         data-stock="<?= htmlspecialchars($p['stock_actual'] ?? 0) ?>"
                                         data-marca="<?= htmlspecialchars($p['marca'] ?? '-') ?>"
                                         data-nombre="<?= htmlspecialchars($p['nombre'] ?? '') ?>"
-                                        data-img="<?= htmlspecialchars($p['imagen_url'] ?? '') ?>">
+                                        data-img="<?= htmlspecialchars($imgUrl) ?>">
                                     <?= htmlspecialchars($p['nombre']) ?>
                                 </option>
                             <?php endforeach; ?>
