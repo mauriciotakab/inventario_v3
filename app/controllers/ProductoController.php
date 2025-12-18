@@ -971,7 +971,8 @@ endobj
             return false;
         }
 
-        $uploadDir = dirname(__DIR__, 2) . '/public/assets/images/';
+        // Guardamos en carpeta persistente de uploads (evita sobrescribir assets estaticos)
+        $uploadDir = dirname(__DIR__, 2) . '/public/uploads/productos/';
         if (! is_dir($uploadDir) && ! mkdir($uploadDir, 0775, true) && ! is_dir($uploadDir)) {
             $errors[] = 'No fue posible preparar el directorio de imagenes.';
             return false;
@@ -985,6 +986,7 @@ endobj
             return false;
         }
 
-        return 'assets/images/' . $filename;
+        // Guardamos ruta relativa para servir desde /public
+        return 'uploads/productos/' . $filename;
     }
 }

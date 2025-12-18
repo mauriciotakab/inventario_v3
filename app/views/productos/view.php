@@ -99,14 +99,14 @@ function safe_css_class($s) {
 					</div>
 				</div>
 				<div class="hero-image">
-					<?php if (!empty($producto['imagen_url'])): ?>
-						<img src="/<?= htmlspecialchars($producto['imagen_url']) ?>" alt="Imagen del producto">
-					<?php else: ?>
-						<div style="text-align:center;color:#7d8bb0;">
-							<i class="fa fa-camera" style="font-size:2rem;"></i>
-							<p style="margin-top:8px;font-size:0.9rem;">Sin imagen registrada</p>
-						</div>
-					<?php endif; ?>
+					<?php
+                        $imgPath   = $producto['imagen_url'] ?? '';
+                        $publicDir = dirname(__DIR__, 2) . '/public/';
+                        $fullPath  = $imgPath ? $publicDir . ltrim($imgPath, '/\\') : '';
+                        $exists    = $imgPath && file_exists($fullPath);
+                        $src       = $exists ? '/' . ltrim($imgPath, '/\\') : '/assets/images/placeholder.png';
+                    ?>
+					<img src="<?= htmlspecialchars($src) ?>" alt="Imagen del producto">
 				</div>
 			</section>
 			<section class="productos-detail-card">
