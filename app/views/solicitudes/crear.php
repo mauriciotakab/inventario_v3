@@ -13,7 +13,7 @@ $nombre = $_SESSION['nombre'] ?? '';
     <link rel="stylesheet" href="/assets/css/dashboard.css">
     <link rel="stylesheet" href="/assets/css/solicitudes_form.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
+    <style>\n        .preview-card {margin-top:12px; display:flex; gap:12px; border:1px solid #e4e8f3; border-radius:12px; padding:12px; background:#f9fbff;}\n        .preview-card img {width:64px; height:64px; object-fit:cover; border-radius:10px; border:1px solid #dfe6f7; background:#fff;}\n        .preview-meta {display:grid; gap:4px;}\n        .preview-label {font-size:0.85rem; color:#5a6a94; text-transform:uppercase; letter-spacing:.5px;}\n        .preview-value {font-weight:700; color:#122c57;}\n    </style>\n</head>
 <body>
 <div class="main-layout">
     <?php include __DIR__ . '/../partials/sidebar.php'; ?>
@@ -41,15 +41,23 @@ $nombre = $_SESSION['nombre'] ?? '';
                     </div>
                     <div class="solicitud-field">
                         <label for="select_consumible">Selecciona un consumible *</label>
-                        <select id="select_consumible">
+                        <select id="select_consumible" onchange="mostrarPreview('consumible')">
                             <option value="">Seleccionar...</option>
                             <?php foreach ($productos_consumibles as $p): ?>
-                                <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['nombre']) ?></option>
+                                <option value="<?= $p['id'] ?>"
+                                        data-tipo="Consumible"
+                                        data-stock="<?= htmlspecialchars($p['stock_actual'] ?? 0) ?>"
+                                        data-marca="<?= htmlspecialchars($p['marca'] ?? '-') ?>"
+                                        data-nombre="<?= htmlspecialchars($p['nombre'] ?? '') ?>"
+                                        data-img="<?= htmlspecialchars($p['imagen_url'] ?? '') ?>">
+                                    <?= htmlspecialchars($p['nombre']) ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <div id="preview_consumible" class="preview-card" style="display:none;"></div>
                     <div class="solicitud-buttons">
-                        <input type="number" id="cantidad_consumible" placeholder="Cantidad" min="1">
+                        <input type="number" step="0.01" id="cantidad_consumible" placeholder="Cantidad" min="0.01">
                         <input type="text" id="obs_consumible" placeholder="Observación (opcional)">
                         <button type="button" class="btn-secondary" onclick="agregarMaterial('Consumible')"><i class="fa fa-plus"></i> Agregar</button>
                     </div>
@@ -63,15 +71,23 @@ $nombre = $_SESSION['nombre'] ?? '';
                     </div>
                     <div class="solicitud-field">
                         <label for="select_herramienta">Selecciona una herramienta *</label>
-                        <select id="select_herramienta">
+                        <select id="select_herramienta" onchange="mostrarPreview('herramienta')">
                             <option value="">Seleccionar...</option>
                             <?php foreach ($productos_herramientas as $p): ?>
-                                <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['nombre']) ?></option>
+                                <option value="<?= $p['id'] ?>"
+                                        data-tipo="Herramienta"
+                                        data-stock="<?= htmlspecialchars($p['stock_actual'] ?? 0) ?>"
+                                        data-marca="<?= htmlspecialchars($p['marca'] ?? '-') ?>"
+                                        data-nombre="<?= htmlspecialchars($p['nombre'] ?? '') ?>"
+                                        data-img="<?= htmlspecialchars($p['imagen_url'] ?? '') ?>">
+                                    <?= htmlspecialchars($p['nombre']) ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <div id="preview_herramienta" class="preview-card" style="display:none;"></div>
                     <div class="solicitud-buttons">
-                        <input type="number" id="cantidad_herramienta" placeholder="Cantidad" min="1">
+                        <input type="number" step="0.01" id="cantidad_herramienta" placeholder="Cantidad" min="0.01">
                         <input type="text" id="obs_herramienta" placeholder="Observación (opcional)">
                         <button type="button" class="btn-secondary" onclick="agregarMaterial('Herramienta')"><i class="fa fa-plus"></i> Agregar</button>
                     </div>
@@ -84,7 +100,7 @@ $nombre = $_SESSION['nombre'] ?? '';
                         <input type="text" id="extra_nombre" placeholder="Nombre o descripción del material extra">
                     </div>
                     <div class="solicitud-buttons">
-                        <input type="number" id="extra_cantidad" min="1" placeholder="Cantidad">
+                        <input type="number" id="extra_cantidad" min="0.01" step="0.01" placeholder="Cantidad">
                         <input type="text" id="extra_observacion" placeholder="Observación (opcional)">
                         <button type="button" class="btn-secondary" onclick="agregarMaterialExtra()"><i class="fa fa-plus"></i> Agregar extra</button>
                     </div>
@@ -137,35 +153,71 @@ $nombre = $_SESSION['nombre'] ?? '';
 </div>
 
 <script>
+(function(){
 let materiales = [];
 
-function agregarMaterial(tipo) {
+function obtenerPreviewData(select){
+    const option = select.options[select.selectedIndex];
+    if (!option || !option.value) return null;
+    return {
+        nombre: option.getAttribute('data-nombre') || option.textContent,
+        stock: parseFloat(option.getAttribute('data-stock') || '0'),
+        marca: option.getAttribute('data-marca') || '-',
+        tipo: option.getAttribute('data-tipo') || '',
+        img: option.getAttribute('data-img') || ''
+    };
+}
+
+window.mostrarPreview = function(tipo){
+    const select = tipo === 'consumible' ? document.getElementById('select_consumible') : document.getElementById('select_herramienta');
+    const target = document.getElementById('preview_' + tipo);
+    const data = obtenerPreviewData(select);
+    if (!data) { target.style.display = 'none'; target.innerHTML=''; return; }
+    const img = data.img ? data.img : '/assets/images/placeholder.png';
+    target.style.display = 'flex';
+    target.innerHTML = `<img src="${img}" alt="${data.nombre}">
+        <div class="preview-meta">
+            <span class="preview-label">Producto</span>
+            <span class="preview-value">${data.nombre}</span>
+            <span class="preview-label">Marca / Stock</span>
+            <span class="preview-value">${data.marca} ? ${data.stock} disponibles</span>
+            <span class="preview-label">Tipo</span>
+            <span class="preview-value">${data.tipo}</span>
+        </div>`;
+};
+
+window.agregarMaterial = function(tipo){
     let select, cantidad, observacion;
     if (tipo === 'Consumible') {
         select = document.getElementById('select_consumible');
-        cantidad = document.getElementById('cantidad_consumible').value;
+        cantidad = parseFloat(document.getElementById('cantidad_consumible').value);
         observacion = document.getElementById('obs_consumible').value;
     } else {
         select = document.getElementById('select_herramienta');
-        cantidad = document.getElementById('cantidad_herramienta').value;
+        cantidad = parseFloat(document.getElementById('cantidad_herramienta').value);
         observacion = document.getElementById('obs_herramienta').value;
     }
     const producto_id = select.value;
     const producto_nombre = select.options[select.selectedIndex]?.text || '';
-    if (!producto_id || !cantidad || cantidad < 1) {
-        alert('Selecciona un producto y una cantidad válida.');
+    const stockDisp = parseFloat(select.options[select.selectedIndex]?.getAttribute('data-stock') || '0');
+    if (!producto_id || !cantidad || cantidad <= 0) {
+        alert('Selecciona un producto y una cantidad valida.');
         return;
+    }
+    if (stockDisp && cantidad > stockDisp) {
+        const seguir = confirm(`Estas solicitando ${cantidad} y solo hay ${stockDisp} en stock. ?Deseas continuar?`);
+        if (!seguir) return;
     }
     materiales.push({ tipo, producto_id, producto_nombre, cantidad, observacion });
     actualizarTabla();
-}
+};
 
-function agregarMaterialExtra() {
+window.agregarMaterialExtra = function() {
     const nombre = document.getElementById('extra_nombre').value.trim();
-    const cantidad = document.getElementById('extra_cantidad').value;
+    const cantidad = parseFloat(document.getElementById('extra_cantidad').value);
     const observacion = document.getElementById('extra_observacion').value;
-    if (!nombre || !cantidad || cantidad < 1) {
-        alert('Escribe nombre y cantidad válida para el material extra.');
+    if (!nombre || !cantidad || cantidad <= 0) {
+        alert('Escribe nombre y cantidad valida para el material extra.');
         return;
     }
     materiales.push({ tipo: 'Extra', producto_id: null, producto_nombre: nombre, cantidad, observacion });
@@ -173,9 +225,9 @@ function agregarMaterialExtra() {
     document.getElementById('extra_nombre').value = '';
     document.getElementById('extra_cantidad').value = '';
     document.getElementById('extra_observacion').value = '';
-}
+};
 
-function actualizarTabla() {
+window.actualizarTabla = function() {
     const tbody = document.querySelector('#tabla_materiales tbody');
     tbody.innerHTML = '';
     if (materiales.length === 0) {
@@ -192,14 +244,14 @@ function actualizarTabla() {
         });
     }
     document.getElementById('input_materiales').value = JSON.stringify(materiales);
-}
+};
 
-function eliminarMaterial(idx) {
+window.eliminarMaterial = function(idx) {
     materiales.splice(idx, 1);
     actualizarTabla();
-}
+};
 
-function filtrarOpciones(tipo) {
+window.filtrarOpciones = function(tipo) {
     let input, select;
     if (tipo === 'consumible') {
         input = document.getElementById('busqueda_consumible').value.toLowerCase();
@@ -212,7 +264,7 @@ function filtrarOpciones(tipo) {
         if (idx === 0) return;
         opt.style.display = opt.text.toLowerCase().includes(input) ? '' : 'none';
     });
-}
+};
 
 document.getElementById('solicitudForm').addEventListener('submit', function (event) {
     if (materiales.length === 0) {
@@ -222,6 +274,7 @@ document.getElementById('solicitudForm').addEventListener('submit', function (ev
         document.getElementById('input_materiales').value = JSON.stringify(materiales);
     }
 });
+})();
 </script>
 <?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
