@@ -948,8 +948,8 @@ endobj
             return false;
         }
 
-        if (($file['size'] ?? 0) > 2 * 1024 * 1024) {
-            $errors[] = 'La imagen no debe superar los 2 MB.';
+        if (($file['size'] ?? 0) > 5 * 1024 * 1024) {
+            $errors[] = 'La imagen no debe superar los 5 MB.';
             return false;
         }
 
