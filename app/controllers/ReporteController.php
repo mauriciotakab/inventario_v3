@@ -86,6 +86,8 @@ class ReporteController
             'estado_inventario'      => $estadoInventario,
             'productos_consumibles'  => $productosPorTipo['consumibles'],
             'productos_herramientas' => $productosPorTipo['herramientas'],
+            'productos_equipos'      => $productosPorTipo['equipos'],
+            'productos_todos'        => $productosPorTipo['todos'],
         ];
 
         if ($mostrarCostos) {
@@ -515,8 +517,10 @@ class ReporteController
         $sql = "SELECT p.codigo,
                        p.nombre,
                        p.tipo,
+                       p.marca,
                        c.nombre AS categoria,
                        a.nombre AS almacen,
+                       p.ubicacion_fisica,
                        p.stock_actual,
                        p.stock_minimo,
                        um.abreviacion AS unidad,
@@ -531,14 +535,19 @@ class ReporteController
         $resultado = [
             'consumibles'  => [],
             'herramientas' => [],
+            'equipos'      => [],
+            'todos'        => [],
         ];
 
         foreach ($filas as $fila) {
             $tipo = strtolower($fila['tipo'] ?? '');
+            $resultado['todos'][] = $fila;
             if ($tipo === 'consumible') {
                 $resultado['consumibles'][] = $fila;
             } elseif ($tipo === 'herramienta') {
                 $resultado['herramientas'][] = $fila;
+            } elseif ($tipo === 'equipo') {
+                $resultado['equipos'][] = $fila;
             }
         }
 
@@ -947,8 +956,10 @@ class ReporteController
                     'columns'  => [
                         ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
                         ['label' => 'Producto', 'value' => fn($row) => $row['nombre']],
+                        ['label' => 'Marca', 'value' => fn($row) => $row['marca'] ?? '-'],
                         ['label' => 'Categoria', 'value' => fn($row) => $row['categoria'] ?? '-'],
                         ['label' => 'Almacen', 'value' => fn($row) => $row['almacen'] ?? '-'],
+                        ['label' => 'Ubicacion fisica', 'value' => fn($row) => $row['ubicacion_fisica'] ?? '-'],
                         ['label' => 'Stock actual', 'value' => fn($row) => $formatNumber($row['stock_actual'])],
                         ['label' => 'Stock minimo', 'value' => fn($row) => $formatNumber($row['stock_minimo'])],
                         ['label' => 'Unidad', 'value' => fn($row) => $row['unidad'] ?? '-'],
@@ -962,8 +973,44 @@ class ReporteController
                     'columns'  => [
                         ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
                         ['label' => 'Producto', 'value' => fn($row) => $row['nombre']],
+                        ['label' => 'Marca', 'value' => fn($row) => $row['marca'] ?? '-'],
                         ['label' => 'Categoria', 'value' => fn($row) => $row['categoria'] ?? '-'],
                         ['label' => 'Almacen', 'value' => fn($row) => $row['almacen'] ?? '-'],
+                        ['label' => 'Ubicacion fisica', 'value' => fn($row) => $row['ubicacion_fisica'] ?? '-'],
+                        ['label' => 'Stock actual', 'value' => fn($row) => $formatNumber($row['stock_actual'])],
+                        ['label' => 'Stock minimo', 'value' => fn($row) => $formatNumber($row['stock_minimo'])],
+                        ['label' => 'Unidad', 'value' => fn($row) => $row['unidad'] ?? '-'],
+                        ['label' => 'Estado', 'value' => fn($row) => $row['estado'] ?? '-'],
+                    ],
+                ];
+            case 'productos_equipos':
+                return [
+                    'title'    => 'Catalogo de equipos',
+                    'filename' => 'productos_equipos',
+                    'columns'  => [
+                        ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
+                        ['label' => 'Producto', 'value' => fn($row) => $row['nombre']],
+                        ['label' => 'Marca', 'value' => fn($row) => $row['marca'] ?? '-'],
+                        ['label' => 'Categoria', 'value' => fn($row) => $row['categoria'] ?? '-'],
+                        ['label' => 'Almacen', 'value' => fn($row) => $row['almacen'] ?? '-'],
+                        ['label' => 'Ubicacion fisica', 'value' => fn($row) => $row['ubicacion_fisica'] ?? '-'],
+                        ['label' => 'Stock actual', 'value' => fn($row) => $formatNumber($row['stock_actual'])],
+                        ['label' => 'Stock minimo', 'value' => fn($row) => $formatNumber($row['stock_minimo'])],
+                        ['label' => 'Unidad', 'value' => fn($row) => $row['unidad'] ?? '-'],
+                        ['label' => 'Estado', 'value' => fn($row) => $row['estado'] ?? '-'],
+                    ],
+                ];
+            case 'productos_todos':
+                return [
+                    'title'    => 'Catalogo completo de productos',
+                    'filename' => 'productos_todos',
+                    'columns'  => [
+                        ['label' => 'Codigo', 'value' => fn($row) => $row['codigo']],
+                        ['label' => 'Producto', 'value' => fn($row) => $row['nombre']],
+                        ['label' => 'Marca', 'value' => fn($row) => $row['marca'] ?? '-'],
+                        ['label' => 'Categoria', 'value' => fn($row) => $row['categoria'] ?? '-'],
+                        ['label' => 'Almacen', 'value' => fn($row) => $row['almacen'] ?? '-'],
+                        ['label' => 'Ubicacion fisica', 'value' => fn($row) => $row['ubicacion_fisica'] ?? '-'],
                         ['label' => 'Stock actual', 'value' => fn($row) => $formatNumber($row['stock_actual'])],
                         ['label' => 'Stock minimo', 'value' => fn($row) => $formatNumber($row['stock_minimo'])],
                         ['label' => 'Unidad', 'value' => fn($row) => $row['unidad'] ?? '-'],

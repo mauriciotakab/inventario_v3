@@ -156,15 +156,15 @@ class Producto
             peso, ancho, alto, profundidad, unidad_medida_id, clase_categoria,
             marca, color, forma, especificaciones_tecnicas, origen,
             costo_compra, precio_venta, stock_minimo, stock_actual, almacen_id,
-            estado, tipo, imagen_url, last_requested_by_user_id, last_request_date, tags
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            ubicacion_fisica, estado, tipo, imagen_url, last_requested_by_user_id, last_request_date, tags
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $db->prepare($sql);
         return $stmt->execute([
             $data['codigo'], $data['codigo_barras'], $data['nombre'], $data['descripcion'], $data['proveedor_id'], $data['categoria_id'],
             $data['peso'], $data['ancho'], $data['alto'], $data['profundidad'], $data['unidad_medida_id'],
             $data['clase_categoria'], $data['marca'], $data['color'], $data['forma'], $data['especificaciones_tecnicas'],
             $data['origen'], $data['costo_compra'], $data['precio_venta'], $data['stock_minimo'], $data['stock_actual'],
-            $data['almacen_id'], $data['estado'], $data['tipo'], $data['imagen_url'],
+            $data['almacen_id'], $data['ubicacion_fisica'], $data['estado'], $data['tipo'], $data['imagen_url'],
             $data['last_requested_by_user_id'], $data['last_request_date'], $data['tags']
         ]);
     }
@@ -261,7 +261,7 @@ class Producto
             peso=?, ancho=?, alto=?, profundidad=?, unidad_medida_id=?, clase_categoria=?,
             marca=?, color=?, forma=?, especificaciones_tecnicas=?, origen=?,
             costo_compra=?, precio_venta=?, stock_minimo=?, stock_actual=?, almacen_id=?,
-            estado=?, tipo=?, imagen_url=?, last_requested_by_user_id=?, last_request_date=?, tags=?
+            ubicacion_fisica=?, estado=?, tipo=?, imagen_url=?, last_requested_by_user_id=?, last_request_date=?, tags=?
             WHERE id=?";
         $stmt = $db->prepare($sql);
         $data['codigo'] = strtoupper(trim((string) ($data['codigo'] ?? '')));
@@ -273,7 +273,7 @@ class Producto
             $data['peso'], $data['ancho'], $data['alto'], $data['profundidad'], $data['unidad_medida_id'],
             $data['clase_categoria'], $data['marca'], $data['color'], $data['forma'], $data['especificaciones_tecnicas'],
             $data['origen'], $data['costo_compra'], $data['precio_venta'], $data['stock_minimo'], $data['stock_actual'],
-            $data['almacen_id'], $data['estado'], $data['tipo'], $data['imagen_url'],
+            $data['almacen_id'], $data['ubicacion_fisica'], $data['estado'], $data['tipo'], $data['imagen_url'],
             $data['last_requested_by_user_id'], $data['last_request_date'], $data['tags'], $id
         ]);
     }

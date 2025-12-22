@@ -182,6 +182,10 @@ $breadcrumbs = [
                             </select>
                         </div>
                         <div class="productos-form-field">
+                            <label for="ubicacion_fisica">Ubicaci&oacute;n f&iacute;sica</label>
+                            <input type="text" id="ubicacion_fisica" name="ubicacion_fisica" value="<?= htmlspecialchars($values['ubicacion_fisica'] ?? '') ?>" placeholder="Ej. Estante A-3">
+                        </div>
+                        <div class="productos-form-field">
                             <label for="stock_actual">Stock actual *</label>
                             <input type="number" step="0.01" id="stock_actual" name="stock_actual" min="0" value="<?= htmlspecialchars($values['stock_actual'] ?? '0') ?>" required>
                         </div>

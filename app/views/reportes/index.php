@@ -204,20 +204,28 @@ $buildQuery = function(array $overrides = []) {
             <?php
                 $consumiblesListado = $productosPorTipo['consumibles'] ?? [];
                 $herramientasListado = $productosPorTipo['herramientas'] ?? [];
+                $equiposListado = $productosPorTipo['equipos'] ?? [];
+                $todosListado = $productosPorTipo['todos'] ?? [];
                 $consumiblesStock = array_sum(array_map(fn($row) => (float) ($row['stock_actual'] ?? 0), $consumiblesListado));
                 $herramientasStock = array_sum(array_map(fn($row) => (float) ($row['stock_actual'] ?? 0), $herramientasListado));
+                $equiposStock = array_sum(array_map(fn($row) => (float) ($row['stock_actual'] ?? 0), $equiposListado));
+                $todosStock = array_sum(array_map(fn($row) => (float) ($row['stock_actual'] ?? 0), $todosListado));
             ?>
             <section class="reportes-section">
                 <div class="section-header">
                     <div>
                         <h2><i class="fa fa-boxes-stacked"></i> Productos por tipo</h2>
-                        <span class="section-sub">Descarga el catalogo completo separado en consumibles y herramientas.</span>
+                        <span class="section-sub">Descarga el catalogo por tipo o el inventario completo.</span>
                     </div>
                     <div class="section-actions">
                         <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_consumibles']) ?>"><i class="fa-solid fa-file-csv"></i> Consumibles CSV</a>
                         <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_consumibles']) ?>"><i class="fa-solid fa-file-pdf"></i> Consumibles PDF</a>
                         <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_herramientas']) ?>"><i class="fa-solid fa-file-csv"></i> Herramientas CSV</a>
                         <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_herramientas']) ?>"><i class="fa-solid fa-file-pdf"></i> Herramientas PDF</a>
+                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_equipos']) ?>"><i class="fa-solid fa-file-csv"></i> Equipos CSV</a>
+                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_equipos']) ?>"><i class="fa-solid fa-file-pdf"></i> Equipos PDF</a>
+                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_todos']) ?>"><i class="fa-solid fa-file-csv"></i> Totalidad CSV</a>
+                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_todos']) ?>"><i class="fa-solid fa-file-pdf"></i> Totalidad PDF</a>
                     </div>
                 </div>
                 <div class="reportes-table-wrapper">
@@ -247,6 +255,24 @@ $buildQuery = function(array $overrides = []) {
                                 <td class="reportes-actions-inline">
                                     <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_herramientas']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
                                     <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_herramientas']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-tipo equipo">Equipos</span></td>
+                                <td><?= number_format(count($equiposListado)) ?></td>
+                                <td><?= number_format($equiposStock, 2) ?></td>
+                                <td class="reportes-actions-inline">
+                                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_equipos']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
+                                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_equipos']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-tipo total">Totalidad</span></td>
+                                <td><?= number_format(count($todosListado)) ?></td>
+                                <td><?= number_format($todosStock, 2) ?></td>
+                                <td class="reportes-actions-inline">
+                                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_todos']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
+                                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_todos']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -657,5 +683,4 @@ $buildQuery = function(array $overrides = []) {
 <?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>
-
 

@@ -249,14 +249,7 @@ $nombre = $_SESSION['nombre'] ?? '';
                         </div>
                     </div>
 
-                    <div class="solicitud-panel tips-panel">
-                        <div class="panel-title"><i class="fa-solid fa-lightbulb"></i> Tips rápidos</div>
-                        <ul>
-                            <li>Los íconos de estado te indican si el stock es suficiente o está por agotarse.</li>
-                            <li>Para móviles, desplaza lateralmente la tabla de materiales si se ve incompleta.</li>
-                            <li>Si necesitas más de lo disponible, confirma el aviso para notificar al almacén.</li>
-                        </ul>
-                    </div>
+
                 </aside>
             </div>
 

@@ -326,6 +326,14 @@
     background: #f1e6ff;
     color: #6a36c2;
 }
+.badge-tipo.equipo {
+    background: #e9f8f3;
+    color: #1f7a5a;
+}
+.badge-tipo.total {
+    background: #f3f4f8;
+    color: #49536e;
+}
 
 .badge-warning {
     background: #ffe9e9;

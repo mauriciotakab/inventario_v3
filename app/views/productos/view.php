@@ -126,6 +126,10 @@ function safe_css_class($s) {
 						<span class="value"><?= htmlspecialchars($producto['proveedor'] ?? '-') ?></span>
 					</div>
 					<div class="detail-item">
+						<span class="label">Ubicaci&oacute;n f&iacute;sica</span>
+						<span class="value"><?= htmlspecialchars($producto['ubicacion_fisica'] ?? '-') ?></span>
+					</div>
+					<div class="detail-item">
 						<span class="label">Clase interna</span>
 						<span class="value"><?= htmlspecialchars($producto['clase_categoria'] ?? '-') ?></span>
 					</div>

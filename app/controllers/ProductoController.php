@@ -392,6 +392,7 @@ class ProductoController
             'categoria_id',
             'proveedor_id',
             'almacen_id',
+            'ubicacion_fisica',
             'unidad_medida_id',
             'stock_actual',
             'stock_minimo',
@@ -572,6 +573,7 @@ class ProductoController
                 'stock_minimo'              => $stockMinimo,
                 'stock_actual'              => $stockActual,
                 'almacen_id'                => $almacenId,
+                'ubicacion_fisica'          => trim($rowAssoc['ubicacion_fisica'] ?? ''),
                 'estado'                    => $estado,
                 'tipo'                      => $tipo,
                 'imagen_url'                => null,
@@ -661,6 +663,7 @@ class ProductoController
             'stock_minimo'              => 0.0,
             'stock_actual'              => 0.0,
             'almacen_id'                => null,
+            'ubicacion_fisica'          => '',
             'estado'                    => 'Nuevo',
             'tipo'                      => 'Consumible',
             'imagen_url'                => null,
@@ -711,6 +714,10 @@ class ProductoController
         $data['almacen_id']       = $this->toNullableInt($input['almacen_id'] ?? null);
         if (empty($data['almacen_id'])) {
             $errors[] = 'Debes seleccionar un almacen asignado.';
+        }
+        $data['ubicacion_fisica'] = trim($input['ubicacion_fisica'] ?? '');
+        if (mb_strlen($data['ubicacion_fisica']) > 150) {
+            $errors[] = 'La ubicacion fisica no debe exceder 150 caracteres.';
         }
 
         $data['clase_categoria']           = trim($input['clase_categoria'] ?? '');
