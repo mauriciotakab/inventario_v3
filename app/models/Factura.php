@@ -224,16 +224,22 @@ class Factura
             }
 
             $db->commit();
+        } catch (\Throwable $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            throw $e;
+        }
 
-            ActivityLogger::log('factura_creada', 'Se registró la factura ' . ($data['numero_factura'] ?: '#' . $facturaId), [
+        try {
+            ActivityLogger::log('factura_creada', 'Se registr? la factura ' . ($data['numero_factura'] ?: '#' . $facturaId), [
                 'factura_id' => $facturaId,
                 'proveedor_id' => (int) $data['proveedor_id'],
             ]);
-
-            return $facturaId;
         } catch (\Throwable $e) {
-            $db->rollBack();
-            throw $e;
+            // No bloquear el flujo si falla el log.
         }
+
+        return $facturaId;
     }
 }
