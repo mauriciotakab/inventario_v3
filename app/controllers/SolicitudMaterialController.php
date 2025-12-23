@@ -186,10 +186,22 @@
                 $observacion = trim($_POST['observacion'] ?? '');
                 $fechaEstim  = trim($_POST['fecha_estimada_devolucion'] ?? '');
 
+                $productosCache = [];
+                $obtenerProducto = function ($productoId) use (&$productosCache) {
+                    $productoId = (int) $productoId;
+                    if ($productoId <= 0) {
+                        return null;
+                    }
+                    if (!array_key_exists($productoId, $productosCache)) {
+                        $productosCache[$productoId] = Producto::find($productoId);
+                    }
+                    return $productosCache[$productoId];
+                };
+
                 $tieneHerramienta = false;
                 foreach ($detalles as $d) {
                     if ($d['producto_id']) {
-                        $productoTmp = Producto::find($d['producto_id']);
+                        $productoTmp = $obtenerProducto($d['producto_id']);
                         if ($productoTmp && $productoTmp['tipo'] === 'Herramienta') {$tieneHerramienta = true;
                             break;}
                     }
@@ -200,10 +212,29 @@
                     return;
                 }
 
+                $faltantes = [];
+                foreach ($detalles as $d) {
+                    $producto = $obtenerProducto($d['producto_id']);
+                    if (! $producto) {
+                        $faltantes[] = 'Producto #' . (int) $d['producto_id'] . ' (no encontrado)';
+                        continue;
+                    }
+                    $cantidad = (float) $d['cantidad'];
+                    $stockDisponible = (float) ($producto['stock_actual'] ?? 0);
+                    if ($cantidad > $stockDisponible) {
+                        $faltantes[] = ($producto['nombre'] ?? 'Producto') . ' (solicitado ' . $cantidad . ', disponible ' . $stockDisponible . ')';
+                    }
+                }
+                if (!empty($faltantes)) {
+                    $msg = 'No hay stock suficiente para entregar: ' . implode('; ', $faltantes) . '.';
+                    include __DIR__ . '/../views/solicitudes/entregar.php';
+                    return;
+                }
+
                 if ($solicitud['tipo_solicitud'] === 'Servicio' || $solicitud['tipo_solicitud'] === 'Mixta') {
                     foreach ($detalles as $d) {
                         if ($d['producto_id']) {
-                            $producto = Producto::find($d['producto_id']);
+                            $producto = $obtenerProducto($d['producto_id']);
                             if ($producto && $producto['tipo'] === 'Herramienta') {
                                 Prestamo::crear([
                                     'producto_id'               => $d['producto_id'],
