@@ -350,6 +350,12 @@ class Producto
 
     private static bool $stockTableChecked = false;
 
+    public static function ensureStockTableReady(): void
+    {
+        $db = Database::getInstance()->getConnection();
+        self::ensureStockTable($db);
+    }
+
     private static function ensureStockTable(\PDO $db): void
     {
         if (self::$stockTableChecked) return;

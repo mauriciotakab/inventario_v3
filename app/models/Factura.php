@@ -141,6 +141,7 @@ class Factura
     public static function create(array $data, array $items): int
     {
         self::ensureTables();
+        Producto::ensureStockTableReady();
         $db = Database::getInstance()->getConnection();
         $db->beginTransaction();
 
@@ -223,7 +224,9 @@ class Factura
                 $stmtOrden->execute([(int) $data['orden_id']]);
             }
 
-            $db->commit();
+            if ($db->inTransaction()) {
+                $db->commit();
+            }
         } catch (\Throwable $e) {
             if ($db->inTransaction()) {
                 $db->rollBack();
