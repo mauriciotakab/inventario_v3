@@ -21,7 +21,7 @@ $nombre = $_SESSION['nombre'] ?? '';
             <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
             <div>
                 <div class="sidebar-title">TAKAB</div>
-                <div class="sidebar-desc">Panel de control</div>
+                <div class="sidebar-desc">Dashboard</div>
             </div>
         </div>
         <nav class="sidebar-nav">

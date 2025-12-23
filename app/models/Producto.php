@@ -189,7 +189,31 @@ class Producto
                               LEFT JOIN estados_producto_activo epa ON p.activo_id = epa.id
                               WHERE p.id = ?");
         $stmt->execute([$id]);
-        return $stmt->fetch();
+        $row = $stmt->fetch();
+        if ($row && (empty($row['last_request_date']) || empty($row['last_requested_by_user_id']))) {
+            $fallback = self::ultimaSolicitudPorProducto($db, (int) $id);
+            if ($fallback) {
+                $row['last_requested_by_user_id'] = $fallback['usuario_id'] ?? $row['last_requested_by_user_id'];
+                $row['last_request_date'] = $fallback['fecha_solicitud'] ?? $row['last_request_date'];
+                $row['last_user'] = $fallback['nombre_completo'] ?? $row['last_user'];
+            }
+        }
+        return $row;
+    }
+
+    private static function ultimaSolicitudPorProducto(\PDO $db, int $productoId): ?array
+    {
+        $sql = "SELECT s.usuario_id, s.fecha_solicitud, u.nombre_completo
+                FROM detalle_solicitud d
+                INNER JOIN solicitudes_material s ON s.id = d.solicitud_id
+                LEFT JOIN usuarios u ON s.usuario_id = u.id
+                WHERE d.producto_id = ?
+                ORDER BY s.fecha_solicitud DESC
+                LIMIT 1";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$productoId]);
+        $row = $stmt->fetch();
+        return $row ?: null;
     }
 
     public static function findByCodigo($codigo)

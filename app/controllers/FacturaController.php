@@ -3,6 +3,7 @@ require_once __DIR__ . '/../helpers/Session.php';
 require_once __DIR__ . '/../helpers/Database.php';
 require_once __DIR__ . '/../helpers/ActivityLogger.php';
 require_once __DIR__ . '/../models/Factura.php';
+require_once __DIR__ . '/../models/OrdenCompra.php';
 
 class FacturaController
 {
@@ -69,6 +70,10 @@ class FacturaController
         $ordenSeleccionada = null;
         if (!empty($facturaData['orden_id'])) {
             $facturaData = $this->hydrateOrdenDefaults($facturaData, $ordenSeleccionada);
+            $ordenItems = $this->fetchOrdenItems((int) $facturaData['orden_id']);
+            if (!empty($ordenItems) && $this->itemsEmpty($facturaData['items'])) {
+                $facturaData['items'] = $ordenItems;
+            }
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -89,6 +94,12 @@ class FacturaController
                 }
 
                 $facturaData = $this->hydrateOrdenDefaults($facturaData, $ordenSeleccionada);
+                if (!empty($facturaData['orden_id'])) {
+                    $ordenItems = $this->fetchOrdenItems((int) $facturaData['orden_id']);
+                    if (!empty($ordenItems) && $this->itemsEmpty($facturaData['items'])) {
+                        $facturaData['items'] = $ordenItems;
+                    }
+                }
 
                 if (!empty($facturaData['orden_id']) && ! $ordenSeleccionada) {
                     $errors[] = 'La orden seleccionada no existe.';
@@ -199,6 +210,9 @@ class FacturaController
         if (empty($facturaData['proveedor_id'])) {
             $facturaData['proveedor_id'] = (int) $ordenSeleccionada['proveedor_id'];
         }
+        if (empty($facturaData['numero_factura']) && !empty($ordenSeleccionada['numero_factura'])) {
+            $facturaData['numero_factura'] = (string) $ordenSeleccionada['numero_factura'];
+        }
         if (empty($facturaData['almacen_id']) && !empty($ordenSeleccionada['almacen_destino_id'])) {
             $facturaData['almacen_id'] = (int) $ordenSeleccionada['almacen_destino_id'];
         }
@@ -225,5 +239,42 @@ class FacturaController
         $stmt->execute([$ordenId]);
         $row = $stmt->fetch();
         return $row ?: null;
+    }
+
+    private function fetchOrdenItems(int $ordenId): array
+    {
+        if ($ordenId <= 0) {
+            return [];
+        }
+        $detalles = OrdenCompra::detalles($ordenId);
+        $items = [];
+        foreach ($detalles as $detalle) {
+            $productoId = (int) ($detalle['producto_id'] ?? 0);
+            $cantidad = (float) ($detalle['cantidad'] ?? 0);
+            $costo = (float) ($detalle['precio_unitario'] ?? 0);
+            if ($productoId <= 0 || $cantidad <= 0) {
+                continue;
+            }
+            $items[] = [
+                'producto_id'    => $productoId,
+                'cantidad'       => $cantidad,
+                'costo_unitario' => $costo,
+                'impuesto'       => 0,
+            ];
+        }
+        return $items;
+    }
+
+    private function itemsEmpty(array $items): bool
+    {
+        foreach ($items as $item) {
+            $pid = (int) ($item['producto_id'] ?? 0);
+            $cantidad = (float) ($item['cantidad'] ?? 0);
+            $costo = (float) ($item['costo_unitario'] ?? 0);
+            if ($pid > 0 || $cantidad > 0 || $costo > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }

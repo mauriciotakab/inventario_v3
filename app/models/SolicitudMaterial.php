@@ -20,6 +20,7 @@ class SolicitudMaterial {
     ]);
     $solicitud_id = $db->lastInsertId();
 
+    $updateProducto = $db->prepare("UPDATE productos SET last_requested_by_user_id = ?, last_request_date = NOW() WHERE id = ?");
     foreach ($detalles as $detalle) {
         $sql_det = "INSERT INTO detalle_solicitud (solicitud_id, producto_id, cantidad, observacion) VALUES (?, ?, ?, ?)";
         $stmt_det = $db->prepare($sql_det);
@@ -29,6 +30,12 @@ class SolicitudMaterial {
             $detalle['cantidad'],
             isset($detalle['observacion']) ? $detalle['observacion'] : null
         ]);
+        if (!empty($detalle['producto_id'])) {
+            $updateProducto->execute([
+                $data['usuario_id'],
+                $detalle['producto_id'],
+            ]);
+        }
     }
     $db->commit();
     return $solicitud_id;

@@ -10,8 +10,8 @@ $nombre = $_SESSION['nombre'] ?? '';
 $producto = is_array($producto ?? null) ? $producto : [];
 
 // Valores derivados y tipados
-$stockActual = (int) ($producto['stock_actual'] ?? 0);
-$stockMinimo = (int) ($producto['stock_minimo'] ?? 0);
+$stockActual = (float) ($producto['stock_actual'] ?? 0);
+$stockMinimo = (float) ($producto['stock_minimo'] ?? 0);
 $valorInventario = (float) ($producto['costo_compra'] ?? 0) * $stockActual;
 $estadoActivo = $producto['estado_activo'] ?? 'Activo';
 $unidad = $producto['unidad_abreviacion'] ?? $producto['unidad_medida_nombre'] ?? '';
@@ -25,6 +25,14 @@ $breadcrumbs = [
 function safe_css_class($s) {
 	$s = strtolower((string) $s);
 	return preg_replace('/[^a-z0-9_-]/', '', $s);
+}
+
+function format_stock($value) {
+	$num = (float) $value;
+	if (abs($num - round($num)) < 0.00001) {
+		return number_format($num, 0, '.', ',');
+	}
+	return number_format($num, 2, '.', ',');
 }
 ?>
 <!DOCTYPE html>
@@ -79,8 +87,8 @@ function safe_css_class($s) {
 					<div class="hero-stats">
 						<div class="hero-stat">
 							<span class="label">Stock actual</span>
-							<span class="value"><?= number_format($stockActual) ?> <?= htmlspecialchars($unidad) ?></span>
-							<span class="stat-foot">Mínimo: <?= number_format($stockMinimo) ?></span>
+							<span class="value"><?= format_stock($stockActual) ?> <?= htmlspecialchars($unidad) ?></span>
+							<span class="stat-foot">Mínimo: <?= format_stock($stockMinimo) ?></span>
 						</div>
 						<div class="hero-stat">
 							<span class="label">Costo unitario</span>

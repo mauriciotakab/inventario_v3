@@ -239,10 +239,12 @@ $previewTotal = $previewSubtotal + $previewImpuestos;
     const ordenSelect = document.getElementById('orden_id');
     const proveedorSelect = document.getElementById('proveedor_id');
     const almacenSelect = document.getElementById('almacen_id');
+    const numeroFacturaInput = document.getElementById('numero_factura');
     const tableBody = document.querySelector('#itemsTable tbody');
     const template = document.getElementById('itemTemplate');
     const btnAdd = document.getElementById('btnAddItem');
     const totalsBox = document.getElementById('totalesPreview');
+    let lastOrdenId = ordenSelect ? ordenSelect.value : '';
 
     function applyOrdenDefaults(){
         const option = ordenSelect.options[ordenSelect.selectedIndex];
@@ -254,7 +256,49 @@ $previewTotal = $previewSubtotal + $previewImpuestos;
         if (almacen && almacenSelect && almacen !== '0')
             almacenSelect.value = almacen;
     }
-    ordenSelect.addEventListener('change', applyOrdenDefaults);
+    function buildRedirectUrl(ordenId){
+        const params = new URLSearchParams();
+        if (ordenId) {
+            params.set('orden_id', ordenId);
+        }
+        const numero = numeroFacturaInput ? numeroFacturaInput.value.trim() : '';
+        if (numero) {
+            params.set('numero', numero);
+        }
+        return 'facturas_create.php' + (params.toString() ? ('?' + params.toString()) : '');
+    }
+
+    function hasItemData(){
+        return Array.from(tableBody.querySelectorAll('tr')).some(row => {
+            const prod = row.querySelector('select[name="item_producto_id[]"]')?.value || '';
+            const qty = row.querySelector('input[name="item_cantidad[]"]')?.value || '';
+            const cost = row.querySelector('input[name="item_costo[]"]')?.value || '';
+            return prod !== '' || qty !== '' || cost !== '';
+        });
+    }
+
+    function handleOrdenChange(){
+        const selected = ordenSelect.value;
+        if (selected === lastOrdenId) {
+            return;
+        }
+        const shouldReload = hasItemData();
+        if (shouldReload) {
+            const ok = confirm('Al cambiar la orden se recargara la pagina y se reemplazaran los productos actuales. ¿Deseas continuar?');
+            if (!ok) {
+                ordenSelect.value = lastOrdenId;
+                return;
+            }
+        }
+        window.location.href = buildRedirectUrl(selected);
+    }
+
+    if (ordenSelect) {
+        ordenSelect.addEventListener('change', () => {
+            applyOrdenDefaults();
+            handleOrdenChange();
+        });
+    }
 
     function recalc(){
         let subtotal = 0;

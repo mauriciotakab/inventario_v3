@@ -17,6 +17,13 @@ if ($errorCode === 'relaciones') {
     $mensajeError = 'El formulario expiró, intenta nuevamente.';
 }
 $importResultado = $importAlert ?? null;
+function format_stock($value) {
+    $num = (float) $value;
+    if (abs($num - round($num)) < 0.00001) {
+        return number_format($num, 0, '.', ',');
+    }
+    return number_format($num, 2, '.', ',');
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -40,6 +47,7 @@ $importResultado = $importAlert ?? null;
     </style>
 </head>
 <body>
+    
 <div class="main-layout">
     <?php include __DIR__ . '/../partials/sidebar.php'; ?>
 
@@ -273,6 +281,7 @@ $importResultado = $importAlert ?? null;
                             <thead>
                             <tr>
                                 <th>Código</th>
+                                <th>Codigo de barras</th>
                                 <th>Producto</th>
                                 <th>Tipo</th>
                                 <th>Categoría</th>
@@ -288,8 +297,8 @@ $importResultado = $importAlert ?? null;
                             <tbody>
                             <?php foreach ($productos as $producto): ?>
                                 <?php
-                                $stockActual = (int) ($producto['stock_actual'] ?? 0);
-                                $stockMinimo = (int) ($producto['stock_minimo'] ?? 0);
+                                $stockActual = (float) ($producto['stock_actual'] ?? 0);
+                                $stockMinimo = (float) ($producto['stock_minimo'] ?? 0);
                                 $valorInventario = (float) ($producto['costo_compra'] ?? 0) * $stockActual;
                                 $badgeStock = 'ok';
                                 if ($stockActual <= 0) {
@@ -311,9 +320,9 @@ $importResultado = $importAlert ?? null;
                                     <td><?= htmlspecialchars($producto['categoria'] ?? 'Sin categoría') ?></td>
                                     <td class="col-stock">
                                         <span class="badge badge-stock <?= $badgeStock ?>">
-                                            <?= number_format($stockActual) ?> <?= htmlspecialchars($producto['unidad_abreviacion'] ?? '') ?>
+                                            <?= format_stock($stockActual) ?> <?= htmlspecialchars($producto['unidad_abreviacion'] ?? '') ?>
                                         </span>
-                                        <small>Mín: <?= number_format($stockMinimo) ?></small>
+                                        <small>Mín: <?= format_stock($stockMinimo) ?></small>
                                     </td>
                                     <td><?= htmlspecialchars($producto['estado'] ?? '-') ?></td>
                                     <td>
