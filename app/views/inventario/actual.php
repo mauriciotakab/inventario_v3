@@ -96,7 +96,7 @@ $buildQuery = function(array $overrides = []) {
                     <div class="inventario-stat-card success">
                         <span class="stat-label">Valor estimado</span>
                         <span class="stat-value">$<?= number_format((float) ($stats['valor_total'] ?? 0), 2) ?></span>
-                        <span class="stat-foot">Costo acumulado de inventario</span>
+                        <span class="stat-foot">Costo acumulado de inventario con I.V.A.</span>
                     </div>
                 <?php endif; ?>
             </section>
@@ -323,4 +323,3 @@ $buildQuery = function(array $overrides = []) {
 <?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>
-

@@ -77,9 +77,9 @@ $buildQuery = function(array $overrides = []) {
                 </div>
                 <?php if ($mostrarCostos): ?>
                     <div class="reportes-summary-card success">
-                        <span class="label">Valor estimado del inventario</span>
+                        <span class="label">Valor estimado del inventario con I.V.A.</span>
                         <span class="value">$<?= number_format($inventarioResumen['valor_total'], 2) ?></span>
-                        <span class="foot">Considera stock actual * costo compra</span>
+                        <span class="foot">Considera stock actual * costo compra con I.V.A.</span>
                     </div>
                 <?php endif; ?>
             </section>
@@ -683,4 +683,3 @@ $buildQuery = function(array $overrides = []) {
 <?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>
-

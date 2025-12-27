@@ -131,7 +131,7 @@ function format_stock($value) {
                 <div class="productos-stat-card success">
                     <span class="stat-label">Valor inventario</span>
                     <span class="stat-value">$<?= number_format($stats['valor_total'], 2) ?></span>
-                    <span class="stat-foot">Costo estimado total</span>
+                    <span class="stat-foot">Costo estimado total con I.V.A.</span>
                 </div>
             </section>
 

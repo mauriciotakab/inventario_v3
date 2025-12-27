@@ -84,6 +84,7 @@ class ProveedorController
     {
         $nombre      = trim($payload['nombre'] ?? '');
         $contacto    = trim($payload['contacto'] ?? '');
+        $rfc         = strtoupper(trim($payload['rfc'] ?? ''));
         $telefono    = trim($payload['telefono'] ?? '');
         $email       = trim($payload['email'] ?? '');
         $direccion   = trim($payload['direccion'] ?? '');
@@ -105,6 +106,7 @@ class ProveedorController
         return [
             'nombre'           => $nombre,
             'contacto'         => $contacto,
+            'rfc'              => $rfc,
             'telefono'         => $telefono,
             'email'            => $email,
             'direccion'        => $direccion,
@@ -117,6 +119,7 @@ class ProveedorController
         return [
             'nombre'           => '',
             'contacto'         => '',
+            'rfc'              => '',
             'telefono'         => '',
             'email'            => '',
             'direccion'        => '',

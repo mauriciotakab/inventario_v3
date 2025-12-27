@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin(['Administrador', 'Almacen']);
 ?>
@@ -27,17 +27,18 @@ Session::requireLogin(['Administrador', 'Almacen']);
                     </ul>
                 </div>
             <?php endif; ?>
-            <form method="post" class="form-takab">
+                        <form method="post" class="form-takab">
                 <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
                 <div class="form-row">
                     <label>Nombre:<input type="text" name="nombre" value="<?= htmlspecialchars($proveedor['nombre'] ?? '') ?>" required></label>
                     <label>Contacto:<input type="text" name="contacto" value="<?= htmlspecialchars($proveedor['contacto'] ?? '') ?>" required></label>
                 </div>
                 <div class="form-row">
-                    <label>Teléfono:<input type="text" name="telefono" value="<?= htmlspecialchars($proveedor['telefono'] ?? '') ?>"></label>
-                    <label>Email:<input type="email" name="email" value="<?= htmlspecialchars($proveedor['email'] ?? '') ?>"></label>
+                    <label>RFC:<input type="text" name="rfc" value="<?= htmlspecialchars($proveedor['rfc'] ?? '') ?>"></label>
+                    <label>Telefono:<input type="text" name="telefono" value="<?= htmlspecialchars($proveedor['telefono'] ?? '') ?>"></label>
                 </div>
-                <label>Dirección:<input type="text" name="direccion" value="<?= htmlspecialchars($proveedor['direccion'] ?? '') ?>"></label>
+                <label>Email:<input type="email" name="email" value="<?= htmlspecialchars($proveedor['email'] ?? '') ?>"></label>
+                <label>Direccion:<input type="text" name="direccion" value="<?= htmlspecialchars($proveedor['direccion'] ?? '') ?>"></label>
                 <label>Condiciones de pago:<input type="text" name="condiciones_pago" value="<?= htmlspecialchars($proveedor['condiciones_pago'] ?? '') ?>"></label>
                 <div class="form-actions">
                     <button type="submit" class="btn-principal">Guardar</button>
@@ -50,3 +51,4 @@ Session::requireLogin(['Administrador', 'Almacen']);
 <?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>
+

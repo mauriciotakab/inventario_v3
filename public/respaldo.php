@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'proveedores'      => $db->query('SELECT * FROM proveedores ORDER BY nombre ASC')->fetchAll() ?: [],
             'unidades_medida'  => $db->query('SELECT * FROM unidades_medida ORDER BY nombre ASC')->fetchAll() ?: [],
             'almacenes'        => $db->query('SELECT * FROM almacenes ORDER BY nombre ASC')->fetchAll() ?: [],
+            'productos'        => $db->query('SELECT * FROM productos ORDER BY nombre ASC')->fetchAll() ?: [],
             'usuarios_activos' => $db->query('SELECT id, nombre_completo, username, role FROM usuarios WHERE activo = 1 ORDER BY nombre_completo ASC')->fetchAll() ?: [],
         ];
 
@@ -59,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <span class="config-icon gradient-gray"><i class="fa-solid fa-database"></i></span>
                             Respaldos de configuración
                         </div>
-                        <p class="config-section-desc">Descarga un archivo JSON con catálogos clave (categorías, almacenes, unidades, proveedores y usuarios activos).</p>
+                        <p class="config-section-desc">Descarga un archivo JSON con catalogos clave (categorias, almacenes, unidades, proveedores, productos y usuarios activos).</p>
                     </div>
                 </div>
                 <div class="config-section-actions" style="margin-bottom:18px;">
@@ -73,9 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p style="margin-bottom:18px;color:#5f6b8a;">Puedes conservar este archivo para restaurar la configuración base del sistema en una instalación nueva.</p>
 
                 <ul style="margin:0 0 20px 18px;color:#2d3257;">
-                    <li>Categorías, proveedores y unidades de medida.</li>
+                    <li>Categorias, proveedores y unidades de medida.</li>
                     <li>Almacenes registrados con su responsable.</li>
-                    <li>Usuarios activos (sin contraseñas).</li>
+                    <li>Productos con su informacion de inventario.</li>
+                    <li>Usuarios activos (sin contrasenas).</li>
                 </ul>
 
                 <form method="post">
@@ -90,3 +92,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include __DIR__ . '/../app/views/partials/scripts.php'; ?>
 </body>
 </html>
+
