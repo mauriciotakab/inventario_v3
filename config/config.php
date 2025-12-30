@@ -22,3 +22,4 @@ define('APP_LANG', 'es_MX');
 date_default_timezone_set('America/Mexico_City'); // esto es solo para PHP
 
 
+

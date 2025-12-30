@@ -105,6 +105,9 @@ $breadcrumbs = [['label' => 'Entrega de solicitud']];
                 <input type="date" name="fecha_estimada_devolucion" class="entregar-input">
             </label>
             <div class="entregar-actions">
+                <a href="solicitud_entregar.php?id=<?= (int) ($solicitud['id'] ?? 0) ?>&formato=salida" class="btn-volver" target="_blank" rel="noopener noreferrer">
+                    <i class="fa fa-file-arrow-down"></i> Descargar formato
+                </a>
                 <button type="submit" class="btn-entregar" data-confirm-click="¿Confirmas que la solicitud ha sido entregada? Esta acción actualizará el estado a 'Entregada'.">
                     <i class="fa fa-box"></i> Marcar como Entregada
                 </button>

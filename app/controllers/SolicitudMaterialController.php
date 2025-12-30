@@ -3,6 +3,7 @@
     require_once __DIR__ . '/../models/Producto.php';
     require_once __DIR__ . '/../helpers/Session.php';
     require_once __DIR__ . '/../models/Prestamo.php';
+    require_once __DIR__ . '/../helpers/Database.php';
 
     class SolicitudMaterialController
     {
@@ -176,6 +177,54 @@
                 return;
             }
 
+            $productosCache = [];
+            $obtenerProducto = function ($productoId) use (&$productosCache) {
+                $productoId = (int) $productoId;
+                if ($productoId <= 0) {
+                    return null;
+                }
+                if (!array_key_exists($productoId, $productosCache)) {
+                    $productosCache[$productoId] = Producto::find($productoId);
+                }
+                return $productosCache[$productoId];
+            };
+
+            $usuarioNombre = null;
+            if (!empty($solicitud['usuario_id'])) {
+                $db = Database::getInstance()->getConnection();
+                $stmtUsuario = $db->prepare("SELECT nombre_completo FROM usuarios WHERE id = ?");
+                $stmtUsuario->execute([(int) $solicitud['usuario_id']]);
+                $usuarioNombre = $stmtUsuario->fetchColumn() ?: null;
+            }
+
+            $consumibles = [];
+            $herramientas = [];
+            foreach ($detalles as $detalle) {
+                $producto = $obtenerProducto($detalle['producto_id'] ?? 0);
+                if (! $producto) {
+                    continue;
+                }
+                $unidad = $producto['unidad_abreviacion'] ?? $producto['unidad_medida_nombre'] ?? '';
+                $item = [
+                    'cantidad'      => (float) ($detalle['cantidad'] ?? 0),
+                    'unidad'        => $unidad,
+                    'descripcion'   => $producto['nombre'] ?? ($detalle['producto'] ?? ''),
+                    'marca'         => $producto['marca'] ?? '',
+                    'especificacion'=> $producto['especificaciones_tecnicas'] ?? '',
+                ];
+                if (($producto['tipo'] ?? '') === 'Consumible') {
+                    $consumibles[] = $item;
+                } else {
+                    $herramientas[] = $item;
+                }
+            }
+
+            if (!empty($_GET['formato']) && $_GET['formato'] === 'salida') {
+                $formatoFecha = date('d/m/Y');
+                include __DIR__ . '/../views/solicitudes/salida_almacen.php';
+                return;
+            }
+
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
                     $msg = 'Token CSRF invalido.';
@@ -185,18 +234,6 @@
 
                 $observacion = trim($_POST['observacion'] ?? '');
                 $fechaEstim  = trim($_POST['fecha_estimada_devolucion'] ?? '');
-
-                $productosCache = [];
-                $obtenerProducto = function ($productoId) use (&$productosCache) {
-                    $productoId = (int) $productoId;
-                    if ($productoId <= 0) {
-                        return null;
-                    }
-                    if (!array_key_exists($productoId, $productosCache)) {
-                        $productosCache[$productoId] = Producto::find($productoId);
-                    }
-                    return $productosCache[$productoId];
-                };
 
                 $tieneHerramienta = false;
                 foreach ($detalles as $d) {
