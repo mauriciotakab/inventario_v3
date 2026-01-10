@@ -29,7 +29,6 @@ class Session {
             'role' => $_SESSION['role'] ?? null,
         ];
     }
-
     public static function requireLogin($roles = null) {
         self::start();
         if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }

@@ -100,7 +100,7 @@ class Navigation
             'label' => 'Solicitar material (servicio)',
             'icon'  => 'fa-solid fa-plus-square',
             'href'  => 'solicitudes_crear.php',
-            'roles' => ['Empleado'],
+            'roles' => ['Empleado', 'Almacen'],
         ],
         'solicitar_general'   => [
             'label' => 'Solicitud general',
@@ -112,7 +112,7 @@ class Navigation
             'label' => 'Mis solicitudes',
             'icon'  => 'fa-solid fa-clipboard-list',
             'href'  => 'mis_solicitudes.php',
-            'roles' => ['Empleado'],
+            'roles' => ['Empleado', 'Almacen'],
         ],
     ];
 
@@ -143,6 +143,8 @@ class Navigation
             'prestamos',
             'compras_proveedor',
             'reportes_rotacion',
+            'solicitudes_crear',
+            'mis_solicitudes',
             'solicitudes_revisar',
             'reportes',
             'configuracion',

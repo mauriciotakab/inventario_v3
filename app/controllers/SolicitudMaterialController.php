@@ -22,7 +22,7 @@
         // Logica compartida
         private function crearSolicitud($isGeneral = false)
         {
-            Session::requireLogin('Empleado');
+            Session::requireLogin(['Empleado', 'Almacen']);
             $productos_consumibles  = $isGeneral ? [] : Producto::all(['tipo' => 'Consumible']);
             $productos_herramientas = $isGeneral ? [] : Producto::all(['tipo' => 'Herramienta']);
             $msg                    = '';
@@ -117,14 +117,14 @@
 
         public function historial()
         {
-            Session::requireLogin('Empleado');
+            Session::requireLogin(['Empleado', 'Almacen']);
             $solicitudes = SolicitudMaterial::historialPorUsuario($_SESSION['user_id']);
             include __DIR__ . '/../views/solicitudes/historial.php';
         }
 
         public function detalle($id)
         {
-            Session::requireLogin('Empleado');
+            Session::requireLogin(['Empleado', 'Almacen']);
             $solicitud = SolicitudMaterial::find($id, $_SESSION['user_id']);
             $detalles  = $solicitud ? SolicitudMaterial::detalles($id) : [];
             include __DIR__ . '/../views/solicitudes/detalle.php';
