@@ -5,22 +5,25 @@ session_start();
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Error 404 - Página no encontrada | TAKAB</title>
+    <title>INICIO TAKAB</title>
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/config.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body, html {
-            background: #f5f7fa;
+            
+            background-color: #f5f7fa;
         }
         .content-area {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+             
+            background-image: url('../public/assets/images/edificios10.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
-
-
-
         
         .top-header {
             background: #14295e;
@@ -80,11 +83,75 @@ session_start();
             text-decoration: none;
             transition: background 0.17s;
         }
+        .error-icon {
+            font-size: 6rem;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
         .error-btn:hover { background: #1741a6; }
         @media (max-width:600px){
             .top-header{padding:12px 10px;}
             .error-title{font-size:1.5rem;}
             .error-icon{font-size:3rem;}
+        }
+        .inicio-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: rgba(255, 255, 255, 0);
+            padding: 45px 70px;
+            border-radius: 14px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+            backdrop-filter: blur(8px);
+            }
+        .inicio-icon {
+            font-size: 6rem;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .inicio-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #223264;
+        }
+        .inicio-desc {
+            font-size: 1.3rem;
+            color: #364e96;
+            margin-bottom: 32px;
+        }
+        .inicio-btn {
+            display: inline-block;
+            background: #2563eb;
+            color: #fff;
+            padding: 13px 32px;
+            border-radius: 9px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.17s;
+        }
+        .inicio-icon {
+            font-size: 6rem;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .inicio-btn:hover { background: #1741a6; }
+        @media (max-width:600px){
+            .top-header{padding:12px 10px;}
+            .error-title{font-size:1.5rem;}
+            .error-icon{font-size:3rem;}
+        }
+       .login-container {
+        background: #ffffff7c;
+        border-radius: 20px;
+        box-shadow: 0 6px 30px 0 rgba(16,24,40,0.30);
+        padding: 40px 40px 20px 40px;
+        width: 370px;
+        text-align: center;
         }
     </style>
 </head>
@@ -92,7 +159,7 @@ session_start();
     <div class="content-area">
         
         <!-- Topbar -->
-        <header class="top-header">
+        <!--<header class="top-header">
             
             <div class="top-header-user">
                 
@@ -102,24 +169,37 @@ session_start();
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </a>
             </div>
-        </header>
-        <main class="error-main">
+        </header>-->
+
+         <!--<main class="error-main">
             
-            <div class="error-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            
+           <div class="error-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
             <div class="error-title">404 | Página no encontrada</div>
             <div class="error-desc">
                 Lo sentimos, la página que buscas no existe o ha sido movida.<br>
                 Si crees que es un error, contacta al administrador.
-            </div>
-            <a href="dashboard.php" class="error-btn"><i class="fa fa-home"></i> Ir al inicio</a>
+            </div> 
+            <a href="dashboard.php" class="error-btn"><i class="fa fa-home"></i> Ir al inicio</a> -->
 
+         <main class="inicio-main">
+            
+            
+            <div class="login-container" >
+            <div class="inicio-title">Bienvenido a TAKAB</div>
+            <div class="inicio-desc"> Inicia sesión para continuar.</div> 
+            <a href="dashboard.php" class="inicio-btn"><i class="fa fa-home"></i> Iniciar sesión</a> 
+         
+
+            
             <footer>
 
                 <div>
-                    <img src="/assets/images/LogoTakab2.webp" alt="logo Takab">
+                    <br>
+                    <img src="../public/assets/images/LogoTakab2.webp" alt="logo Takab">
                     
                 </div>
-            </footer>
+            </footer>        
         </main>
 
         
