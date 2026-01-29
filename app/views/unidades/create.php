@@ -1,5 +1,5 @@
 ﻿<?php
-Session::requireLogin(['Administrador']);
+Session::requireLogin(['Administrador', 'Almacen']);
 
 $role = $_SESSION['role'];
 $nombre = $_SESSION['nombre'];

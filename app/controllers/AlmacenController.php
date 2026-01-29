@@ -7,14 +7,14 @@ class AlmacenController
 {
     public function index(): void
     {
-        Session::requireLogin(['Administrador']);
+        Session::requireLogin(['Administrador', 'Almacen']);
         $almacenes = Almacen::all();
         include __DIR__ . '/../views/almacenes/index.php';
     }
 
     public function create(): void
     {
-        Session::requireLogin(['Administrador']);
+        Session::requireLogin(['Administrador', 'Almacen']);
         $usuarios = Usuario::all();
         $error    = '';
 
@@ -33,7 +33,7 @@ class AlmacenController
 
     public function edit($id): void
     {
-        Session::requireLogin(['Administrador']);
+        Session::requireLogin(['Administrador', 'Almacen']);
         $almacen  = Almacen::find($id);
         $usuarios = Usuario::all();
         $error    = '';
@@ -57,7 +57,7 @@ class AlmacenController
 
     public function delete($id): void
     {
-        Session::requireLogin(['Administrador']);
+        Session::requireLogin(['Administrador', 'Almacen']);
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || ! Session::checkCsrf($_POST['csrf'] ?? '')) {
             header('Location: almacenes.php?error=csrf');
             exit();

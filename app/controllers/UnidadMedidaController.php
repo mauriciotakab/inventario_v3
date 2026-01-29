@@ -6,14 +6,14 @@ class UnidadMedidaController
 {
     public function index(): void
     {
-        Session::requireLogin(['Administrador']);
+        Session::requireLogin(['Administrador', 'Almacen']);
         $unidades = UnidadMedida::all();
         include __DIR__ . '/../views/unidades/index.php';
     }
 
     public function create(): void
     {
-        Session::requireLogin(['Administrador']);
+        Session::requireLogin(['Administrador', 'Almacen']);
         $error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -36,7 +36,7 @@ class UnidadMedidaController
 
     public function edit($id): void
     {
-        Session::requireLogin(['Administrador']);
+        Session::requireLogin(['Administrador', 'Almacen']);
         $unidad = UnidadMedida::find($id);
         $error  = '';
 
@@ -64,7 +64,7 @@ class UnidadMedidaController
 
     public function delete($id): void
     {
-        Session::requireLogin(['Administrador']);
+        Session::requireLogin(['Administrador', 'Almacen']);
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || ! Session::checkCsrf($_POST['csrf'] ?? '')) {
             header('Location: unidades.php?error=csrf');
             exit();

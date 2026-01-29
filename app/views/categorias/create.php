@@ -1,6 +1,7 @@
 ﻿<?php
 Session::requireLogin([
-    'Administrador'
+    'Administrador',
+    'Almacen'
 ]);
 
 $role = $_SESSION['role'];

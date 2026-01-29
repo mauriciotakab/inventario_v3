@@ -6,14 +6,14 @@ class CategoriaController
 {
     public function index(): void
     {
-        Session::requireLogin(['Administrador']);
+        Session::requireLogin(['Administrador', 'Almacen']);
         $categorias = Categoria::all();
         include __DIR__ . '/../views/categorias/index.php';
     }
 
     public function create(): void
     {
-        Session::requireLogin(['Administrador']);
+        Session::requireLogin(['Administrador', 'Almacen']);
         $error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -33,7 +33,7 @@ class CategoriaController
 
     public function edit($id): void
     {
-        Session::requireLogin(['Administrador']);
+        Session::requireLogin(['Administrador', 'Almacen']);
         $categoria = Categoria::find($id);
         $error     = '';
 
@@ -58,7 +58,7 @@ class CategoriaController
 
     public function delete($id): void
     {
-        Session::requireLogin(['Administrador']);
+        Session::requireLogin(['Administrador', 'Almacen']);
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || ! Session::checkCsrf($_POST['csrf'] ?? '')) {
             header('Location: categorias.php?error=csrf');
             exit();
