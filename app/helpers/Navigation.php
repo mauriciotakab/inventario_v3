@@ -417,6 +417,15 @@ class Navigation
             return 'Empleado';
         }
 
+        $roleMap = [
+            'Almacén' => 'Almacen',
+            'almacén' => 'Almacen',
+            'almacen' => 'Almacen',
+        ];
+        if (isset($roleMap[$role])) {
+            $role = $roleMap[$role];
+        }
+
         $valid = array_keys(self::ROLE_ORDER);
         return in_array($role, $valid, true) ? $role : 'Empleado';
     }
