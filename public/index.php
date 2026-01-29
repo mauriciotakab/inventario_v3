@@ -19,7 +19,7 @@ session_start();
             display: flex;
             flex-direction: column;
              
-            background-image: url('../public/assets/images/edificios10.jpeg');
+            background-image: url('assets/images/edificios10.jpeg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -196,7 +196,7 @@ session_start();
 
                 <div>
                     <br>
-                    <img src="../public/assets/images/LogoTakab2.webp" alt="logo Takab">
+                    <img src="assets/images/LogoTakab2.webp" alt="logo Takab">
                     
                 </div>
             </footer>        

@@ -8,6 +8,13 @@ $selectedProducto = $_POST['producto_id'] ?? '';
 $selectedAlmacen = $_POST['almacen_id'] ?? '';
 $cantidadSolicitada = $_POST['cantidad'] ?? '';
 $observaciones = $_POST['observaciones'] ?? '';
+$categoriasFiltro = [];
+foreach ($productos as $producto) {
+    if (!empty($producto['categoria'])) {
+        $categoriasFiltro[$producto['categoria']] = true;
+    }
+}
+ksort($categoriasFiltro);
 $breadcrumbs = [
     ['label' => 'Registrar salida'],
 ];
@@ -46,6 +53,37 @@ $breadcrumbs = [
                 <section class="inventario-form-card">
                     <h2><i class="fa fa-clipboard"></i> Detalles de la salida</h2>
                     <form method="post" enctype="application/x-www-form-urlencoded"><input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>" autocomplete="off" class="inventario-entry-form">
+                        <div class="form-field" style="margin-bottom:14px;">
+                            <label>Buscador avanzado</label>
+                            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">
+                                <input type="text" id="filtro_texto" placeholder="Buscar por nombre, codigo o barras">
+                                <select id="filtro_tipo">
+                                    <option value="">Tipo (todos)</option>
+                                    <option value="Consumible">Consumible</option>
+                                    <option value="Herramienta">Herramienta</option>
+                                    <option value="Equipo">Equipo</option>
+                                </select>
+                                <select id="filtro_categoria">
+                                    <option value="">Categoria (todas)</option>
+                                    <?php foreach (array_keys($categoriasFiltro) as $categoriaNombre): ?>
+                                        <option value="<?= htmlspecialchars($categoriaNombre) ?>"><?= htmlspecialchars($categoriaNombre) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <select id="filtro_almacen">
+                                    <option value="">Almacen asignado (todos)</option>
+                                    <?php foreach ($almacenes as $almacen): ?>
+                                        <option value="<?= (int) $almacen['id'] ?>"><?= htmlspecialchars($almacen['nombre']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.95rem;">
+                                    <input type="checkbox" id="filtro_stock" style="width:auto; margin:0;"> Solo con stock
+                                </label>
+                            </div>
+                            <div style="margin-top:8px; font-size:0.9rem; color:#5c6a96;">
+                                Productos visibles: <span id="filtro_resultados">0</span>
+                            </div>
+                        </div>
+
                         <div class="form-field">
                             <label for="producto_id">Producto *</label>
                             <select id="producto_id" name="producto_id" required>
@@ -56,6 +94,10 @@ $breadcrumbs = [
                                             data-min="<?= (float) ($producto['stock_minimo'] ?? 0) ?>"
                                             data-unidad="<?= htmlspecialchars($producto['unidad_abreviacion'] ?? '') ?>"
                                             data-almacen="<?= (int) ($producto['almacen_id'] ?? 0) ?>"
+                                            data-tipo="<?= htmlspecialchars($producto['tipo'] ?? '') ?>"
+                                            data-categoria="<?= htmlspecialchars($producto['categoria'] ?? '') ?>"
+                                            data-codigo="<?= htmlspecialchars($producto['codigo'] ?? '') ?>"
+                                            data-barras="<?= htmlspecialchars($producto['codigo_barras'] ?? '') ?>"
                                             <?= $selectedProducto == $producto['id'] ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($producto['nombre']) ?> (<?= htmlspecialchars($producto['codigo']) ?>)
                                     </option>
@@ -173,11 +215,76 @@ const summaryStock = document.getElementById('summary-stock');
 const summaryMin = document.getElementById('summary-min');
 const summaryUnidad = document.getElementById('summary-unidad');
 const summaryAlmacen = document.getElementById('summary-almacen');
+const filtroTexto = document.getElementById('filtro_texto');
+const filtroTipo = document.getElementById('filtro_tipo');
+const filtroCategoria = document.getElementById('filtro_categoria');
+const filtroAlmacen = document.getElementById('filtro_almacen');
+const filtroStock = document.getElementById('filtro_stock');
+const filtroResultados = document.getElementById('filtro_resultados');
 const almacenesMap = new Map([
     <?php foreach ($almacenes as $almacen): ?>
     [<?= (int) $almacen['id'] ?>, "<?= addslashes($almacen['nombre']) ?>"],
     <?php endforeach; ?>
 ]);
+
+function aplicarFiltroProductos() {
+    const texto = (filtroTexto.value || '').trim().toLowerCase();
+    const tipo = filtroTipo.value;
+    const categoria = filtroCategoria.value;
+    const almacen = filtroAlmacen.value;
+    const soloStock = filtroStock.checked;
+    let visibles = 0;
+
+    for (let i = 0; i < productosSelect.options.length; i++) {
+        const option = productosSelect.options[i];
+        if (!option.value) {
+            option.hidden = false;
+            option.disabled = false;
+            continue;
+        }
+
+        const nombre = (option.textContent || '').toLowerCase();
+        const codigo = (option.dataset.codigo || '').toLowerCase();
+        const barras = (option.dataset.barras || '').toLowerCase();
+        const tipoOpt = option.dataset.tipo || '';
+        const categoriaOpt = option.dataset.categoria || '';
+        const almacenOpt = option.dataset.almacen || '';
+        const stockOpt = parseFloat(option.dataset.stock || '0');
+
+        let coincide = true;
+        if (texto) {
+            coincide = nombre.includes(texto) || codigo.includes(texto) || barras.includes(texto);
+        }
+        if (coincide && tipo) {
+            coincide = tipoOpt === tipo;
+        }
+        if (coincide && categoria) {
+            coincide = categoriaOpt === categoria;
+        }
+        if (coincide && almacen) {
+            coincide = almacenOpt === almacen;
+        }
+        if (coincide && soloStock) {
+            coincide = stockOpt > 0;
+        }
+
+        option.hidden = !coincide;
+        option.disabled = !coincide;
+        if (coincide) {
+            visibles += 1;
+        }
+    }
+
+    if (filtroResultados) {
+        filtroResultados.textContent = visibles.toString();
+    }
+
+    const selected = productosSelect.options[productosSelect.selectedIndex];
+    if (selected && selected.value && selected.hidden) {
+        productosSelect.value = '';
+        actualizarResumen();
+    }
+}
 
 function actualizarResumen() {
     const option = productosSelect.options[productosSelect.selectedIndex];
@@ -203,6 +310,13 @@ function actualizarResumen() {
 }
 
 productosSelect.addEventListener('change', actualizarResumen);
+filtroTexto.addEventListener('input', aplicarFiltroProductos);
+filtroTipo.addEventListener('change', aplicarFiltroProductos);
+filtroCategoria.addEventListener('change', aplicarFiltroProductos);
+filtroAlmacen.addEventListener('change', aplicarFiltroProductos);
+filtroStock.addEventListener('change', aplicarFiltroProductos);
+
+aplicarFiltroProductos();
 
 if (productosSelect.value) {
     actualizarResumen();
@@ -211,4 +325,3 @@ if (productosSelect.value) {
 <?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>
-
