@@ -42,7 +42,7 @@ class OrdenCompraController
 
     public function crear(): void
     {
-        Session::requireLogin(['Administrador', 'Compras']);
+        Session::requireLogin(['Administrador', 'Compras', 'Almacen']);
         $db = Database::getInstance()->getConnection();
 
         $proveedores = $db->query("SELECT id, nombre, rfc FROM proveedores ORDER BY nombre ASC")->fetchAll();
@@ -87,7 +87,7 @@ class OrdenCompraController
 
     public function editar(int $id): void
     {
-        Session::requireLogin(['Administrador', 'Compras']);
+        Session::requireLogin(['Administrador', 'Compras', 'Almacen']);
         $orden = OrdenCompra::find($id);
         if (! $orden) {
             header('Location: ordenes_compra.php?not_found=1');

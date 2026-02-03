@@ -139,6 +139,7 @@ class Navigation
             'productos',
             'ordenes',
             'facturas',
+            'ordenes_crear',
             'inventario',
             'prestamos',
             'compras_proveedor',
