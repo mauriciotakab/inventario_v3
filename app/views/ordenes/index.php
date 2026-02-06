@@ -71,7 +71,7 @@ $queryWith = function(array $overrides = []) {
                     <h1>Ordenes de compra</h1>
                     <p style="margin:6px 0 0; color:#61729f;">Gestiona la creacion y seguimiento de compras. El inventario se incrementa cuando registras la factura.</p>
                 </div>
-                <?php if (in_array($role, ['Administrador', 'Compras'], true)): ?>
+                <?php if (in_array($role, ['Administrador', 'Compras', 'Almacen'], true)): ?>
                 <div class="acciones">
                     <a class="btn-primary" href="ordenes_compra_crear.php"><i class="fa-solid fa-plus"></i> Nueva orden</a>
                 </div>
@@ -115,7 +115,7 @@ $queryWith = function(array $overrides = []) {
                         <a href="ordenes_compra.php" class="btn-link"><i class="fa-solid fa-rotate-left"></i> Limpiar</a>
                     </div>
                 </form>
-            </section>
+            </section>    
 
             <section class="ordenes-summary">
                 <div class="ordenes-card">

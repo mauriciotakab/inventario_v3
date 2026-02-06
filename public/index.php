@@ -19,7 +19,7 @@ session_start();
             display: flex;
             flex-direction: column;
              
-            background-image: url('assets/images/edificios10.jpeg');
+            background-image: url('assets/images/edificios13.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -101,11 +101,7 @@ session_start();
             align-items: center;
             justify-content: center;
             text-align: center;
-            background: rgba(255, 255, 255, 0);
-            padding: 45px 70px;
-            border-radius: 14px;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.2);
-            backdrop-filter: blur(8px);
+            
             }
         .inicio-icon {
             font-size: 6rem;
@@ -146,9 +142,9 @@ session_start();
             .error-icon{font-size:3rem;}
         }
        .login-container {
-        background: #ffffff7c;
+        background: #ffffffbd;
         border-radius: 20px;
-        box-shadow: 0 6px 30px 0 rgba(16,24,40,0.30);
+        box-shadow: 0 6px 30px 0 rgba(16, 24, 40, 0.3);
         padding: 40px 40px 20px 40px;
         width: 370px;
         text-align: center;
