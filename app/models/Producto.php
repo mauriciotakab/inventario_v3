@@ -1,10 +1,10 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../helpers/Database.php';
 
 class Producto
 {
     private const ESTADOS = ['Nuevo', 'Usado', 'Dañado', 'En reparación'];
-    private const TIPOS = ['Consumible', 'Herramienta', 'Equipo'];
+    private const TIPOS = ['Consumible', 'Herramienta'];
 
     public static function all($filtros = [])
     {
@@ -29,8 +29,8 @@ class Producto
 
         if (!empty($filtros['buscar'])) {
             $buscar = '%' . trim($filtros['buscar']) . '%';
-            $sql .= " AND (p.nombre LIKE ? OR p.codigo LIKE ? OR p.codigo_barras LIKE ? OR p.descripcion LIKE ? OR p.tags LIKE ?)";
-            array_push($params, $buscar, $buscar, $buscar, $buscar, $buscar);
+            $sql .= " AND (p.nombre LIKE ? OR p.codigo LIKE ? OR p.descripcion LIKE ? OR p.tags LIKE ?)";
+            array_push($params, $buscar, $buscar, $buscar, $buscar);
         }
 
         if (!empty($filtros['nombre'])) {
@@ -41,11 +41,6 @@ class Producto
         if (!empty($filtros['codigo'])) {
             $sql .= " AND p.codigo LIKE ?";
             $params[] = '%' . trim($filtros['codigo']) . '%';
-        }
-
-        if (!empty($filtros['codigo_barras'])) {
-            $sql .= " AND p.codigo_barras = ?";
-            $params[] = trim($filtros['codigo_barras']);
         }
 
         if (!empty($filtros['tipo']) && in_array($filtros['tipo'], self::TIPOS, true)) {
@@ -146,25 +141,21 @@ class Producto
 
     public static function create($data)
     {
-        $data['codigo'] = strtoupper(trim((string) ($data['codigo'] ?? '')));
-        $data['codigo_barras'] = isset($data['codigo_barras']) && $data['codigo_barras'] !== ''
-            ? strtoupper(trim((string) $data['codigo_barras']))
-            : null;
         $db = Database::getInstance()->getConnection();
         $sql = "INSERT INTO productos (
-            codigo, codigo_barras, nombre, descripcion, proveedor_id, categoria_id,
+            codigo, nombre, descripcion, proveedor_id, categoria_id,
             peso, ancho, alto, profundidad, unidad_medida_id, clase_categoria,
             marca, color, forma, especificaciones_tecnicas, origen,
             costo_compra, precio_venta, stock_minimo, stock_actual, almacen_id,
-            ubicacion_fisica, estado, tipo, imagen_url, last_requested_by_user_id, last_request_date, tags
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            estado, tipo, imagen_url, last_requested_by_user_id, last_request_date, tags
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $db->prepare($sql);
         return $stmt->execute([
-            $data['codigo'], $data['codigo_barras'], $data['nombre'], $data['descripcion'], $data['proveedor_id'], $data['categoria_id'],
+            $data['codigo'], $data['nombre'], $data['descripcion'], $data['proveedor_id'], $data['categoria_id'],
             $data['peso'], $data['ancho'], $data['alto'], $data['profundidad'], $data['unidad_medida_id'],
             $data['clase_categoria'], $data['marca'], $data['color'], $data['forma'], $data['especificaciones_tecnicas'],
             $data['origen'], $data['costo_compra'], $data['precio_venta'], $data['stock_minimo'], $data['stock_actual'],
-            $data['almacen_id'], $data['ubicacion_fisica'], $data['estado'], $data['tipo'], $data['imagen_url'],
+            $data['almacen_id'], $data['estado'], $data['tipo'], $data['imagen_url'],
             $data['last_requested_by_user_id'], $data['last_request_date'], $data['tags']
         ]);
     }
@@ -189,89 +180,20 @@ class Producto
                               LEFT JOIN estados_producto_activo epa ON p.activo_id = epa.id
                               WHERE p.id = ?");
         $stmt->execute([$id]);
-        $row = $stmt->fetch();
-        if ($row && (empty($row['last_request_date']) || empty($row['last_requested_by_user_id']))) {
-            $fallback = self::ultimaSolicitudPorProducto($db, (int) $id);
-            if ($fallback) {
-                $row['last_requested_by_user_id'] = $fallback['usuario_id'] ?? $row['last_requested_by_user_id'];
-                $row['last_request_date'] = $fallback['fecha_solicitud'] ?? $row['last_request_date'];
-                $row['last_user'] = $fallback['nombre_completo'] ?? $row['last_user'];
-            }
-        }
-        return $row;
-    }
-
-    private static function ultimaSolicitudPorProducto(\PDO $db, int $productoId): ?array
-    {
-        $sql = "SELECT s.usuario_id, s.fecha_solicitud, u.nombre_completo
-                FROM detalle_solicitud d
-                INNER JOIN solicitudes_material s ON s.id = d.solicitud_id
-                LEFT JOIN usuarios u ON s.usuario_id = u.id
-                WHERE d.producto_id = ?
-                ORDER BY s.fecha_solicitud DESC
-                LIMIT 1";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([$productoId]);
-        $row = $stmt->fetch();
-        return $row ?: null;
+        return $stmt->fetch();
     }
 
     public static function findByCodigo($codigo)
     {
-        $codigo = strtoupper(trim((string) $codigo));
-        if ($codigo === '') {
-            return false;
-        }
         $db = Database::getInstance()->getConnection();
         $stmt = $db->prepare("SELECT * FROM productos WHERE codigo = ?");
         $stmt->execute([$codigo]);
         return $stmt->fetch();
     }
 
-    public static function findByCodigoBarras(string $codigoBarras)
-    {
-        $codigoBarras = strtoupper(trim($codigoBarras));
-        if ($codigoBarras === '') {
-            return false;
-        }
-        $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT * FROM productos WHERE codigo_barras = ?");
-        $stmt->execute([$codigoBarras]);
-        return $stmt->fetch();
-    }
-
-    public static function codigoBarrasExiste(string $codigoBarras, ?int $exceptId = null): bool
-    {
-        $codigoBarras = strtoupper(trim($codigoBarras));
-        if ($codigoBarras === '') {
-            return false;
-        }
-        $db = Database::getInstance()->getConnection();
-        if ($exceptId) {
-            $stmt = $db->prepare("SELECT COUNT(*) FROM productos WHERE codigo_barras = ? AND id <> ?");
-            $stmt->execute([$codigoBarras, $exceptId]);
-        } else {
-            $stmt = $db->prepare("SELECT COUNT(*) FROM productos WHERE codigo_barras = ?");
-            $stmt->execute([$codigoBarras]);
-        }
-        return (int) $stmt->fetchColumn() > 0;
-    }
-
-    public static function actualizarCodigoBarras(int $id, string $codigo): bool
-    {
-        $codigo = strtoupper(trim($codigo));
-        $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("UPDATE productos SET codigo_barras = ? WHERE id = ?");
-        return $stmt->execute([$codigo, $id]);
-    }
-
     public static function existsCodigoExcept($codigo, $id)
     {
         $db = Database::getInstance()->getConnection();
-        $codigo = strtoupper(trim((string) $codigo));
-        if ($codigo === '') {
-            return false;
-        }
         $stmt = $db->prepare("SELECT * FROM productos WHERE codigo = ? AND id != ?");
         $stmt->execute([$codigo, $id]);
         return $stmt->fetch();
@@ -281,23 +203,19 @@ class Producto
     {
         $db = Database::getInstance()->getConnection();
         $sql = "UPDATE productos SET
-            codigo=?, codigo_barras=?, nombre=?, descripcion=?, proveedor_id=?, categoria_id=?,
+            codigo=?, nombre=?, descripcion=?, proveedor_id=?, categoria_id=?,
             peso=?, ancho=?, alto=?, profundidad=?, unidad_medida_id=?, clase_categoria=?,
             marca=?, color=?, forma=?, especificaciones_tecnicas=?, origen=?,
             costo_compra=?, precio_venta=?, stock_minimo=?, stock_actual=?, almacen_id=?,
-            ubicacion_fisica=?, estado=?, tipo=?, imagen_url=?, last_requested_by_user_id=?, last_request_date=?, tags=?
+            estado=?, tipo=?, imagen_url=?, last_requested_by_user_id=?, last_request_date=?, tags=?
             WHERE id=?";
         $stmt = $db->prepare($sql);
-        $data['codigo'] = strtoupper(trim((string) ($data['codigo'] ?? '')));
-        $data['codigo_barras'] = isset($data['codigo_barras']) && $data['codigo_barras'] !== ''
-            ? strtoupper(trim((string) $data['codigo_barras']))
-            : null;
         return $stmt->execute([
-            $data['codigo'], $data['codigo_barras'], $data['nombre'], $data['descripcion'], $data['proveedor_id'], $data['categoria_id'],
+            $data['codigo'], $data['nombre'], $data['descripcion'], $data['proveedor_id'], $data['categoria_id'],
             $data['peso'], $data['ancho'], $data['alto'], $data['profundidad'], $data['unidad_medida_id'],
             $data['clase_categoria'], $data['marca'], $data['color'], $data['forma'], $data['especificaciones_tecnicas'],
             $data['origen'], $data['costo_compra'], $data['precio_venta'], $data['stock_minimo'], $data['stock_actual'],
-            $data['almacen_id'], $data['ubicacion_fisica'], $data['estado'], $data['tipo'], $data['imagen_url'],
+            $data['almacen_id'], $data['estado'], $data['tipo'], $data['imagen_url'],
             $data['last_requested_by_user_id'], $data['last_request_date'], $data['tags'], $id
         ]);
     }
@@ -305,39 +223,8 @@ class Producto
     public static function delete($id)
     {
         $db = Database::getInstance()->getConnection();
-        try {
-            $db->beginTransaction();
-
-            self::deleteRelatedRecords($db, (int) $id);
-
-            $stmt = $db->prepare("DELETE FROM productos WHERE id=?");
-            $stmt->execute([$id]);
-
-            $db->commit();
-            return true;
-        } catch (\PDOException $e) {
-            if ($db->inTransaction()) {
-                $db->rollBack();
-            }
-            return false;
-        }
-    }
-
-    private static function deleteRelatedRecords(\PDO $db, int $productoId): void
-    {
-        $relations = [
-            'detalle_ordenes'        => 'producto_id',
-            'detalle_solicitud'      => 'producto_id',
-            'movimientos_inventario' => 'producto_id',
-            'prestamos'              => 'producto_id',
-            'solicitudes'            => 'producto_id',
-            'stock_almacen'          => 'producto_id',
-        ];
-
-        foreach ($relations as $table => $column) {
-            $stmt = $db->prepare("DELETE FROM {$table} WHERE {$column} = ?");
-            $stmt->execute([$productoId]);
-        }
+        $stmt = $db->prepare("DELETE FROM productos WHERE id=?");
+        return $stmt->execute([$id]);
     }
 
     public static function setActive($id, $active)
@@ -348,109 +235,18 @@ class Producto
         return $stmt->execute([$estado, $id]);
     }
 
-    private static bool $stockTableChecked = false;
-
-    public static function ensureStockTableReady(): void
+    public static function sumarStock($id, $cantidad)
     {
         $db = Database::getInstance()->getConnection();
-        self::ensureStockTable($db);
-    }
-
-    private static function ensureStockTable(\PDO $db): void
-    {
-        if (self::$stockTableChecked) return;
-        $sql = "CREATE TABLE IF NOT EXISTS stock_almacen (
-                    producto_id INT NOT NULL,
-                    almacen_id INT NOT NULL,
-                    stock DECIMAL(10,2) NOT NULL DEFAULT 0,
-                    PRIMARY KEY (producto_id, almacen_id),
-                    KEY idx_stock_almacen_prod (producto_id),
-                    KEY idx_stock_almacen_alm (almacen_id)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
-        $db->exec($sql);
-        self::$stockTableChecked = true;
-    }
-
-    public static function sumarStock($id, $cantidad, ?int $almacenId = null)
-    {
-        $db = Database::getInstance()->getConnection();
-        // Stock global
         $stmt = $db->prepare("UPDATE productos SET stock_actual = stock_actual + ? WHERE id = ?");
-        $ok = $stmt->execute([$cantidad, $id]);
-        if (!$ok) return false;
-
-        // Stock por almacén
-        if ($almacenId) {
-            self::ensureStockTable($db);
-            $up = $db->prepare("INSERT INTO stock_almacen (producto_id, almacen_id, stock)
-                                VALUES (?, ?, ?)
-                                ON DUPLICATE KEY UPDATE stock = stock + VALUES(stock)");
-            return $up->execute([(int)$id, (int)$almacenId, (float)$cantidad]);
-        }
-        return true;
+        return $stmt->execute([$cantidad, $id]);
     }
 
-    public static function restarStock($id, $cantidad, ?int $almacenId = null)
+    public static function restarStock($id, $cantidad)
     {
         $db = Database::getInstance()->getConnection();
-        // Stock global
         $stmt = $db->prepare("UPDATE productos SET stock_actual = GREATEST(stock_actual - ?, 0) WHERE id = ?");
-        $ok = $stmt->execute([$cantidad, $id]);
-        if (!$ok) return false;
-
-        // Stock por almacén
-        if ($almacenId) {
-            self::ensureStockTable($db);
-            // Asegurar no bajar de 0
-            $current = self::stockEnAlmacen($id, $almacenId);
-            $nuevo = max(0.0, (float)$current - (float)$cantidad);
-            $up = $db->prepare("INSERT INTO stock_almacen (producto_id, almacen_id, stock)
-                                VALUES (?, ?, ?)
-                                ON DUPLICATE KEY UPDATE stock = VALUES(stock)");
-            return $up->execute([(int)$id, (int)$almacenId, $nuevo]);
-        }
-        return true;
-    }
-
-    public static function stockEnAlmacen(int $productoId, int $almacenId): float
-    {
-        $db = Database::getInstance()->getConnection();
-        self::ensureStockTable($db);
-        $stmt = $db->prepare("SELECT stock FROM stock_almacen WHERE producto_id = ? AND almacen_id = ?");
-        $stmt->execute([$productoId, $almacenId]);
-        $row = $stmt->fetch();
-        return (float)($row['stock'] ?? 0);
-    }
-
-    public static function moverStock(int $productoId, int $origenId, int $destinoId, float $cantidad): bool
-    {
-        if ($cantidad <= 0) return false;
-        $db = Database::getInstance()->getConnection();
-        self::ensureStockTable($db);
-        $db->beginTransaction();
-        try {
-            $disp = self::stockEnAlmacen($productoId, $origenId);
-            if ($cantidad > $disp) {
-                $db->rollBack();
-                return false;
-            }
-            // Restar en origen (no dejar negativo)
-            self::restarStock($productoId, $cantidad, $origenId);
-            // Sumar en destino
-            self::sumarStock($productoId, $cantidad, $destinoId);
-            $db->commit();
-            return true;
-        } catch (\Throwable $e) {
-            $db->rollBack();
-            return false;
-        }
-    }
-
-    public static function actualizarAlmacen(int $id, int $almacenId): bool
-    {
-        $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("UPDATE productos SET almacen_id = ? WHERE id = ?");
-        return $stmt->execute([$almacenId, $id]);
+        return $stmt->execute([$cantidad, $id]);
     }
 
     public static function allInventario($filtros = [])
@@ -469,8 +265,7 @@ class Producto
                 WHERE 1=1";
         $params = [];
         if (!empty($filtros['q'])) {
-            $sql .= " AND (p.nombre LIKE ? OR p.codigo LIKE ? OR p.codigo_barras LIKE ?)";
-            $params[] = '%' . $filtros['q'] . '%';
+            $sql .= " AND (p.nombre LIKE ? OR p.codigo LIKE ?)";
             $params[] = '%' . $filtros['q'] . '%';
             $params[] = '%' . $filtros['q'] . '%';
         }
@@ -501,13 +296,8 @@ class Producto
 
         if (!empty($filtros['buscar'])) {
             $buscar = '%' . trim($filtros['buscar']) . '%';
-            $condiciones[] = '(p.nombre LIKE ? OR p.codigo LIKE ? OR p.codigo_barras LIKE ? OR IFNULL(p.descripcion, "") LIKE ? OR IFNULL(p.tags, "") LIKE ? OR IFNULL(pr.nombre, "") LIKE ?)';
-            array_push($params, $buscar, $buscar, $buscar, $buscar, $buscar, $buscar);
-        }
-
-        if (!empty($filtros['codigo_barras'])) {
-            $condiciones[] = 'p.codigo_barras = ?';
-            $params[] = trim($filtros['codigo_barras']);
+            $condiciones[] = '(p.nombre LIKE ? OR p.codigo LIKE ? OR IFNULL(p.descripcion, "") LIKE ? OR IFNULL(p.tags, "") LIKE ? OR IFNULL(pr.nombre, "") LIKE ?)';
+            array_push($params, $buscar, $buscar, $buscar, $buscar, $buscar);
         }
 
         if (!empty($filtros['categoria_id'])) {

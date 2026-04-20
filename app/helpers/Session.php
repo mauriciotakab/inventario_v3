@@ -29,9 +29,18 @@ class Session {
             'role' => $_SESSION['role'] ?? null,
         ];
     }
+
     public static function requireLogin($roles = null) {
         self::start();
-        if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
+        // Flujo deseado: Bienvenido -> Login -> Menú de módulos -> Módulos
+        // Si no hay sesión, redirigir a login y conservar la página solicitada.
+        if (!isset($_SESSION['user_id'])) {
+            $file = basename($_SERVER['PHP_SELF'] ?? '');
+            $qs = $_SERVER['QUERY_STRING'] ?? '';
+            $next = $file . ($qs ? ('?' . $qs) : '');
+            header('Location: login.php?next=' . urlencode($next));
+            exit();
+        }
         if ($roles) {
             $role = $_SESSION['role'] ?? '';
             if (is_array($roles)) { if (!in_array($role, $roles, true)) { header("Location: dashboard.php?no_access=1"); exit(); } }

@@ -25,7 +25,7 @@ window.mostrarPreview = function(tipo){
             <span class="preview-label">Producto</span>
             <span class="preview-value">${data.nombre}</span>
             <span class="preview-label">Marca / Stock</span>
-            <span class="preview-value">${data.marca} · ${data.stock} disponibles</span>
+            <span class="preview-value">${data.marca} ï¿½ ${data.stock} disponibles</span>
             <span class="preview-label">Tipo</span>
             <span class="preview-value">${data.tipo}</span>
         </div>`;
@@ -50,7 +50,7 @@ window.agregarMaterial = function(tipo){
         return;
     }
     if (stockDisp && cantidad > stockDisp) {
-        const seguir = confirm(`Estas solicitando ${cantidad} y solo hay ${stockDisp} en stock. ¿Deseas continuar?`);
+        const seguir = confirm(`Estas solicitando ${cantidad} y solo hay ${stockDisp} en stock. ï¿½Deseas continuar?`);
         if (!seguir) return;
     }
     materiales.push({ tipo, producto_id, producto_nombre, cantidad, observacion });

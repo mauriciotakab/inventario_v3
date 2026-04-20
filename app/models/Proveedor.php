@@ -20,13 +20,12 @@ class Proveedor
     public static function create($data)
     {
         $db = Database::getInstance()->getConnection();
-        $sql = "INSERT INTO proveedores (nombre, contacto, rfc, telefono, email, direccion, condiciones_pago)
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO proveedores (nombre, contacto, telefono, email, direccion, condiciones_pago) 
+                VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $db->prepare($sql);
         return $stmt->execute([
             $data['nombre'],
             $data['contacto'],
-            $data['rfc'],
             $data['telefono'],
             $data['email'],
             $data['direccion'],
@@ -38,13 +37,12 @@ class Proveedor
     {
         $db = Database::getInstance()->getConnection();
         $sql = "UPDATE proveedores SET 
-            nombre=?, contacto=?, rfc=?, telefono=?, email=?, direccion=?, condiciones_pago=?
+            nombre=?, contacto=?, telefono=?, email=?, direccion=?, condiciones_pago=?
             WHERE id=?";
         $stmt = $db->prepare($sql);
         return $stmt->execute([
             $data['nombre'],
             $data['contacto'],
-            $data['rfc'],
             $data['telefono'],
             $data['email'],
             $data['direccion'],

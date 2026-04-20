@@ -218,10 +218,14 @@ INSERT INTO movimientos_inventario (id, producto_id, tipo, cantidad, fecha, usua
 CREATE TABLE ordenes_compra (
 id int(11) NOT NULL,
 proveedor_id int(11) NOT NULL,
+usuario_id int(11) DEFAULT NULL,
 solicitud_id int(11) DEFAULT NULL,
+rfc varchar(13) DEFAULT NULL,
+numero_factura varchar(50) DEFAULT NULL,
 fecha datetime NOT NULL DEFAULT current_timestamp(),
 estado enum('Pendiente','Enviada','Recibida','Cancelada') DEFAULT 'Pendiente',
-total decimal(12,2) DEFAULT NULL
+total decimal(12,2) DEFAULT NULL,
+almacen_destino_id int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -519,9 +523,10 @@ ADD KEY almacen_origen_id (almacen_origen_id),
 ADD KEY almacen_destino_id (almacen_destino_id);
 
 ALTER TABLE ordenes_compra
-ADD PRIMARY KEY (id),
-ADD KEY proveedor_id (proveedor_id),
-ADD KEY solicitud_id (solicitud_id);
+ADD KEY usuario_id (usuario_id),
+  ADD KEY almacen_destino_id (almacen_destino_id),
+  ADD CONSTRAINT ordenes_compra_ibfk_3 FOREIGN KEY (usuario_id) REFERENCES usuarios (id),
+  ADD CONSTRAINT ordenes_compra_ibfk_4 FOREIGN KEY (almacen_destino_id) REFERENCES almacenes (id);
 
 ALTER TABLE prestamos
 ADD PRIMARY KEY (id),
@@ -635,7 +640,9 @@ ADD CONSTRAINT movimientos_inventario_ibfk_4 FOREIGN KEY (almacen_destino_id) RE
 
 ALTER TABLE ordenes_compra
 ADD CONSTRAINT ordenes_compra_ibfk_1 FOREIGN KEY (proveedor_id) REFERENCES proveedores (id),
-ADD CONSTRAINT ordenes_compra_ibfk_2 FOREIGN KEY (solicitud_id) REFERENCES solicitudes (id);
+ADD CONSTRAINT ordenes_compra_ibfk_2 FOREIGN KEY (solicitud_id) REFERENCES solicitudes (id),
+ADD CONSTRAINT ordenes_compra_ibfk_3 FOREIGN KEY (usuario_id) REFERENCES usuarios (id),
+ADD CONSTRAINT ordenes_compra_ibfk_4 FOREIGN KEY (almacen_destino_id) REFERENCES almacenes (id);
 
 ALTER TABLE prestamos
 ADD CONSTRAINT prestamos_ibfk_1 FOREIGN KEY (producto_id) REFERENCES productos (id),

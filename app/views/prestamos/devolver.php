@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin(['Administrador', 'Almacen']);
 ?>
@@ -7,7 +7,7 @@ Session::requireLogin(['Administrador', 'Almacen']);
 <head>
     <meta charset="UTF-8">
     <title>Registrar Devolución de Herramienta | TAKAB</title>
-    <link rel="stylesheet" href="/assets/css/prestamo-devolver.css">
+    <link rel="stylesheet" href="../public/assets/css/prestamo-devolver.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -39,7 +39,6 @@ Session::requireLogin(['Administrador', 'Almacen']);
             </div>
         </div>
         <form method="post" class="devolver-form">
-            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
             <label for="estado_devolucion">Estado al devolver:</label>
             <select name="estado_devolucion" id="estado_devolucion" class="devolver-select" required>
                 <option value="Bueno">Bueno</option>
@@ -64,6 +63,5 @@ Session::requireLogin(['Administrador', 'Almacen']);
         </a>
     <?php endif; ?>
 </div>
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

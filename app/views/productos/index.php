@@ -9,30 +9,15 @@ if (!empty($alerta['success'])) {
         : 'Producto registrado correctamente.';
 }
 $mensajeEliminado = !empty($alerta['deleted']) ? 'Producto eliminado correctamente.' : null;
-$mensajeError = null;
-$errorCode = $_GET['error'] ?? '';
-if ($errorCode === 'relaciones') {
-    $mensajeError = 'No se pudo eliminar el producto porque tiene movimientos, solicitudes o préstamos vinculados.';
-} elseif ($errorCode === 'csrf') {
-    $mensajeError = 'El formulario expiró, intenta nuevamente.';
-}
-$importResultado = $importAlert ?? null;
-function format_stock($value) {
-    $num = (float) $value;
-    if (abs($num - round($num)) < 0.00001) {
-        return number_format($num, 0, '.', ',');
-    }
-    return number_format($num, 2, '.', ',');
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Gestión de Productos | TAKAB</title>
-    <link rel="stylesheet" href="/assets/css/dashboard.css">
-    <link rel="stylesheet" href="/assets/css/config.css">
-    <link rel="stylesheet" href="/assets/css/productos.css">
+    <link rel="stylesheet" href="../public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="../public/assets/css/config.css">
+    <link rel="stylesheet" href="../public/assets/css/productos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         /* Ensures the Stock column is a bit wider and numbers don't wrap/cut */
@@ -47,69 +32,58 @@ function format_stock($value) {
     </style>
 </head>
 <body>
-    
 <div class="main-layout">
-    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="login-logo"><img src="../public/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
+            <div>
+                <div class="sidebar-title">TAKAB</div>
+                <div class="sidebar-desc">Inventario y almacén</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <?php if ($role === 'Administrador'): ?>
+                <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestión de Usuarios</a>
+            <?php endif; ?>
+            <a href="productos.php" class="active"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
+            <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
+            <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
+            <?php if ($role === 'Administrador' || $role === 'Almacen'): ?>
+                <a href="prestamos_pendientes.php"><i class="fa-solid fa-toolbox"></i> Préstamos</a>
+                <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+            <?php endif; ?>
+            <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+        </nav>
+    </aside>
 
     <div class="content-area">
-        <?php include __DIR__ . '/../partials/topbar.php'; ?>
+        <header class="top-header">
+            <div></div>
+            <div class="top-header-user">
+                <span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
+                <i class="fa-solid fa-user-circle"></i>
+                <a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+            </div>
+        </header>
 
         <main class="dashboard-main productos-main">
-            <?php if ($mensajeError): ?>
-                <div class="alert alert-danger"><i class="fa fa-circle-exclamation"></i> <?= htmlspecialchars($mensajeError) ?></div>
-            <?php endif; ?>
             <?php if ($mensajeExito): ?>
                 <div class="alert alert-success"><i class="fa fa-check-circle"></i> <?= htmlspecialchars($mensajeExito) ?></div>
             <?php endif; ?>
             <?php if ($mensajeEliminado): ?>
                 <div class="alert alert-danger"><i class="fa fa-trash"></i> <?= htmlspecialchars($mensajeEliminado) ?></div>
             <?php endif; ?>
-            <?php if (!empty($importResultado)): ?>
-                <?php
-                    $importSuccess = (int) ($importResultado['success'] ?? 0);
-                    $importProcessed = (int) ($importResultado['processed'] ?? 0);
-                    $importSkipped = (int) ($importResultado['skipped'] ?? 0);
-                    $importErrors = $importResultado['errors'] ?? [];
-                    $hayErroresImport = !empty($importErrors);
-                ?>
-                <div class="alert <?= $hayErroresImport ? 'alert-danger' : 'alert-success' ?>">
-                    <i class="fa <?= $hayErroresImport ? 'fa-circle-exclamation' : 'fa-check-circle' ?>"></i>
-                    Se procesaron <?= $importProcessed ?> filas. Importados correctamente: <?= $importSuccess ?><?= $importSkipped > 0 ? " · Saltados: {$importSkipped}" : '' ?>.
-                    <?php if ($hayErroresImport): ?>
-                        <div class="alert-detail">
-                            <strong>Observaciones:</strong>
-                            <ul>
-                                <?php foreach (array_slice($importErrors, 0, 8) as $error): ?>
-                                    <li><?= htmlspecialchars($error) ?></li>
-                                <?php endforeach; ?>
-                                <?php if (count($importErrors) > 8): ?>
-                                    <li>Se omitieron <?= count($importErrors) - 8 ?> mensajes adicionales.</li>
-                                <?php endif; ?>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
 
             <div class="productos-header">
                 <div>
                     <h1>Gestión de Productos</h1>
                     <p class="productos-header-desc">Administra el catálogo de materiales y herramientas de TAKAB.</p>
-                    <p class="productos-import-note desktop-only">Usa la plantilla para cargar múltiples productos. Los valores deben corresponder con los IDs de catálogos ya registrados (categorías, proveedores, almacenes, unidades).</p>
                 </div>
                 <div class="productos-header-actions">
-                    <a class="btn-secondary" href="productos_template.php"><i class="fa-solid fa-download"></i> Descargar plantilla</a>
-                    <form class="productos-import-form" action="productos_import.php" method="post" enctype="multipart/form-data">
-                        <label class="btn-secondary btn-file">
-                            <i class="fa-solid fa-file-csv"></i> Seleccionar CSV
-                            <input type="file" name="productos_archivo" accept=".csv,text/csv" required>
-                        </label>
-                        <button type="submit" class="btn-main"><i class="fa-solid fa-upload"></i> Importar productos</button>
-                    </form>
-                    <a class="btn-secondary" href="productos_barcode.php"><i class="fa fa-barcode"></i> Buscar por codigo</a>
                     <a class="btn-main" href="productos_create.php"><i class="fa fa-plus"></i> Nuevo producto</a>
                 </div>
-                <p class="productos-import-note mobile-only">Usa la plantilla para cargar múltiples productos. Los valores deben corresponder con los IDs de catálogos ya registrados (categorías, proveedores, almacenes, unidades).</p>
             </div>
 
             <section class="productos-stats-grid">
@@ -131,7 +105,7 @@ function format_stock($value) {
                 <div class="productos-stat-card success">
                     <span class="stat-label">Valor inventario</span>
                     <span class="stat-value">$<?= number_format($stats['valor_total'], 2) ?></span>
-                    <span class="stat-foot">Costo estimado total con I.V.A.</span>
+                    <span class="stat-foot">Costo estimado total</span>
                 </div>
             </section>
 
@@ -281,7 +255,6 @@ function format_stock($value) {
                             <thead>
                             <tr>
                                 <th>Código</th>
-                                <th>Codigo de barras</th>
                                 <th>Producto</th>
                                 <th>Tipo</th>
                                 <th>Categoría</th>
@@ -297,8 +270,8 @@ function format_stock($value) {
                             <tbody>
                             <?php foreach ($productos as $producto): ?>
                                 <?php
-                                $stockActual = (float) ($producto['stock_actual'] ?? 0);
-                                $stockMinimo = (float) ($producto['stock_minimo'] ?? 0);
+                                $stockActual = (int) ($producto['stock_actual'] ?? 0);
+                                $stockMinimo = (int) ($producto['stock_minimo'] ?? 0);
                                 $valorInventario = (float) ($producto['costo_compra'] ?? 0) * $stockActual;
                                 $badgeStock = 'ok';
                                 if ($stockActual <= 0) {
@@ -309,7 +282,6 @@ function format_stock($value) {
                                 ?>
                                 <tr>
                                     <td><span class="mono"><?= htmlspecialchars($producto['codigo']) ?></span></td>
-                                    <td><span class="mono"><?= htmlspecialchars($producto['codigo_barras'] ?? '') ?></span></td>
                                     <td>
                                         <strong><?= htmlspecialchars($producto['nombre']) ?></strong>
                                         <?php if (!empty($producto['tags'])): ?>
@@ -320,9 +292,9 @@ function format_stock($value) {
                                     <td><?= htmlspecialchars($producto['categoria'] ?? 'Sin categoría') ?></td>
                                     <td class="col-stock">
                                         <span class="badge badge-stock <?= $badgeStock ?>">
-                                            <?= format_stock($stockActual) ?> <?= htmlspecialchars($producto['unidad_abreviacion'] ?? '') ?>
+                                            <?= number_format($stockActual) ?> <?= htmlspecialchars($producto['unidad_abreviacion'] ?? '') ?>
                                         </span>
-                                        <small>Mín: <?= format_stock($stockMinimo) ?></small>
+                                        <small>Mín: <?= number_format($stockMinimo) ?></small>
                                     </td>
                                     <td><?= htmlspecialchars($producto['estado'] ?? '-') ?></td>
                                     <td>
@@ -336,25 +308,12 @@ function format_stock($value) {
                                     <td class="col-actions">
                                         <a class="btn-table" title="Ver detalle" href="productos_view.php?id=<?= $producto['id'] ?>"><i class="fa fa-eye"></i></a>
                                         <a class="btn-table" title="Editar" href="productos_edit.php?id=<?= $producto['id'] ?>"><i class="fa fa-pen"></i></a>
-                                        <a class="btn-table" title="Imprimir etiqueta" href="productos_etiqueta.php?id=<?= $producto['id'] ?>"><i class="fa fa-barcode"></i></a>
-                                        <form method="post" action="productos_setactive.php" class="inline-form" style="display:inline-block">
-                                            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
-                                            <input type="hidden" name="id" value="<?= (int) $producto['id'] ?>">
-                                            <input type="hidden" name="active" value="<?= (int)($producto['activo_id'] ?? 1) === 1 ? 0 : 1 ?>">
-                                            <button type="submit"
-                                                    class="btn-table"
-                                                    title="<?= (int)($producto['activo_id'] ?? 1) === 1 ? 'Desactivar' : 'Activar' ?>"
-                                                    data-confirm-click="<?= (int)($producto['activo_id'] ?? 1) === 1 ? '¿Desactivar este producto?' : '¿Activar este producto?' ?>">
-                                                <i class="fa <?= (int)($producto['activo_id'] ?? 1) === 1 ? 'fa-toggle-off' : 'fa-toggle-on' ?>"></i>
-                                            </button>
-                                        </form>
-                                        <form method="post" action="productos_delete.php" class="inline-form" style="display:inline-block" data-confirm="¿Eliminar el producto seleccionado? Esta acción no se puede deshacer.">
-                                            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
-                                            <input type="hidden" name="id" value="<?= (int) $producto['id'] ?>">
-                                            <button type="submit" class="btn-table btn-danger" title="Eliminar">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <?php if ((int)($producto['activo_id'] ?? 1) === 1): ?>
+                                            <a class="btn-table" title="Desactivar" href="productos_setactive.php?id=<?= $producto['id'] ?>&active=0" onclick="return confirm('¿Desactivar este producto?');"><i class="fa fa-toggle-off"></i></a>
+                                        <?php else: ?>
+                                            <a class="btn-table" title="Activar" href="productos_setactive.php?id=<?= $producto['id'] ?>&active=1" onclick="return confirm('¿Activar este producto?');"><i class="fa fa-toggle-on"></i></a>
+                                        <?php endif; ?>
+                                        <a class="btn-table btn-danger" title="Eliminar" href="productos_delete.php?id=<?= $producto['id'] ?>" onclick="return confirm('¿Eliminar el producto seleccionado? Esta acción no se puede deshacer.');"><i class="fa fa-trash"></i></a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -366,8 +325,5 @@ function format_stock($value) {
         </main>
     </div>
 </div>
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>
-
-

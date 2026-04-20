@@ -1,14 +1,13 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin(['Administrador', 'Almacen']);
-$breadcrumbs = [["label" => 'Aprobación de solicitud']];
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Revisión de Solicitud | TAKAB</title>
-    <link rel="stylesheet" href="/assets/css/solicitud-aprobar.css">
+    <link rel="stylesheet" href="../public/assets/css/solicitud-aprobar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -95,16 +94,15 @@ $breadcrumbs = [["label" => 'Aprobación de solicitud']];
         <?php endif; endif; ?>
 
         <form method="post" class="aprobar-form" id="aprobarForm">
-            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
             <label>
                 Observación (opcional, visible para el empleado):
                 <input type="text" name="observacion" class="aprobar-input">
             </label>
             <div class="aprobar-actions">
-                <button type="submit" name="accion" value="aprobar" class="btn-aprobar" data-confirm-click="¿Estás seguro de aprobar esta solicitud?">
+                <button type="submit" name="accion" value="aprobar" class="btn-aprobar" onclick="return confirmarAprobar(event);">
                     <i class="fa fa-check"></i> Aprobar
                 </button>
-                <button type="submit" name="accion" value="rechazar" class="btn-rechazar" data-confirm-click="¿Estás seguro de RECHAZAR esta solicitud? Esta acción no se puede deshacer.">
+                <button type="submit" name="accion" value="rechazar" class="btn-rechazar" onclick="return confirmarRechazar(event);">
                     <i class="fa fa-times"></i> Rechazar
                 </button>
                 <a href="revisar_solicitudes.php" class="btn-volver">
@@ -112,10 +110,25 @@ $breadcrumbs = [["label" => 'Aprobación de solicitud']];
                 </a>
             </div>
         </form>
+        <script>
+        function confirmarAprobar(e) {
+            if(!confirm("¿Estás seguro de aprobar esta solicitud?")) {
+                e.preventDefault();
+                return false;
+            }
+            return true;
+        }
+        function confirmarRechazar(e) {
+            if(!confirm("¿Estás seguro de RECHAZAR esta solicitud?\nEsta acción no se puede deshacer.")) {
+                e.preventDefault();
+                return false;
+            }
+            return true;
+        }
+        </script>
     <?php else: ?>
         <p>Solicitud no encontrada.</p>
     <?php endif; ?>
 </div>
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

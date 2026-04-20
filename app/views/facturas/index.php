@@ -9,8 +9,8 @@ $importeTotal = array_sum(array_map(fn($row) => (float) ($row['total'] ?? 0), $f
 <head>
     <meta charset="UTF-8">
     <title>Facturas de compra | TAKAB</title>
-    <link rel="stylesheet" href="/assets/css/dashboard.css">
-    <link rel="stylesheet" href="/assets/css/reportes.css">
+    <link rel="stylesheet" href="../public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="../public/assets/css/reportes.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         .facturas-main { padding: 32px 32px 48px; }
@@ -48,9 +48,40 @@ $importeTotal = array_sum(array_map(fn($row) => (float) ($row['total'] ?? 0), $f
 </head>
 <body>
 <div class="main-layout">
-    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
+   <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="login-logo"><img src="../public/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
+            <div>
+                <div class="sidebar-title">TAKAB</div>
+                <div class="sidebar-desc">Compras</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">     
+            <?php if ($role === 'Administrador'): ?>
+                <a href="ordenes_compra.php"><i class="fa-solid fa-file-invoice-dollar"></i> Ordenes de compra</a>
+                <a href="facturas.php"><i class="fa-solid fa-file-circle-check"></i> Facturas de compra</a>
+                <a href="ordenes_compra_crear.php"><i class="fa-solid fa-plus"></i> Nueva Orden</a>
+                <a href="proveedores.php"><i class="fa-solid fa-address-book"></i> Proveedores</a>
+                <a href="compras_proveedor.php"><i class="fa-solid fa-shopping-cart"></i> Compras por proveedor</a>
+            <?php elseif ($role === 'Almacen'): ?>
+                <a href="ordenes_compra.php"><i class="fa-solid fa-file-invoice-dollar"></i> Ordenes de compra</a>
+                <a href="facturas.php"><i class="fa-solid fa-file-circle-check"></i> Facturas de compra</a>
+                <a href="ordenes_compra_crear.php"><i class="fa-solid fa-plus"></i> Nueva Orden</a>
+                <a href="proveedores.php"><i class="fa-solid fa-address-book"></i> Proveedores</a>
+                <a href="compras_proveedor.php"><i class="fa-solid fa-shopping-cart"></i> Compras por proveedor</a>
+            <?php elseif ($role === 'Compras'): ?>
+                <a href="ordenes_compra.php"><i class="fa-solid fa-file-invoice-dollar"></i> Ordenes de compra</a>
+                <a href="facturas.php"><i class="fa-solid fa-file-circle-check"></i> Facturas de compra</a>
+                <a href="ordenes_compra_crear.php"><i class="fa-solid fa-plus"></i> Nueva Orden</a>
+                <a href="proveedores.php"><i class="fa-solid fa-address-book"></i> Proveedores</a>
+                <a href="compras_proveedor.php"><i class="fa-solid fa-shopping-cart"></i> Compras por proveedor</a>
+            <?php endif; ?>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+        </nav>
+    </aside>
+    <!--?php include __DIR__ . '/../partials/sidebar.php'; ?-->
     <div class="content-area">
-        <?php include __DIR__ . '/../partials/topbar.php'; ?>
+    <?php include __DIR__ . '/../partials/topbar.php'; ?>
         <main class="facturas-main">
             <div class="facturas-header">
                 <div>

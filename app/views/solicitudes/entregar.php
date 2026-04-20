@@ -1,14 +1,13 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../../helpers/Session.php';
 Session::requireLogin(['Administrador', 'Almacen']);
-$breadcrumbs = [['label' => 'Entrega de solicitud']];
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Entrega de Solicitud | TAKAB</title>
-    <link rel="stylesheet" href="/assets/css/solicitud-entregar.css">
+    <link rel="stylesheet" href="../public/assets/css/solicitud-entregar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -95,20 +94,12 @@ $breadcrumbs = [['label' => 'Entrega de solicitud']];
         <?php endif; endif; ?>
 
         <form method="post" class="entregar-form" id="entregarForm">
-            <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
             <label>
                 Observación de entrega (opcional):
                 <input type="text" name="observacion" class="entregar-input">
             </label>
-            <label>
-                Fecha estimada de devolución (solo herramientas):
-                <input type="date" name="fecha_estimada_devolucion" class="entregar-input">
-            </label>
             <div class="entregar-actions">
-                <a href="solicitud_entregar.php?id=<?= (int) ($solicitud['id'] ?? 0) ?>&formato=salida" class="btn-volver" target="_blank" rel="noopener noreferrer">
-                    <i class="fa fa-file-arrow-down"></i> Descargar formato
-                </a>
-                <button type="submit" class="btn-entregar" data-confirm-click="¿Confirmas que la solicitud ha sido entregada? Esta acción actualizará el estado a 'Entregada'.">
+                <button type="submit" class="btn-entregar" onclick="return confirmarEntrega(event);">
                     <i class="fa fa-box"></i> Marcar como Entregada
                 </button>
                 <a href="revisar_solicitudes.php" class="btn-volver">
@@ -116,10 +107,18 @@ $breadcrumbs = [['label' => 'Entrega de solicitud']];
                 </a>
             </div>
         </form>
+        <script>
+        function confirmarEntrega(e) {
+            if(!confirm("¿Confirmas que la solicitud ha sido entregada?\nEsta acción actualizará el estado a 'Entregada'.")) {
+                e.preventDefault();
+                return false;
+            }
+            return true;
+        }
+        </script>
     <?php else: ?>
         <p>Solicitud no encontrada o no aprobada.</p>
     <?php endif; ?>
 </div>
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

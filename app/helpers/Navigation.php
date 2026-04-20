@@ -221,10 +221,10 @@ class Navigation
         'clientes_create.php'            => 'configuracion',
         'clientes_edit.php'              => 'configuracion',
         'clientes_delete.php'            => 'configuracion',
-        'proveedores.php'                => 'configuracion',
-        'proveedores_create.php'         => 'configuracion',
-        'proveedores_edit.php'           => 'configuracion',
-        'proveedores_delete.php'         => 'configuracion',
+        'proveedores.php'                => 'proveedores',
+        'proveedores_create.php'         => 'proveedores',
+        'proveedores_edit.php'           => 'proveedores',
+        'proveedores_delete.php'         => 'proveedores',
         'unidades.php'                   => 'configuracion',
         'unidades_create.php'            => 'configuracion',
         'unidades_edit.php'              => 'configuracion',
@@ -259,6 +259,10 @@ class Navigation
         'compras_proveedor'   => [
             ['label' => 'Compras'],
             ['label' => 'Compras por proveedor'],
+        ],
+         'proveedores'   => [
+            ['label' => 'Compras'],
+            ['label' => 'Proveedores'],
         ],
         'inventario'          => [
             ['label' => 'Inventario'],
@@ -342,7 +346,7 @@ class Navigation
         $html   = [];
         $html[] = '<aside class="sidebar">';
         $html[] = '    <div class="sidebar-header">';
-        $html[] = '        <div class="login-logo"><img src="/assets/images/icono_takab.png" alt="logo TAKAB" width="90" height="55"></div>';
+        $html[] = '        <div class="login-logo"><img src="../public/assets/images/icono_takab.png" alt="logo TAKAB" width="90" height="55"></div>';
         $html[] = '        <div>';
         $html[] = '            <div class="sidebar-title">TAKAB</div>';
         $html[] = '            <div class="sidebar-desc">Dashboard</div>';

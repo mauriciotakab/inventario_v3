@@ -5,7 +5,7 @@ require_once __DIR__ . '/../helpers/Session.php';
 
 class PrestamoController
 {
-    // Listar prestamos pendientes de devolucion
+    // Listar préstamos pendientes de devolución
     public function pendientes()
     {
         Session::requireLogin(['Administrador', 'Almacen']);
@@ -13,28 +13,24 @@ class PrestamoController
         include __DIR__ . '/../views/prestamos/pendientes.php';
     }
 
-    // Registrar devolucion (formulario)
+    // Registrar devolución (formulario)
     public function devolver($id)
     {
         Session::requireLogin(['Administrador', 'Almacen']);
         $prestamo = Prestamo::find($id);
-        $msg      = '';
-        if (! $prestamo || $prestamo['estado'] !== 'Prestado') {
-            $msg = 'Este prestamo no esta pendiente de devolucion o no existe.';
+        $msg = '';
+        if (!$prestamo || $prestamo['estado'] !== 'Prestado') {
+            $msg = "Este préstamo no está pendiente de devolución o no existe.";
             include __DIR__ . '/../views/prestamos/devolver.php';
             return;
         }
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (! Session::checkCsrf($_POST['csrf'] ?? '')) {
-                $msg = 'Token CSRF invalido.';
-            } else {
-                $estado_devolucion = $_POST['estado_devolucion'] ?? '';
-                $observaciones     = trim($_POST['observaciones'] ?? '');
-                Prestamo::devolver($id, $estado_devolucion, $observaciones);
-                $msg = 'Devolucion registrada correctamente.';
-                // Recargar prestamo actualizado
-                $prestamo = Prestamo::find($id);
-            }
+            $estado_devolucion = $_POST['estado_devolucion'];
+            $observaciones = trim($_POST['observaciones'] ?? '');
+            Prestamo::devolver($id, $estado_devolucion, $observaciones);
+            $msg = "Devolución registrada correctamente.";
+            // Recargar préstamo actualizado
+            $prestamo = Prestamo::find($id);
         }
         include __DIR__ . '/../views/prestamos/devolver.php';
     }
@@ -43,24 +39,7 @@ class PrestamoController
     public function historial()
     {
         Session::requireLogin(['Administrador', 'Almacen']);
-
-        $busqueda  = trim($_GET['q'] ?? '');
-        $estado    = trim($_GET['estado'] ?? '');
-        $desde     = trim($_GET['desde'] ?? '');
-        $hasta     = trim($_GET['hasta'] ?? '');
-        $page      = max(1, (int) ($_GET['page'] ?? 1));
-        $porPagina = 9;
-
-        $filtros = [
-            'estado' => $estado,
-            'desde'  => $desde,
-            'hasta'  => $hasta,
-        ];
-
-        $prestamos  = Prestamo::historialPaginado($busqueda, $page, $porPagina, $filtros);
-        $total      = Prestamo::totalHistorial($busqueda, $filtros);
-        $totalPages = (int) ceil(($total ?: 0) / $porPagina);
-
+        $prestamos = Prestamo::historial();
         include __DIR__ . '/../views/prestamos/historial.php';
     }
 }

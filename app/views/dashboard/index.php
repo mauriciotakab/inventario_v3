@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $role = $datos['role'] ?? 'Empleado';
 $nombre = $datos['nombre'] ?? '';
 $alertas = $datos['alertas'] ?? [];
@@ -8,30 +8,65 @@ $alertas = $datos['alertas'] ?? [];
 <head>
     <meta charset="UTF-8">
     <title>Dashboard - TAKAB</title>
-    <link rel="stylesheet" href="/assets/css/dashboard.css">
-    <link rel="stylesheet" href="/assets/css/dashboard_custom.css">
+    <link rel="stylesheet" href="../public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="../public/assets/css/dashboard_custom.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 <div class="main-layout">
-    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="login-logo"><img src="../public/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
+            <div>
+                <div class="sidebar-title">TAKAB</div>
+                <div class="sidebar-desc">Inventario y almacén</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.php" class="active"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <?php if ($role === 'Administrador'): ?>
+                <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestión de Usuarios</a>
+                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
+                <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
+                <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
+                <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
+            <?php elseif ($role === 'Almacen'): ?>
+                <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
+                <a href="revisar_solicitudes.php"><i class="fa-solid fa-inbox"></i> Solicitudes de Material</a>
+                <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
+                <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+            <?php elseif ($role === 'Empleado'): ?>
+                <a href="solicitudes_crear.php"><i class="fa-solid fa-plus-square"></i> Solicitar Material</a>
+                <a href="mis_solicitudes.php"><i class="fa-solid fa-clipboard-list"></i> Mis Solicitudes</a>
+            <?php endif; ?>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+        </nav>
+    </aside>
 
     <div class="content-area">
-        <?php include __DIR__ . '/../partials/topbar.php'; ?>
+        <header class="top-header">
+            <div></div>
+            <div class="top-header-user">
+                <span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
+                <i class="fa-solid fa-user-circle"></i>
+                <a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+            </div>
+        </header>
 
         <main class="dashboard-main">
             <div class="dashboard-header-row">
                 <div>
-                    <h1><?= $role === 'Administrador' ? 'Dashboard administrativo' : ($role === 'Almacen' ? 'Dashboard almacen' : 'Dashboard empleado') ?></h1>
+                    <h1><?= $role === 'Administrador' ? 'Dashboard administrativo' : ($role === 'Almacen' ? 'Dashboard almacén' : 'Dashboard empleado') ?></h1>
                     <span class="dashboard-desc">
                         <?php if ($role === 'Administrador'): ?>Resumen general del sistema de inventario TAKAB.
-                        <?php elseif ($role === 'Almacen'): ?>Panel para gestion de inventario y solicitudes.
+                        <?php elseif ($role === 'Almacen'): ?>Panel para gestión de inventario y solicitudes.
                         <?php else: ?>Resumen de tus solicitudes y actividades.
                         <?php endif; ?>
                     </span>
                 </div>
                 <div class="dashboard-updated">
-                    <div>Ultimo actualizado</div>
+                    <div>Último actualizado</div>
                     <div><?= htmlspecialchars($datos['last_update']) ?></div>
                 </div>
             </div>
@@ -46,12 +81,12 @@ $alertas = $datos['alertas'] ?? [];
                     <div class="dashboard-card red">
                         <div class="card-label">Stock bajo</div>
                         <div class="card-value"><?= number_format($datos['stockBajo'] ?? 0) ?></div>
-                        <div class="card-sub">Productos requieren reposicion</div>
+                        <div class="card-sub">Productos requieren reposición</div>
                     </div>
                     <div class="dashboard-card yellow">
                         <div class="card-label">Solicitudes pendientes</div>
                         <div class="card-value"><?= number_format($datos['solicitudesPendientes'] ?? 0) ?></div>
-                        <div class="card-sub">En espera de aprobacion</div>
+                        <div class="card-sub">En espera de aprobación</div>
                     </div>
                     <div class="dashboard-card sky">
                         <div class="card-label">Herramientas prestadas</div>
@@ -62,12 +97,12 @@ $alertas = $datos['alertas'] ?? [];
                     <div class="dashboard-card blue">
                         <div class="card-label">Productos registrados</div>
                         <div class="card-value"><?= number_format($datos['productosAlmacen'] ?? 0) ?></div>
-                        <div class="card-sub">En este almacen</div>
+                        <div class="card-sub">En este almacén</div>
                     </div>
                     <div class="dashboard-card yellow">
                         <div class="card-label">Solicitudes por gestionar</div>
                         <div class="card-value"><?= number_format($datos['solicitudesAlmacen'] ?? 0) ?></div>
-                        <div class="card-sub">Pendientes de atencion</div>
+                        <div class="card-sub">Pendientes de atención</div>
                     </div>
                     <div class="dashboard-card red">
                         <div class="card-label">Stock bajo</div>
@@ -81,9 +116,9 @@ $alertas = $datos['alertas'] ?? [];
                         <div class="card-sub">Totales enviadas</div>
                     </div>
                     <div class="dashboard-card yellow">
-                        <div class="card-label">Pendientes de aprobacion</div>
+                        <div class="card-label">Pendientes de aprobación</div>
                         <div class="card-value"><?= number_format($datos['pendientesAprobar'] ?? 0) ?></div>
-                        <div class="card-sub">En espera de almacen</div>
+                        <div class="card-sub">En espera de almacén</div>
                     </div>
                     <div class="dashboard-card sky">
                         <div class="card-label">Entregadas</div>
@@ -103,10 +138,10 @@ $alertas = $datos['alertas'] ?? [];
 
             <?php if ($role === 'Administrador'): ?>
                 <section class="dashboard-widget">
-                    <div class="widget-title sky"><i class="fa-solid fa-history"></i> Ultimos movimientos</div>
+                    <div class="widget-title sky"><i class="fa-solid fa-history"></i> Últimos movimientos</div>
                     <?php if (!empty($datos['ultimaActualizacion'])): ?>
                         <table class="dashboard-mini-table">
-                            <thead><tr><th>Fecha</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Almacen</th></tr></thead>
+                            <thead><tr><th>Fecha</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Almacén</th></tr></thead>
                             <tbody>
                             <?php foreach ($datos['ultimaActualizacion'] as $mov): ?>
                                 <tr>
@@ -141,23 +176,23 @@ $alertas = $datos['alertas'] ?? [];
                             </tbody>
                         </table>
                     <?php else: ?>
-                        <p class="widget-empty">Sin movimientos recientes en este almacen.</p>
+                        <p class="widget-empty">Sin movimientos recientes en este almacén.</p>
                     <?php endif; ?>
                 </section>
             <?php else: ?>
                 <section class="dashboard-widget">
-                    <div class="widget-title blue"><i class="fa-solid fa-info-circle"></i> Ultimas solicitudes</div>
+                    <div class="widget-title blue"><i class="fa-solid fa-info-circle"></i> Últimas solicitudes</div>
                     <?php if (!empty($alertas)): ?>
                         <ul class="dashboard-alert-list">
                             <?php foreach ($alertas as $al): ?>
                                 <li>
                                     <strong><?= htmlspecialchars($al['comentario'] ?? $al[0] ?? '-') ?></strong>
-                                    <span><?= htmlspecialchars($al['fecha'] ?? '-') ?>  Estado: <?= htmlspecialchars($al['estado'] ?? '-') ?></span>
+                                    <span><?= htmlspecialchars($al['fecha'] ?? '-') ?> · Estado: <?= htmlspecialchars($al['estado'] ?? '-') ?></span>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
                     <?php else: ?>
-                        <p class="widget-empty">Aun no tienes solicitudes recientes.</p>
+                        <p class="widget-empty">Aún no tienes solicitudes recientes.</p>
                     <?php endif; ?>
                 </section>
             <?php endif; ?>
@@ -179,7 +214,5 @@ $alertas = $datos['alertas'] ?? [];
         </main>
     </div>
 </div>
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>
-

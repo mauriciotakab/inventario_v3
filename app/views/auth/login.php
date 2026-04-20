@@ -1,54 +1,144 @@
-<?php
-require_once __DIR__ . '/../../helpers/Session.php';
-Session::start();
-$error = $error ?? '';
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - TAKAB</title>
-    <link rel="stylesheet" href="/assets/css/login.css">
+    <link rel="stylesheet" href="../public/assets/css/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://kit.fontawesome.com/8b82fe7e0b.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            color: var(--white);
+            background: url('../public/assets/images/edificios20.jpg') center center / cover no-repeat fixed;
+        }
+    </style>
 </head>
 <body>
-    <div class="login-bg">
-        <div class="login-container">
-            <div class="login-logo">
-                <img src="/assets/images/icono_takab.png" alt="logo TAKAB" width="90" height="70">
-            </div>
-            <h1 class="login-title">TAKAB</h1>
-            <p class="login-subtitle">Sistema de Inventario</p>
-            <div class="login-form-area">
-                <h2><i class="fa-solid fa-right-to-bracket"></i> Iniciar sesi&oacute;n</h2>
-                <p class="login-instructions">Ingresa tus credenciales para acceder al sistema</p>
-                <?php if (!empty($error)): ?>
-                    <p class="login-error"><?= htmlspecialchars($error) ?></p>
-                <?php endif; ?>
-                <form method="post" action="">
-                    <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
-                    <label for="username">Usuario</label>
-                    <input type="text" id="username" name="username" required autofocus placeholder="Ingresa tu usuario">
+<?php
+    $moduleLabels = [
+        'nomina' => 'Nómina',
+        'contabilidad' => 'Contabilidad',
+        'bancos' => 'Bancos',
+        'compras' => 'Compras',
+        'inventario' => 'Inventarios',
+        'ventas' => 'Ventas',
+        'proyectos' => 'Realización de proyectos',
+        'mantenimientos' => 'Mantenimientos',
+    ];
+    $moduleKey = $module ?? null;
+    $moduleName = ($moduleKey && isset($moduleLabels[$moduleKey])) ? $moduleLabels[$moduleKey] : 'Acceso general';
+?>
 
-                    <label for="password">Contrase&ntilde;a</label>
-                    <input type="password" id="password" name="password" required placeholder="Ingresa tu contrase&ntilde;a">
+<main class="portal-login">
+    <div class="portal-bg-overlay"></div>
 
-                    <button type="submit">Iniciar sesi&oacute;n</button>
-                    <a class="forgot-link" href="forgot.php">Olvid&eacute; mi contrase&ntilde;a</a>
-                </form>
-                <div class="login-test-users">
-                    <span>Usuarios de prueba:</span>
-                    <ul>
-                        <li><strong>Admin:</strong> admin / 123456</li>
-                        <li><strong>Almac&eacute;n:</strong> almacen / 123456</li>
-                        <li><strong>Empleado:</strong> empleado / 123456</li>
-                        <li><strong>Empleado Prueba:</strong> mau / 123456</li>
-                    </ul>
+    <section class="portal-layout">
+        <div class="portal-left">
+            <div class="portal-brand-wrap">
+                <div class="portal-brand-row">
+                    <div class="brand-logo-block" aria-hidden="true">
+                        <img src="../public/assets/images/icono_takab.png" alt="TAKAB" class="brand-logo-img">
+                    </div>
+
+                    <div class="brand-separator"></div>
+
+                    <div class="brand-portal-block">
+                        <div class="brand-portal-text">
+                            <span class="brand-portal-mini">TAKAB TECHNOLOGY</span>
+                            <h1>SISTEMA ERP</h1>
+                        </div>
+                    </div>
                 </div>
+
+                <p class="portal-copy">
+                    Accede al ERP TAKAB para consultar los módulos disponibles.
+                </p>
+
+            
             </div>
         </div>
-    </div>
-    <script src="https://kit.fontawesome.com/8b82fe7e0b.js" crossorigin="anonymous"></script>
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
+
+        <aside class="login-panel">
+            <div class="login-panel-inner">
+               <div class="login-header">
+                        <h2>Iniciar sesión</h2>
+                        <p>Ingresa tus credenciales para acceder al sistema.</p>
+                </div>
+
+                <?php if (isset($error)): ?>
+                    <div class="login-alert">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span><?= htmlspecialchars($error); ?></span>
+                    </div>
+                <?php endif; ?>
+
+                <form method="POST" action="" class="login-form">
+                        <?php if ($moduleKey): ?>
+                            <input type="hidden" name="module" value="<?= htmlspecialchars($moduleKey); ?>">
+                        <?php endif; ?>
+                        <?php if (!empty($next)): ?>
+                            <input type="hidden" name="next" value="<?= htmlspecialchars($next); ?>">
+                        <?php endif; ?>
+
+
+                        <div class="field-group">
+                            <label for="username">Usuario</label>
+                            <div class="input-wrap">
+                                <i class="fa-regular fa-user"></i>
+                                <input type="text" id="username" name="username" required autofocus placeholder="Ingresa tu usuario">
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="password">Contraseña</label>
+                            <div class="input-wrap">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" id="password" name="password" required placeholder="Ingresa tu contraseña">
+                            </div>
+                        </div>
+
+                       <div class="login-links">
+                          <a class="text-link" href="index.php">Volver al inicio</a> 
+                            <a class="text-link" href="forgot.php">Olvidé mi contraseña</a>
+                        </div>
+
+                    <button type="submit" class="btn-login">Iniciar sesión</button>
+
+                </form>
+
+                <details class="login-test-users">
+                    <summary>Usuarios de prueba</summary>
+                    <ul>
+                        <li><b>Admin:</b> admin / 123456</li>
+                        <li><b>Almacén:</b> almacen / 123456</li>
+                        <li><b>Empleado:</b> empleado / 123456</li>
+                        <li><b>Empleado prueba:</b> mau / 123456</li>
+                    </ul>
+                </details>
+            </div>
+        </aside>
+    </section>
+</main>
+
+<script>
+(function () {
+    const toggleBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+
+
+    if (toggleBtn && passwordInput) {
+        toggleBtn.addEventListener('click', function () {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            const icon = toggleBtn.querySelector('i');
+            if (icon) {
+                icon.className = isPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+            }
+        });
+    }
+
+})();
+</script>
 </body>
 </html>

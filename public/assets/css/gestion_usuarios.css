@@ -1,0 +1,39 @@
+         .card {
+            background: #ffffffc7;
+            border-radius: 20px;
+            box-shadow: 0 6px 30px 0 rgba(16, 24, 40, 0.30);
+            width: min(860px, 100%);
+            padding: 28px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        .title { margin: 0; font-size: 1.7rem; font-weight: 900; color: #223264; }
+        .sub { margin: 6px 0 0 0; color: #364e96; }
+        .user { color: #6476a8; font-weight: 700; }
+        .actions { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 800;
+            background: #2563eb;
+            color: #fff;
+        }
+        .btn.secondary { background: #223264; }
+        .note {
+            margin-top: 14px;
+            background: #2563eb14;
+            border: 1px solid #cbd5e1;
+            border-radius: 14px;
+            padding: 14px;
+            color: #223264;
+        }
+   

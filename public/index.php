@@ -1,5 +1,10 @@
 <?php
 session_start();
+// Si ya hay sesión, saltar directo al menú de módulos.
+if (isset($_SESSION['user_id'])) {
+    header('Location: menu.php');
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -8,146 +13,14 @@ session_start();
     <title>INICIO TAKAB</title>
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/config.css">
+    <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body, html {
-            
-            background-color: #f5f7fa;
-        }
-          .content-area {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-             
-            background-image: url('assets/images/edificios10.jpeg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-        .top-header {
-            background: #14295e;
-            border-bottom: 1.5px solid #e9eef5;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-        .top-header-user {
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            font-weight: 700;
-            color: #c0c2c7ff;
-        }
-        .logout-btn {
-            color: #d32323;
-            font-size: 1.23rem;
-            margin-left: 12px;
-            text-decoration: none;
-            transition: color 0.15s;
-        }
-        .logout-btn:hover { color: #9b1818; }
-        .error-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-        .error-icon {
-            font-size: 6rem;
-            color: #2563eb;
-            margin-bottom: 10px;
-        }
-        .error-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            color: #223264;
-        }
-        .error-desc {
-            font-size: 1.3rem;
-            color: #6476a8;
-            margin-bottom: 32px;
-        }
-        .error-btn {
-            display: inline-block;
-            background: #2563eb;
-            color: #fff;
-            padding: 13px 32px;
-            border-radius: 9px;
-            font-size: 1.15rem;
-            font-weight: 700;
-            text-decoration: none;
-            transition: background 0.17s;
-        }
-        .error-icon {
-            font-size: 6rem;
-            color: #2563eb;
-            margin-bottom: 10px;
-        }
-        .error-btn:hover { background: #1741a6; }
-        @media (max-width:600px){
-            .top-header{padding:12px 10px;}
-            .error-title{font-size:1.5rem;}
-            .error-icon{font-size:3rem;}
-        }
-        .inicio-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            
-            }
-        .inicio-icon {
-            font-size: 6rem;
-            color: #2563eb;
-            margin-bottom: 10px;
-        }
-        .inicio-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            color: #223264;
-        }
-        .inicio-desc {
-            font-size: 1.3rem;
-            color: #364e96;
-            margin-bottom: 32px;
-        }
-        .inicio-btn {
-            display: inline-block;
-            background: #2563eb;
-            color: #fff;
-            padding: 13px 32px;
-            border-radius: 9px;
-            font-size: 1.15rem;
-            font-weight: 700;
-            text-decoration: none;
-            transition: background 0.17s;
-        }
-        .inicio-icon {
-            font-size: 6rem;
-            color: #2563eb;
-            margin-bottom: 10px;
-        }
-        .inicio-btn:hover { background: #1741a6; }
-        @media (max-width:600px){
-            .top-header{padding:12px 10px;}
-            .error-title{font-size:1.5rem;}
-            .error-icon{font-size:3rem;}
-        }
-       .login-container {
-        background: #ffffffbd;
-        border-radius: 20px;
-        box-shadow: 0 6px 30px 0 rgba(16, 24, 40, 0.3);
-        padding: 40px 40px 20px 40px;
-        width: 370px;
-        text-align: center;
-        }
+            color: var(--white);
+            background: url('../public/assets/images/edificios20.jpg') center center / cover no-repeat fixed;
+          
+        } 
     </style>
 </head>
 <body>
@@ -177,27 +50,23 @@ session_start();
             </div> 
             <a href="dashboard.php" class="error-btn"><i class="fa fa-home"></i> Ir al inicio</a> -->
 
-         <main class="inicio-main">
+        <main class="inicio-main">
             
             
             <div class="login-container" >
-            <div class="inicio-title">Bienvenido a TAKAB</div>
-            <div class="inicio-desc"> Inicia sesión para continuar.</div> 
-            <a href="dashboard.php" class="inicio-btn"><i class="fa fa-home"></i> Iniciar sesión</a> 
-         
-
-            
+            <div class="inicio-title">Bienvenido al 
+                <br> ERP TAKAB
+            </div>
+            <div class="inicio-desc">Inicia sesión para acceder al sistema.</div> 
+            <a href="login.php?next=menu.php" class="inicio-btn"><i class="fa-solid fa-right-to-bracket"></i> Iniciar sesión</a> 
             <footer>
-
                 <div>
                     <br>
-                    <img src="assets/images/LogoTakab2.webp" alt="logo Takab">
-                    
+                    <img src="assets/images/LogoTakab2.webp" alt="logo Takab" align-item="center justify-content-center" width="320px">
                 </div>
             </footer>        
         </main>
-
-        
+      
     </div>
 </body>
 </html>

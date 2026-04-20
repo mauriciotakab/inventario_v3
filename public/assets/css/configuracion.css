@@ -65,8 +65,6 @@
 .config-alm { background: #fef2e6; color: #d97a27; }
 .config-uni { background: #f1e6fa; color: #ae43f6; }
 .config-client { background: #e6f6ff; color: #1e6aa8; }
-.config-backup { background: #e6ecff; color: #2f54c6; }
-.config-doc { background: #fff4e6; color: #c9741c; }
 .config-btn {
     width: 100%;
     background: #f6f8fb;
@@ -90,12 +88,10 @@
 .config-bottom-row {
     margin-top: 28px;
     display: flex;
-    flex-wrap: wrap;
-    gap: 22px;
     justify-content: center;
 }
 .config-bottom-row .config-card {
-    max-width: 420px;
+    max-width: 520px;
     width: 100%;
 }
 @media (max-width: 900px) {
@@ -107,58 +103,4 @@
     .config-header-title { font-size: 1.3rem; }
     .config-cards-grid { grid-template-columns: 1fr; }
     .config-bottom-row { margin-top: 22px; }
-}
-.config-section-card {
-    background: #fff;
-    border-radius: 18px;
-    border: 1px solid #eef1f7;
-    box-shadow: 0 2px 18px rgba(23, 44, 87, 0.05);
-    padding: 28px 30px;
-    margin-bottom: 28px;
-}
-.config-section-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 18px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-.config-section-head h2 {
-    margin: 0;
-    font-size: 1.55rem;
-    color: #16243d;
-}
-.config-section-desc {
-    margin: 6px 0 0;
-    color: #7886a8;
-    font-size: 1rem;
-}
-.config-section-actions {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-}
-.config-table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-}
-.config-empty {
-    padding: 28px;
-    text-align: center;
-    color: #7c88a8;
-    border: 1px dashed #d9deeb;
-    border-radius: 12px;
-}
-@media (max-width: 720px) {
-    .config-section-card { padding: 22px 20px; }
-    .config-section-head { flex-direction: column; align-items: flex-start; }
-    .config-section-actions { width: 100%; }
-    .config-section-actions .btn-main,
-    .config-section-actions .btn-principal {
-        width: 100%;
-        justify-content: center;
-        text-align: center;
-    }
 }

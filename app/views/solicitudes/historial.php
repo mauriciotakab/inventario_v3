@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../../helpers/Session.php';
-Session::requireLogin(['Empleado', 'Almacen']);
-$breadcrumbs = [['label' => 'Historial de solicitudes']];
+Session::requireLogin('Empleado');
 $role = $_SESSION['role'];
 $nombre = $_SESSION['nombre'];
 require_once __DIR__ . '/../../models/SolicitudMaterial.php';
@@ -25,8 +24,7 @@ if ($estadoFiltro) {
 
 
 require_once __DIR__ . '/../../helpers/Session.php';
-Session::requireLogin(['Empleado', 'Almacen']);
-$breadcrumbs = [['label' => 'Historial de solicitudes']];
+Session::requireLogin('Empleado');
 $role = $_SESSION['role'];
 $nombre = $_SESSION['nombre'];
 $estadoFiltro = $_GET['estado'] ?? '';
@@ -45,8 +43,8 @@ $tabs = [
 <head>
     <meta charset="UTF-8">
     <title>Mis Solicitudes de Material/Herramienta | TAKAB</title>
-    <link rel="stylesheet" href="/assets/css/dashboard.css">
-    <link rel="stylesheet" href="/assets/css/config.css">
+    <link rel="stylesheet" href="../public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="../public/assets/css/config.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body { background: #f6f7fa; }
@@ -115,9 +113,38 @@ $tabs = [
 <body>
 <div class="main-layout">
     <!-- Sidebar -->
-    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="login-logo"><img src="../public/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55""></div>
+            <div>
+                <div class="sidebar-title">TAKAB</div>
+                <div class="sidebar-desc">Inventario y almacén</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
+
+            <?php if ($role === 'Empleado'): ?>
+                <a href="solicitudes_crear.php"><i class="fa-solid fa-plus-square"></i> Solicitar Material para Servicio</a>
+                <a href='solicitar_material_general.php'><i class="fa-solid fa-comment-medical"></i> Solicitar Material en General</a>
+                <a href="mis_solicitudes.php" class="active"><i class="fa-solid fa-clipboard-list"></i> Mis Solicitudes</a>
+
+
+                <?php endif; ?>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+        </nav>
+    </aside>
     <div class="content-area">
-        <?php include __DIR__ . '/../partials/topbar.php'; ?>
+        <header class="top-header">
+            <div></div>
+            <div class="top-header-user">
+                <span><?= htmlspecialchars($_SESSION['nombre'] ?? 'TAKAB'); ?></span>
+                <i class="fa-solid fa-user-circle"></i>
+                <a href="../logout.php" class="logout-btn" title="Cerrar sesión">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a>
+            </div>
+        </header>
         <main class="dashboard-main sol-main">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:18px;">
                 <div>
@@ -193,7 +220,6 @@ $tabs = [
         </main>
     </div>
 </div>
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>
 <?php

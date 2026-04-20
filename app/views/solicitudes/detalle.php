@@ -1,15 +1,14 @@
 <?php
 require_once __DIR__ . '/../../helpers/Session.php';
-Session::requireLogin(['Empleado', 'Almacen']);
-$breadcrumbs = [['label' => 'Detalle de la solicitud']];
+Session::requireLogin('Empleado');
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Detalle de Solicitud | TAKAB</title>
-    <link rel="stylesheet" href="/assets/css/dashboard.css">
-    <link rel="stylesheet" href="/assets/css/config.css">
+    <link rel="stylesheet" href="../public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="../public/assets/css/config.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body { background: #f6f7fa; }
@@ -132,6 +131,5 @@ $breadcrumbs = [['label' => 'Detalle de la solicitud']];
         <?php endif; ?>
         <a href="mis_solicitudes.php#" class="detalle-btn-back"><i class="fa fa-arrow-left"></i> Regresar</a>
     </div>
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

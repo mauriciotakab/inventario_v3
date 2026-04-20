@@ -1,19 +1,47 @@
-<?php Session::requireLogin('Administrador'); ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Editar Usuario - TAKAB</title>
-    <link rel="stylesheet" href="/assets/css/dashboard.css">
+    <link rel="stylesheet" href="../public/assets/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 <div class="main-layout">
     <!-- Sidebar -->
-    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="login-logo"><img src="../public/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55""></div>
+            <div>
+                <div class="sidebar-title">TAKAB</div>
+                <div class="sidebar-desc">Gestión de Usuarios</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="solicitudes.php"><i class="fa-solid fa-inbox"></i> Solicitudes</a>
+            <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Productos</a>
+            <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
+            <a href="usuarios.php" class="active"><i class="fa-solid fa-users"></i> Usuarios</a>
+            <a href="reportes.php"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+            <a href="categorias.php"><i class="fa-solid fa-tags"></i> Categorías</a>
+            <a href="almacenes.php"><i class="fa-solid fa-warehouse"></i> Almacenes</a>
+            <a href="unidades.php"><i class="fa-solid fa-balance-scale"></i> Unidades</a>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+        </nav>
+    </aside>
     <div class="content-area">
         <!-- Topbar -->
-        <?php include __DIR__ . '/../partials/topbar.php'; ?>
+        <header class="top-header">
+            <div></div>
+            <div class="top-header-user">
+                <span><?php echo htmlspecialchars($_SESSION['nombre'] ?? 'Admin TAKAB'); ?></span>
+                <i class="fa-solid fa-user-circle"></i>
+                <a href="logout.php" class="logout-btn" title="Cerrar sesión">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a>
+            </div>
+        </header>
         <!-- Formulario de edición -->
         <main class="dashboard-main">
             <div class="usuarios-header-row2">
@@ -23,7 +51,6 @@
             <div class="form-box">
                 <?php if (!empty($error)) echo "<p class='form-error'>$error</p>"; ?>
                 <form class="usuario-form" method="post" action="">
-                    <input type="hidden" name="csrf" value="<?= Session::csrfToken() ?>">
                     <label>Nombre completo:</label>
                     <input type="text" name="nombre_completo" value="<?= htmlspecialchars($usuario['nombre_completo']) ?>" required>
                     <label>Usuario:</label>
@@ -33,8 +60,7 @@
                     <label>Rol:</label>
                     <select name="role" required>
                         <option value="Empleado" <?= $usuario['role'] === 'Empleado' ? 'selected' : '' ?>>Empleado</option>
-                        <option value="Almacen" <?= $usuario['role'] === 'Almacen' ? 'selected' : '' ?>>Almacen</option>
-                        <option value="Compras" <?= $usuario['role'] === 'Compras' ? 'selected' : '' ?>>Compras</option>
+                        <option value="Almacen" <?= $usuario['role'] === 'Almacen' ? 'selected' : '' ?>>Almacén</option>
                         <option value="Administrador" <?= $usuario['role'] === 'Administrador' ? 'selected' : '' ?>>Administrador</option>
                     </select>
                     <label class="check-label">
@@ -47,7 +73,5 @@
         </main>
     </div>
 </div>
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>
-

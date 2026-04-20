@@ -7,19 +7,6 @@ $filters = $filters ?? [];
 $fechaInicio = htmlspecialchars($filters['from'] ?? date('Y-m-01'), ENT_QUOTES, 'UTF-8');
 $fechaFin = htmlspecialchars($filters['to'] ?? date('Y-m-d'), ENT_QUOTES, 'UTF-8');
 $movTipo = htmlspecialchars($filters['mov_tipo'] ?? '', ENT_QUOTES, 'UTF-8');
-$movAlmacenSeleccionado = htmlspecialchars($filters['mov_almacen_id'] ?? '', ENT_QUOTES, 'UTF-8');
-$invAlmacenSeleccionado = htmlspecialchars($filters['inv_almacen_id'] ?? '', ENT_QUOTES, 'UTF-8');
-$invCategoriaSeleccionada = htmlspecialchars($filters['inv_categoria_id'] ?? '', ENT_QUOTES, 'UTF-8');
-$proveedorSeleccionado = htmlspecialchars($filters['proveedor_id'] ?? '', ENT_QUOTES, 'UTF-8');
-$topTipoSeleccionado = htmlspecialchars($filters['top_tipo'] ?? '', ENT_QUOTES, 'UTF-8');
-$topAlmacenSeleccionado = htmlspecialchars($filters['top_almacen_id'] ?? '', ENT_QUOTES, 'UTF-8');
-
-$proveedores = is_array($proveedores ?? null) ? $proveedores : [];
-$almacenes = is_array($almacenes ?? null) ? $almacenes : [];
-$categorias = is_array($categorias ?? null) ? $categorias : [];
-$tiposProducto = is_array($tiposProducto ?? null) ? $tiposProducto : [];
-$comprasListado = is_array($comprasListado ?? null) ? $comprasListado : [];
-$comprasResumen = is_array($comprasResumen ?? null) ? $comprasResumen : ['total' => 0, 'proveedores' => []];
 
 $buildQuery = function(array $overrides = []) {
     $params = array_merge($_GET, $overrides);
@@ -36,27 +23,51 @@ $buildQuery = function(array $overrides = []) {
 <head>
     <meta charset="UTF-8">
     <title>Reportes | TAKAB</title>
-    <link rel="stylesheet" href="/assets/css/dashboard.css">
-    <link rel="stylesheet" href="/assets/css/reportes.css">
+    <link rel="stylesheet" href="../public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="../public/assets/css/reportes.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 <div class="main-layout">
-    <?php include __DIR__ . '/../partials/sidebar.php'; ?>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="login-logo"><img src="../public/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
+            <div>
+                <div class="sidebar-title">TAKAB</div>
+                <div class="sidebar-desc">Panel de control</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <?php if ($role === 'Administrador'): ?>
+                <a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestión de Usuarios</a>
+            <?php endif; ?>
+            <a href="productos.php"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
+            <a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
+            <a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
+            <a href="reportes.php" class="active"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+            <a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
+            <a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+        </nav>
+    </aside>
 
     <div class="content-area">
-        <?php include __DIR__ . '/../partials/topbar.php'; ?>
+        <header class="top-header">
+            <div></div>
+            <div class="top-header-user">
+                <span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
+                <i class="fa-solid fa-user-circle"></i>
+                <a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+            </div>
+        </header>
 
         <main class="dashboard-main reportes-main">
             <div class="reportes-header">
                 <div>
                     <h1>Centro de reportes</h1>
-                    <p class="reportes-desc">Analiza el estado del inventario, movimientos y prestamos. Exporta la informacion a CSV o PDF para respaldo o analisis.</p>
+                    <p class="reportes-desc">Analiza el estado del inventario, movimientos y préstamos. Exporta la información a CSV para respaldo o análisis externo.</p>
                 </div>
-                <div class="reportes-actions">
-                    <a class="btn-secondary" href="<?= $buildQuery(['export' => 'csv', 'section' => 'movimientos']) ?>"><i class="fa-solid fa-file-csv"></i> Movimientos CSV</a>
-                    <a class="btn-secondary" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'movimientos']) ?>"><i class="fa-solid fa-file-pdf"></i> Movimientos PDF</a>
-                </div>
+                <a class="btn-secondary" href="<?= $buildQuery(['export' => 'csv', 'section' => 'movimientos']) ?>"><i class="fa fa-download"></i> Exportar movimientos</a>
             </div>
 
             <section class="reportes-summary-grid">
@@ -77,207 +88,11 @@ $buildQuery = function(array $overrides = []) {
                 </div>
                 <?php if ($mostrarCostos): ?>
                     <div class="reportes-summary-card success">
-                        <span class="label">Valor estimado del inventario con I.V.A.</span>
+                        <span class="label">Valor estimado del inventario</span>
                         <span class="value">$<?= number_format($inventarioResumen['valor_total'], 2) ?></span>
-                        <span class="foot">Considera stock actual * costo compra con I.V.A.</span>
+                        <span class="foot">Considera stock actual * costo compra</span>
                     </div>
                 <?php endif; ?>
-            </section>
-
-            <?php if ($mostrarCostos): ?>
-            <section class="reportes-section">
-                <div class="section-header">
-                    <div>
-                        <h2><i class="fa fa-warehouse"></i> Valor por almacen</h2>
-                        <span class="section-sub">Inventario valorizado por almacen con totales de unidades.</span>
-                    </div>
-                    <div class="section-actions">
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'valor_almacen']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'valor_almacen']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-                    </div>
-                </div>
-                <?php if (empty($valorPorAlmacen)): ?>
-                    <div class="reportes-empty">
-                        <i class="fa fa-info-circle"></i>
-                        <p>No hay datos para calcular el valor por almacen.</p>
-                    </div>
-                <?php else: ?>
-                    <div class="reportes-table-wrapper">
-                        <table class="reportes-table">
-                            <thead>
-                                <tr>
-                                    <th>Almacen</th>
-                                    <th>Productos</th>
-                                    <th>Unidades</th>
-                                    <th>Valor total (MXN)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($valorPorAlmacen as $row): ?>
-                                    <tr>
-                                        <td><?= htmlspecialchars($row['almacen'] ?? '-') ?></td>
-                                        <td><?= number_format((int) ($row['productos'] ?? 0)) ?></td>
-                                        <td><?= number_format((float) ($row['unidades'] ?? 0), 2) ?></td>
-                                        <td>$<?= number_format((float) ($row['valor_total'] ?? 0), 2) ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
-            </section>
-            <?php endif; ?>
-
-            <?php if ($mostrarCostos): ?>
-            <section class="reportes-section">
-                <div class="section-header">
-                    <div>
-                        <h2><i class="fa fa-file-invoice-dollar"></i> Compras por proveedor</h2>
-                        <span class="section-sub">Órdenes registradas entre <?= $fechaInicio ?> y <?= $fechaFin ?>.</span>
-                    </div>
-                    <div class="section-actions">
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'compras_proveedor']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'compras_proveedor']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-                    </div>
-                </div>
-                <?php if (empty($comprasListado)): ?>
-                    <div class="reportes-empty">
-                        <i class="fa fa-info-circle"></i>
-                        <p>No se registraron compras en el periodo seleccionado.</p>
-                    </div>
-                <?php else: ?>
-                    <div class="reportes-summary-inline">
-                        <div class="reportes-summary-card success">
-                            <span class="label">Total periodo</span>
-                            <span class="value">$<?= number_format((float) ($comprasResumen['total'] ?? 0), 2) ?></span>
-                        </div>
-                        <?php foreach (array_slice($comprasResumen['proveedores'] ?? [], 0, 3) as $resProveedor): ?>
-                            <div class="reportes-summary-card sky">
-                                <span class="label"><?= htmlspecialchars($resProveedor['proveedor']) ?></span>
-                                <span class="value">$<?= number_format((float) $resProveedor['importe'], 2) ?></span>
-                                <span class="foot">Órdenes: <?= number_format((int) $resProveedor['ordenes']) ?></span>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="reportes-table-wrapper">
-                        <table class="reportes-table">
-                            <thead>
-                                <tr>
-                                    <th>Orden</th>
-                                    <th>Fecha</th>
-                                    <th>Proveedor</th>
-                                    <th>RFC proveedor</th>
-                                    <th>RFC orden</th>
-                                    <th>Factura</th>
-                                    <th>Estado</th>
-                                    <th>Almacen</th>
-                                    <th>Productos</th>
-                                    <th>Importe detalle</th>
-                                    <th>Importe total</th>
-                                    <th>Registrado por</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($comprasListado as $compra): ?>
-                                    <tr>
-                                        <td>#<?= (int) $compra['orden_id'] ?></td>
-                                        <td><?= date('d/m/Y', strtotime($compra['fecha'])) ?></td>
-                                        <td><?= htmlspecialchars($compra['proveedor']) ?></td>
-                                        <td><?= htmlspecialchars($compra['proveedor_rfc'] ?? '-') ?></td>
-                                        <td><?= htmlspecialchars($compra['orden_rfc'] ?? '-') ?></td>
-                                        <td><?= htmlspecialchars($compra['numero_factura'] ?? '-') ?></td>
-                                        <td><?= htmlspecialchars($compra['estado']) ?></td>
-                                        <td><?= htmlspecialchars($compra['almacen']) ?></td>
-                                        <td><?= number_format((float) $compra['total_items'], 2) ?></td>
-                                        <td>$<?= number_format((float) $compra['importe_detalle'], 2) ?></td>
-                                        <td>$<?= number_format((float) $compra['importe_total'], 2) ?></td>
-                                        <td><?= htmlspecialchars($compra['creado_por'] ?? '-') ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
-            </section>
-            <?php endif; ?>
-
-            <?php
-                $consumiblesListado = $productosPorTipo['consumibles'] ?? [];
-                $herramientasListado = $productosPorTipo['herramientas'] ?? [];
-                $equiposListado = $productosPorTipo['equipos'] ?? [];
-                $todosListado = $productosPorTipo['todos'] ?? [];
-                $consumiblesStock = array_sum(array_map(fn($row) => (float) ($row['stock_actual'] ?? 0), $consumiblesListado));
-                $herramientasStock = array_sum(array_map(fn($row) => (float) ($row['stock_actual'] ?? 0), $herramientasListado));
-                $equiposStock = array_sum(array_map(fn($row) => (float) ($row['stock_actual'] ?? 0), $equiposListado));
-                $todosStock = array_sum(array_map(fn($row) => (float) ($row['stock_actual'] ?? 0), $todosListado));
-            ?>
-            <section class="reportes-section">
-                <div class="section-header">
-                    <div>
-                        <h2><i class="fa fa-boxes-stacked"></i> Productos por tipo</h2>
-                        <span class="section-sub">Descarga el catalogo por tipo o el inventario completo.</span>
-                    </div>
-                    <div class="section-actions">
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_consumibles']) ?>"><i class="fa-solid fa-file-csv"></i> Consumibles CSV</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_consumibles']) ?>"><i class="fa-solid fa-file-pdf"></i> Consumibles PDF</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_herramientas']) ?>"><i class="fa-solid fa-file-csv"></i> Herramientas CSV</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_herramientas']) ?>"><i class="fa-solid fa-file-pdf"></i> Herramientas PDF</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_equipos']) ?>"><i class="fa-solid fa-file-csv"></i> Equipos CSV</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_equipos']) ?>"><i class="fa-solid fa-file-pdf"></i> Equipos PDF</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_todos']) ?>"><i class="fa-solid fa-file-csv"></i> Totalidad CSV</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_todos']) ?>"><i class="fa-solid fa-file-pdf"></i> Totalidad PDF</a>
-                    </div>
-                </div>
-                <div class="reportes-table-wrapper">
-                    <table class="reportes-table">
-                        <thead>
-                            <tr>
-                                <th>Tipo</th>
-                                <th>Productos</th>
-                                <th>Stock total</th>
-                                <th>Exportar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><span class="badge badge-tipo consumible">Consumibles</span></td>
-                                <td><?= number_format(count($consumiblesListado)) ?></td>
-                                <td><?= number_format($consumiblesStock, 2) ?></td>
-                                <td class="reportes-actions-inline">
-                                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_consumibles']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
-                                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_consumibles']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="badge badge-tipo herramienta">Herramientas</span></td>
-                                <td><?= number_format(count($herramientasListado)) ?></td>
-                                <td><?= number_format($herramientasStock, 2) ?></td>
-                                <td class="reportes-actions-inline">
-                                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_herramientas']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
-                                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_herramientas']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="badge badge-tipo equipo">Equipos</span></td>
-                                <td><?= number_format(count($equiposListado)) ?></td>
-                                <td><?= number_format($equiposStock, 2) ?></td>
-                                <td class="reportes-actions-inline">
-                                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_equipos']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
-                                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_equipos']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="badge badge-tipo total">Totalidad</span></td>
-                                <td><?= number_format(count($todosListado)) ?></td>
-                                <td><?= number_format($todosStock, 2) ?></td>
-                                <td class="reportes-actions-inline">
-                                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'productos_todos']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
-                                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'productos_todos']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </section>
 
             <section class="reportes-filter-card">
@@ -300,67 +115,9 @@ $buildQuery = function(array $overrides = []) {
                                 <option value="Transferencia" <?= $movTipo === 'Transferencia' ? 'selected' : '' ?>>Transferencia</option>
                             </select>
                         </div>
-                        <div class="filter-field">
-                            <label for="mov_almacen_id">Movimientos (almacen)</label>
-                            <select id="mov_almacen_id" name="mov_almacen_id">
-                                <option value="">Todos</option>
-                                <?php foreach ($almacenes as $almacen): ?>
-                                    <option value="<?= (int) $almacen['id'] ?>" <?= $movAlmacenSeleccionado === (string) $almacen['id'] ? 'selected' : '' ?>><?= htmlspecialchars($almacen['nombre']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
                         <div class="filter-actions">
                             <button type="submit" class="btn-main"><i class="fa fa-filter"></i> Actualizar</button>
                             <a class="btn-ghost" href="reportes.php"><i class="fa fa-eraser"></i> Limpiar</a>
-                        </div>
-                    </div>
-                    <div class="filter-row">
-                        <div class="filter-field">
-                            <label for="proveedor_id">Proveedor (compras)</label>
-                            <select id="proveedor_id" name="proveedor_id">
-                                <option value="">Todos</option>
-                                <?php foreach ($proveedores as $proveedor): ?>
-                                    <option value="<?= (int) $proveedor['id'] ?>" <?= $proveedorSeleccionado === (string) $proveedor['id'] ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($proveedor['nombre']) ?><?= !empty($proveedor['rfc']) ? ' - ' . htmlspecialchars($proveedor['rfc']) : '' ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="filter-field">
-                            <label for="inv_almacen_id">Inventario bajo (almacen)</label>
-                            <select id="inv_almacen_id" name="inv_almacen_id">
-                                <option value="">Todos</option>
-                                <?php foreach ($almacenes as $almacen): ?>
-                                    <option value="<?= (int) $almacen['id'] ?>" <?= $invAlmacenSeleccionado === (string) $almacen['id'] ? 'selected' : '' ?>><?= htmlspecialchars($almacen['nombre']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="filter-field">
-                            <label for="inv_categoria_id">Inventario bajo (categoria)</label>
-                            <select id="inv_categoria_id" name="inv_categoria_id">
-                                <option value="">Todas</option>
-                                <?php foreach ($categorias as $categoria): ?>
-                                    <option value="<?= (int) $categoria['id'] ?>" <?= $invCategoriaSeleccionada === (string) $categoria['id'] ? 'selected' : '' ?>><?= htmlspecialchars($categoria['nombre']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="filter-field">
-                            <label for="top_tipo">Top salidas (tipo)</label>
-                            <select id="top_tipo" name="top_tipo">
-                                <option value="">Todos</option>
-                                <?php foreach ($tiposProducto as $tipoProducto): ?>
-                                    <option value="<?= htmlspecialchars($tipoProducto) ?>" <?= $topTipoSeleccionado === $tipoProducto ? 'selected' : '' ?>><?= htmlspecialchars($tipoProducto) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="filter-field">
-                            <label for="top_almacen_id">Top salidas (almacen)</label>
-                            <select id="top_almacen_id" name="top_almacen_id">
-                                <option value="">Todos</option>
-                                <?php foreach ($almacenes as $almacen): ?>
-                                    <option value="<?= (int) $almacen['id'] ?>" <?= $topAlmacenSeleccionado === (string) $almacen['id'] ? 'selected' : '' ?>><?= htmlspecialchars($almacen['nombre']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
                         </div>
                     </div>
                 </form>
@@ -370,12 +127,9 @@ $buildQuery = function(array $overrides = []) {
                 <div class="section-header">
                     <div>
                         <h2><i class="fa fa-triangle-exclamation"></i> Inventario bajo</h2>
-                        <span class="section-sub">Productos con existencias por debajo del minimo definido.</span>
+                        <span class="section-sub">Productos con existencias por debajo del mínimo definido.</span>
                     </div>
-                    <div class="section-actions">
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'inventario_bajo']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'inventario_bajo']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-                    </div>
+                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'inventario_bajo']) ?>"><i class="fa fa-download"></i> Exportar CSV</a>
                 </div>
                 <?php if (empty($inventarioBajo)): ?>
                     <div class="reportes-empty">
@@ -387,13 +141,13 @@ $buildQuery = function(array $overrides = []) {
                         <table class="reportes-table">
                             <thead>
                                 <tr>
-                                    <th>Codigo</th>
+                                    <th>Código</th>
                                     <th>Producto</th>
                                     <th>Tipo</th>
-                                    <th>Categoria</th>
-                                    <th>Almacen</th>
+                                    <th>Categoría</th>
+                                    <th>Almacén</th>
                                     <th>Stock actual</th>
-                                    <th>Stock minimo</th>
+                                    <th>Stock mínimo</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -418,19 +172,16 @@ $buildQuery = function(array $overrides = []) {
             <section class="reportes-section">
                 <div class="section-header">
                     <div>
-                        <h2><i class="fa fa-warehouse"></i> Valor del inventario por almacen</h2>
+                        <h2><i class="fa fa-warehouse"></i> Valor del inventario por almacén</h2>
                         <span class="section-sub">Suma del stock actual multiplicado por el costo de compra.</span>
                     </div>
-                    <div class="section-actions">
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'valor_almacen']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'valor_almacen']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-                    </div>
+                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'valor_almacen']) ?>"><i class="fa fa-download"></i> Exportar CSV</a>
                 </div>
                 <div class="reportes-table-wrapper">
                     <table class="reportes-table">
                         <thead>
                             <tr>
-                                <th>Almacen</th>
+                                <th>Almacén</th>
                                 <th>Productos</th>
                                 <th>Unidades</th>
                                 <th>Valor estimado (MXN)</th>
@@ -457,10 +208,7 @@ $buildQuery = function(array $overrides = []) {
                         <h2><i class="fa fa-exchange-alt"></i> Movimientos de inventario</h2>
                         <span class="section-sub">Entradas, salidas y transferencias registradas entre <?= $fechaInicio ?> y <?= $fechaFin ?>.</span>
                     </div>
-                    <div class="section-actions">
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'movimientos']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'movimientos']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-                    </div>
+                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'movimientos']) ?>"><i class="fa fa-download"></i> Exportar CSV</a>
                 </div>
                 <?php if (empty($movimientos)): ?>
                     <div class="reportes-empty">
@@ -474,11 +222,11 @@ $buildQuery = function(array $overrides = []) {
                                 <tr>
                                     <th>Fecha</th>
                                     <th>Tipo</th>
-                                    <th>Codigo</th>
+                                    <th>Código</th>
                                     <th>Producto</th>
                                     <th>Cantidad</th>
-                                    <th>Almacen origen</th>
-                                    <th>Almacen destino</th>
+                                    <th>Almacén origen</th>
+                                    <th>Almacén destino</th>
                                     <th>Usuario</th>
                                     <th>Observaciones</th>
                                 </tr>
@@ -507,17 +255,14 @@ $buildQuery = function(array $overrides = []) {
                 <div class="section-header">
                     <div>
                         <h2><i class="fa fa-toolbox"></i> Herramientas prestadas</h2>
-                        <span class="section-sub">Prestamos activos dentro del rango seleccionado.</span>
+                        <span class="section-sub">Préstamos activos dentro del rango seleccionado.</span>
                     </div>
-                    <div class="section-actions">
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'prestamos_abiertos']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'prestamos_abiertos']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-                    </div>
+                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'prestamos_abiertos']) ?>"><i class="fa fa-download"></i> Exportar CSV</a>
                 </div>
                 <?php if (empty($prestamosAbiertos)): ?>
                     <div class="reportes-empty">
                         <i class="fa fa-info-circle"></i>
-                        <p>No hay prestamos activos en el periodo.</p>
+                        <p>No hay préstamos activos en el periodo.</p>
                     </div>
                 <?php else: ?>
                     <div class="reportes-table-wrapper">
@@ -525,7 +270,7 @@ $buildQuery = function(array $overrides = []) {
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Fecha prestamo</th>
+                                    <th>Fecha préstamo</th>
                                     <th>Fecha estimada</th>
                                     <th>Producto</th>
                                     <th>Empleado</th>
@@ -552,18 +297,15 @@ $buildQuery = function(array $overrides = []) {
             <section class="reportes-section">
                 <div class="section-header">
                     <div>
-                        <h2><i class="fa fa-circle-exclamation"></i> Prestamos vencidos</h2>
-                        <span class="section-sub">Herramientas que superaron la fecha estimada de devolucion.</span>
+                        <h2><i class="fa fa-circle-exclamation"></i> Préstamos vencidos</h2>
+                        <span class="section-sub">Herramientas que superaron la fecha estimada de devolución.</span>
                     </div>
-                    <div class="section-actions">
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'prestamos_vencidos']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'prestamos_vencidos']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-                    </div>
+                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'prestamos_vencidos']) ?>"><i class="fa fa-download"></i> Exportar CSV</a>
                 </div>
                 <?php if (empty($prestamosVencidos)): ?>
                     <div class="reportes-empty">
                         <i class="fa fa-check-circle"></i>
-                        <p>No se encontraron prestamos vencidos.</p>
+                        <p>No se encontraron préstamos vencidos.</p>
                     </div>
                 <?php else: ?>
                     <div class="reportes-table-wrapper">
@@ -571,9 +313,9 @@ $buildQuery = function(array $overrides = []) {
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Fecha prestamo</th>
+                                    <th>Fecha préstamo</th>
                                     <th>Fecha estimada</th>
-                                    <th>Dias vencidos</th>
+                                    <th>Días vencidos</th>
                                     <th>Producto</th>
                                     <th>Empleado</th>
                                     <th>Observaciones</th>
@@ -585,7 +327,7 @@ $buildQuery = function(array $overrides = []) {
                                         <td class="mono">#<?= (int) $prestamo['id'] ?></td>
                                         <td><?= date('d/m/Y', strtotime($prestamo['fecha_prestamo'])) ?></td>
                                         <td><?= date('d/m/Y', strtotime($prestamo['fecha_estimada_devolucion'])) ?></td>
-                                        <td><span class="badge badge-warning">+<?= (int) $prestamo['dias_vencidos'] ?> dias</span></td>
+                                        <td><span class="badge badge-warning">+<?= (int) $prestamo['dias_vencidos'] ?> días</span></td>
                                         <td><?= htmlspecialchars($prestamo['producto']) ?> <span class="mono">(<?= htmlspecialchars($prestamo['codigo']) ?>)</span></td>
                                         <td><?= htmlspecialchars($prestamo['empleado']) ?></td>
                                         <td><?= htmlspecialchars($prestamo['observaciones'] ?? '-') ?></td>
@@ -601,27 +343,22 @@ $buildQuery = function(array $overrides = []) {
                 <div class="section-header">
                     <div>
                         <h2><i class="fa fa-chart-bar"></i> Productos con mayor salida</h2>
-                        <span class="section-sub">Top 10 articulos con mas movimientos de salida en el periodo.</span>
+                        <span class="section-sub">Top 10 artículos con más movimientos de salida en el periodo.</span>
                     </div>
-                    <div class="section-actions">
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'top_salidas']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'top_salidas']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-                    </div>
+                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'top_salidas']) ?>"><i class="fa fa-download"></i> Exportar CSV</a>
                 </div>
                 <?php if (empty($topSalidas)): ?>
                     <div class="reportes-empty">
                         <i class="fa fa-info-circle"></i>
-                        <p>Aun no se registran salidas en el periodo.</p>
+                        <p>Aún no se registran salidas en el periodo.</p>
                     </div>
                 <?php else: ?>
                     <div class="reportes-table-wrapper">
                         <table class="reportes-table">
                             <thead>
                                 <tr>
-                                    <th>Codigo</th>
+                                    <th>Código</th>
                                     <th>Producto</th>
-                                    <th>Tipo</th>
-                                    <th>Almacen</th>
                                     <th>Cantidad salida</th>
                                     <?php if ($mostrarCostos): ?><th>Costo estimado (MXN)</th><?php endif; ?>
                                 </tr>
@@ -631,8 +368,6 @@ $buildQuery = function(array $overrides = []) {
                                     <tr>
                                         <td><span class="mono"><?= htmlspecialchars($row['codigo']) ?></span></td>
                                         <td><?= htmlspecialchars($row['nombre']) ?></td>
-                                        <td><?= htmlspecialchars($row['tipo'] ?? '-') ?></td>
-                                        <td><?= htmlspecialchars($row['almacen'] ?? '-') ?></td>
                                         <td><?= number_format((float) $row['total_salidas'], 2) ?></td>
                                         <?php if ($mostrarCostos): ?><td>$<?= number_format((float) $row['costo_estimado'], 2) ?></td><?php endif; ?>
                                     </tr>
@@ -647,12 +382,9 @@ $buildQuery = function(array $overrides = []) {
                 <div class="section-header">
                     <div>
                         <h2><i class="fa fa-layer-group"></i> Estado de inventario</h2>
-                        <span class="section-sub">Distribucion de productos por estado fisico.</span>
+                        <span class="section-sub">Distribución de productos por estado físico.</span>
                     </div>
-                    <div class="section-actions">
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'estado_inventario']) ?>"><i class="fa-solid fa-file-csv"></i> CSV</a>
-                        <a class="btn-ghost" href="<?= $buildQuery(['export' => 'pdf', 'section' => 'estado_inventario']) ?>"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-                    </div>
+                    <a class="btn-ghost" href="<?= $buildQuery(['export' => 'csv', 'section' => 'estado_inventario']) ?>"><i class="fa fa-download"></i> Exportar CSV</a>
                 </div>
                 <div class="reportes-table-wrapper">
                     <table class="reportes-table">
@@ -680,6 +412,5 @@ $buildQuery = function(array $overrides = []) {
         </main>
     </div>
 </div>
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>

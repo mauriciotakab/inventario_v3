@@ -10,29 +10,17 @@ $nombre = $_SESSION['nombre'] ?? '';
 $producto = is_array($producto ?? null) ? $producto : [];
 
 // Valores derivados y tipados
-$stockActual = (float) ($producto['stock_actual'] ?? 0);
-$stockMinimo = (float) ($producto['stock_minimo'] ?? 0);
+$stockActual = (int) ($producto['stock_actual'] ?? 0);
+$stockMinimo = (int) ($producto['stock_minimo'] ?? 0);
 $valorInventario = (float) ($producto['costo_compra'] ?? 0) * $stockActual;
 $estadoActivo = $producto['estado_activo'] ?? 'Activo';
 $unidad = $producto['unidad_abreviacion'] ?? $producto['unidad_medida_nombre'] ?? '';
 $tags = array_filter(array_map('trim', explode(',', $producto['tags'] ?? '')));
 
-$breadcrumbs = [
-    ['label' => 'Detalle del producto'],
-];
-
 // Helper para clases CSS seguras a partir del tipo
 function safe_css_class($s) {
 	$s = strtolower((string) $s);
 	return preg_replace('/[^a-z0-9_-]/', '', $s);
-}
-
-function format_stock($value) {
-	$num = (float) $value;
-	if (abs($num - round($num)) < 0.00001) {
-		return number_format($num, 0, '.', ',');
-	}
-	return number_format($num, 2, '.', ',');
 }
 ?>
 <!DOCTYPE html>
@@ -40,16 +28,42 @@ function format_stock($value) {
 <head>
 	<meta charset="UTF-8">
 	<title>Detalle de Producto | TAKAB</title>
-	<link rel="stylesheet" href="/assets/css/dashboard.css">
-	<link rel="stylesheet" href="/assets/css/config.css">
-	<link rel="stylesheet" href="/assets/css/productos.css">
+	<link rel="stylesheet" href="../public/assets/css/dashboard.css">
+	<link rel="stylesheet" href="../public/assets/css/config.css">
+	<link rel="stylesheet" href="../public/assets/css/productos.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 <div class="main-layout">
-	<?php include __DIR__ . '/../partials/sidebar.php'; ?>
+	<aside class="sidebar">
+		<div class="sidebar-header">
+			<div class="login-logo"><img src="../public/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
+			<div>
+				<div class="sidebar-title">TAKAB</div>
+				<div class="sidebar-desc">Inventario y almacén</div>
+			</div>
+		</div>
+		<nav class="sidebar-nav">
+			<a href="dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
+			<?php if ($role === 'Administrador'): ?>
+				<a href="usuarios.php"><i class="fa-solid fa-users-cog"></i> Gestión de Usuarios</a>
+			<?php endif; ?>
+			<a href="productos.php" class="active"><i class="fa-solid fa-boxes-stacked"></i> Gestión de Productos</a>
+			<a href="inventario_actual.php"><i class="fa-solid fa-list-check"></i> Inventario</a>
+			<a href="revisar_solicitudes.php"><i class="fa-solid fa-comment-medical"></i> Solicitudes de Material</a>
+			<a href="configuracion.php"><i class="fa-solid fa-gear"></i> Configuración</a>
+			<a href="logout.php"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+		</nav>
+	</aside>
 	<div class="content-area">
-		<?php include __DIR__ . '/../partials/topbar.php'; ?>
+		<header class="top-header">
+			<div></div>
+			<div class="top-header-user">
+				<span><?= htmlspecialchars($nombre) ?> (<?= htmlspecialchars($role) ?>)</span>
+				<i class="fa-solid fa-user-circle"></i>
+				<a href="logout.php" class="logout-btn" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+			</div>
+		</header>
 		<main class="dashboard-main productos-main">
 			<div class="productos-header">
 				<div>
@@ -58,8 +72,7 @@ function format_stock($value) {
 				</div>
 				<div class="productos-header-actions">
 					<a class="btn-secondary" href="productos.php"><i class="fa fa-arrow-left"></i> Volver</a>
-					<a class="btn-secondary" href="productos_etiqueta.php?id=<?= (int)($producto['id'] ?? 0) ?>"><i class="fa fa-barcode"></i> Imprimir etiqueta</a>
-				<a class="btn-main" href="productos_edit.php?id=<?= (int)($producto['id'] ?? 0) ?>"><i class="fa fa-pen"></i> Editar</a>
+					<a class="btn-main" href="productos_edit.php?id=<?= (int)($producto['id'] ?? 0) ?>"><i class="fa fa-pen"></i> Editar</a>
 				</div>
 			</div>
 			<section class="productos-detail-card productos-hero">
@@ -87,8 +100,8 @@ function format_stock($value) {
 					<div class="hero-stats">
 						<div class="hero-stat">
 							<span class="label">Stock actual</span>
-							<span class="value"><?= format_stock($stockActual) ?> <?= htmlspecialchars($unidad) ?></span>
-							<span class="stat-foot">Mínimo: <?= format_stock($stockMinimo) ?></span>
+							<span class="value"><?= number_format($stockActual) ?> <?= htmlspecialchars($unidad) ?></span>
+							<span class="stat-foot">Mínimo: <?= number_format($stockMinimo) ?></span>
 						</div>
 						<div class="hero-stat">
 							<span class="label">Costo unitario</span>
@@ -107,11 +120,14 @@ function format_stock($value) {
 					</div>
 				</div>
 				<div class="hero-image">
-					<?php
-                        $imgPath = $producto['imagen_url'] ?? '';
-                        $src     = $imgPath ? '/' . ltrim(str_replace('\\', '/', $imgPath), '/') : '/assets/images/placeholder.png';
-                    ?>
-					<img src="<?= htmlspecialchars($src) ?>" alt="Imagen del producto" onerror="this.onerror=null;this.src='/assets/images/placeholder.png';">
+					<?php if (!empty($producto['imagen_url'])): ?>
+						<img src="../public/<?= htmlspecialchars($producto['imagen_url']) ?>" alt="Imagen del producto">
+					<?php else: ?>
+						<div style="text-align:center;color:#7d8bb0;">
+							<i class="fa fa-camera" style="font-size:2rem;"></i>
+							<p style="margin-top:8px;font-size:0.9rem;">Sin imagen registrada</p>
+						</div>
+					<?php endif; ?>
 				</div>
 			</section>
 			<section class="productos-detail-card">
@@ -121,10 +137,6 @@ function format_stock($value) {
 						<span class="label">Código interno</span>
 						<span class="value mono"><?= htmlspecialchars($producto['codigo'] ?? '') ?></span>
 					</div>
-                    <div class="detail-item">
-                    	<span class="label">Codigo de barras</span>
-                    	<span class="value mono"><?= htmlspecialchars($producto['codigo_barras'] ?? '-') ?></span>
-                    </div>
 					<div class="detail-item">
 						<span class="label">Categoría</span>
 						<span class="value"><?= htmlspecialchars($producto['categoria'] ?? '-') ?></span>
@@ -132,10 +144,6 @@ function format_stock($value) {
 					<div class="detail-item">
 						<span class="label">Proveedor</span>
 						<span class="value"><?= htmlspecialchars($producto['proveedor'] ?? '-') ?></span>
-					</div>
-					<div class="detail-item">
-						<span class="label">Ubicaci&oacute;n f&iacute;sica</span>
-						<span class="value"><?= htmlspecialchars($producto['ubicacion_fisica'] ?? '-') ?></span>
 					</div>
 					<div class="detail-item">
 						<span class="label">Clase interna</span>
@@ -209,6 +217,5 @@ function format_stock($value) {
 		</main>
 	</div>
 </div>
-<?php include __DIR__ . '/../partials/scripts.php'; ?>
 </body>
 </html>
