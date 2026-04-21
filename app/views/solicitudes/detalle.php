@@ -7,8 +7,8 @@ Session::requireLogin('Empleado');
 <head>
     <meta charset="UTF-8">
     <title>Detalle de Solicitud | TAKAB</title>
-    <link rel="stylesheet" href="../public/assets/css/dashboard.css">
-    <link rel="stylesheet" href="../public/assets/css/config.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/config.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body { background: #f6f7fa; }

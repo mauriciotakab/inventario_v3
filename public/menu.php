@@ -60,7 +60,7 @@ foreach ($modules as $key => $m) {
     <style>
         body {
             color: var(--white);
-            background: url('../public/assets/images/edificios20_1.jpg') center center / cover no-repeat fixed;
+            background: url('assets/images/edificios20_1.jpg') center center / cover no-repeat fixed;
         }
 
         .content-area {

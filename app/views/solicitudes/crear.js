@@ -18,7 +18,7 @@ window.mostrarPreview = function(tipo){
     const target = document.getElementById('preview_' + tipo);
     const data = obtenerPreviewData(select);
     if (!data) { target.style.display = 'none'; target.innerHTML=''; return; }
-    const img = data.img ? data.img : '/assets/images/placeholder.png';
+    const img = data.img ? data.img : 'assets/images/placeholder.png';
     target.style.display = 'flex';
     target.innerHTML = `<img src="${img}" alt="${data.nombre}">
         <div class="preview-meta">

@@ -346,7 +346,7 @@ class Navigation
         $html   = [];
         $html[] = '<aside class="sidebar">';
         $html[] = '    <div class="sidebar-header">';
-        $html[] = '        <div class="login-logo"><img src="../public/assets/images/icono_takab.png" alt="logo TAKAB" width="90" height="55"></div>';
+        $html[] = '        <div class="login-logo"><img src="assets/images/icono_takab.png" alt="logo TAKAB" width="90" height="55"></div>';
         $html[] = '        <div>';
         $html[] = '            <div class="sidebar-title">TAKAB</div>';
         $html[] = '            <div class="sidebar-desc">Dashboard</div>';

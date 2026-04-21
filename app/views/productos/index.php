@@ -15,9 +15,9 @@ $mensajeEliminado = !empty($alerta['deleted']) ? 'Producto eliminado correctamen
 <head>
     <meta charset="UTF-8">
     <title>Gestión de Productos | TAKAB</title>
-    <link rel="stylesheet" href="../public/assets/css/dashboard.css">
-    <link rel="stylesheet" href="../public/assets/css/config.css">
-    <link rel="stylesheet" href="../public/assets/css/productos.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/config.css">
+    <link rel="stylesheet" href="assets/css/productos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         /* Ensures the Stock column is a bit wider and numbers don't wrap/cut */
@@ -35,7 +35,7 @@ $mensajeEliminado = !empty($alerta['deleted']) ? 'Producto eliminado correctamen
 <div class="main-layout">
     <aside class="sidebar">
         <div class="sidebar-header">
-            <div class="login-logo"><img src="../public/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
+            <div class="login-logo"><img src="assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
             <div>
                 <div class="sidebar-title">TAKAB</div>
                 <div class="sidebar-desc">Inventario y almacén</div>

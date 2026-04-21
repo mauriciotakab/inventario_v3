@@ -18,7 +18,7 @@ if (isset($_SESSION['user_id'])) {
     <style>
         body, html {
             color: var(--white);
-            background: url('../public/assets/images/edificios20.jpg') center center / cover no-repeat fixed;
+            background: url('assets/images/edificios20.jpg') center center / cover no-repeat fixed;
           
         } 
     </style>

@@ -17,8 +17,8 @@ $totalPages = ceil($total / $porPagina);
 <head>
     <meta charset="UTF-8">
     <title>Historial de Préstamos de Herramientas | TAKAB</title>
-    <link rel="stylesheet" href="../public/assets/css/prestamo-historial.css">
-    <link rel="stylesheet" href="../public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/prestamo-historial.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -26,7 +26,7 @@ $totalPages = ceil($total / $porPagina);
             <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <div class="login-logo"><img src="../public/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55""></div>
+            <div class="login-logo"><img src="assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55""></div>
             <div>
                 <div class="sidebar-title">TAKAB</div>
                 <div class="sidebar-desc">Dashboard</div>

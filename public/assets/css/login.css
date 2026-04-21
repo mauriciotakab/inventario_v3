@@ -24,7 +24,7 @@ html, body {
 
 body {
     color: var(--white);
-    background: url('../public/assets/images/edificios20.jpg') center center / cover no-repeat fixed;
+    background: url('../images/edificios20.jpg') center center / cover no-repeat fixed;
 }
 
 .portal-login {

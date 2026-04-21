@@ -20,8 +20,8 @@ $buildQuery = function(array $overrides = []) {
 <head>
     <meta charset="UTF-8">
     <title>Historial de compras por proveedor | TAKAB</title>
-    <link rel="stylesheet" href="../public/assets/css/dashboard.css">
-    <link rel="stylesheet" href="../public/assets/css/reportes.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/reportes.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         .compras-main { padding: 32px 32px 48px; }
@@ -56,7 +56,7 @@ $buildQuery = function(array $overrides = []) {
 <div class="main-layout">
         <aside class="sidebar">
         <div class="sidebar-header">
-            <div class="login-logo"><img src="../public/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
+            <div class="login-logo"><img src="assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55"></div>
             <div>
                 <div class="sidebar-title">TAKAB</div>
                 <div class="sidebar-desc">Compras</div>

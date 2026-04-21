@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Recuperar contraseña - TAKAB</title>
-    <link rel="stylesheet" href="../public/assets/css/login.css">
+    <link rel="stylesheet" href="assets/css/login.css">
     <style>
         body {
             color: var(--white);
-            background: url('../public/assets/images/edificios20.jpg') center center / cover no-repeat fixed;
+            background: url('assets/images/edificios20.jpg') center center / cover no-repeat fixed;
         }
         
     </style>
@@ -21,7 +21,7 @@
             <div class="portal-brand-wrap">
                 <div class="portal-brand-row">
                     <div class="brand-logo-block" aria-hidden="true">
-                        <img src="../public/assets/images/icono_takab.png" alt="TAKAB" class="brand-logo-img">
+                        <img src="assets/images/icono_takab.png" alt="TAKAB" class="brand-logo-img">
                     </div>
 
                     <div class="brand-separator"></div>

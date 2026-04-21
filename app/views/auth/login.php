@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - TAKAB</title>
-    <link rel="stylesheet" href="../public/assets/css/login.css">
+    <link rel="stylesheet" href="assets/css/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://kit.fontawesome.com/8b82fe7e0b.js" crossorigin="anonymous"></script>
     <style>
         body {
             color: var(--white);
-            background: url('../public/assets/images/edificios20.jpg') center center / cover no-repeat fixed;
+            background: url('assets/images/edificios20.jpg') center center / cover no-repeat fixed;
         }
     </style>
 </head>
@@ -38,7 +38,7 @@
             <div class="portal-brand-wrap">
                 <div class="portal-brand-row">
                     <div class="brand-logo-block" aria-hidden="true">
-                        <img src="../public/assets/images/icono_takab.png" alt="TAKAB" class="brand-logo-img">
+                        <img src="assets/images/icono_takab.png" alt="TAKAB" class="brand-logo-img">
                     </div>
 
                     <div class="brand-separator"></div>

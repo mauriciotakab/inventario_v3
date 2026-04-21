@@ -15,8 +15,8 @@ if (!isset($total_paginas)) $total_paginas = 1;
 <head>
     <meta charset="UTF-8">
     <title>Herramientas Pendientes de Devolución | TAKAB</title>
-    <link rel="stylesheet" href="../public/assets/css/prestamos-pendientes.css">
-    <link rel="stylesheet" href="../public/assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/prestamos-pendientes.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -24,7 +24,7 @@ if (!isset($total_paginas)) $total_paginas = 1;
             <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <div class="login-logo"><img src="../public/assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55""></div>
+            <div class="login-logo"><img src="assets/images/icono_takab.png" alt="logo_TAKAB" width="90" height="55""></div>
             <div>
                 <div class="sidebar-title">TAKAB</div>
                 <div class="sidebar-desc">Dashboard</div>

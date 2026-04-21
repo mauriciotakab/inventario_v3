@@ -7,7 +7,7 @@ Session::requireLogin(['Administrador', 'Almacen']);
 <head>
     <meta charset="UTF-8">
     <title>Editar Proveedor | TAKAB</title>
-    <link rel="stylesheet" href="../public/assets/css/proveedores.css">
+    <link rel="stylesheet" href="assets/css/proveedores.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>

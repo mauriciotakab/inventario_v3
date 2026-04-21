@@ -17,8 +17,8 @@ $buildQuery = function(array $overrides = []) {
 <head>
     <meta charset="UTF-8">
     <title>Rotación de inventario | TAKAB</title>
-    <link rel="stylesheet" href="/assets/css/dashboard.css">
-    <link rel="stylesheet" href="/assets/css/reportes.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/reportes.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         .rotacion-main { padding: 32px 32px 48px; }
